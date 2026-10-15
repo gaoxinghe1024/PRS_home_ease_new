@@ -647,7 +647,7 @@ def clear_records(body: schemas.RecordClear):
 def request_help():
     existing = system.store.events(mode="live", state="open", limit=20)
     for old in existing:
-        if old["channel"] == "manual" and time.time() - __import__("datetime").datetime.fromisoformat(old["created_at"]).timestamp() < 30:
+        if old["channel"] == "manual" and not old.get("withdrawal") and time.time() - __import__("datetime").datetime.fromisoformat(old["created_at"]).timestamp() < 30:
             return old
     return system.events.create("manual", {"action": "help_button"}, "live", "长者求助按钮")
 
@@ -668,7 +668,8 @@ def export_csv(days: int = Query(default=7, ge=1, le=90), mode: str = Query(defa
         voice = item["voice"]
         label = voice["label"] + (f" · {voice['detail']}" if voice["detail"] else "")
         writer.writerow([safe(v) for v in ["事件", item["id"], item["created_at"], item["mode"], item["level"],
-                                           item["outcome"] or "", label, voice["reason"], item["state"]]])
+                                           item["outcome"] or "", label, voice["reason"],
+                                           item["state"] + ("\uff08\u957f\u8005\u5df2\u64a4\u56de\uff09" if item.get("withdrawn") else "")]])
     for item in report["sessions"]:
         writer.writerow([safe(v) for v in ["训练", item["session_id"], item["created_at"], item["mode"], item["exercise"],
                                            item.get("count", 0), "", "", item["status"]]])

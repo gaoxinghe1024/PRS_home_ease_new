@@ -58,7 +58,7 @@ class SessionControl(Model):
 
 
 class EventAction(Model):
-    action: Literal["acknowledge", "contact", "escalate", "resolve", "safe"]
+    action: Literal["acknowledge", "contact", "escalate", "resolve", "safe", "withdraw"]
     outcome: Literal["confirmed_fall", "false_alarm", "safe", "unresolved"] | None = None
     note: str = Field(default="", max_length=2000)
     revision: int | None = Field(default=None, ge=1)
