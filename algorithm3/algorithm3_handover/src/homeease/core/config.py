@@ -325,7 +325,7 @@ class HelpListenerCfg(_M):
     cooldown_s: float = Field(30.0, ge=0.0, le=3600.0)  # after one call for help, further calls inside this time are ignored (a TV or one long cry must not raise a second event)
     min_utterance_s: float = Field(0.3, ge=0.1, le=5.0)  # shorter speech segments are noise, not a call
     max_utterance_s: float = Field(6.0, ge=0.5, le=30.0)  # longer speech is a conversation or a broadcast, not a call for help
-    min_asr_logprob: float = Field(-1.0, ge=-5.0, le=0.0)  # faster-whisper avg_logprob a recognised call needs
+    min_asr_logprob: float = Field(-1.2, ge=-5.0, le=0.0)  # faster-whisper avg_logprob a recognised call needs
 
     @model_validator(mode="after")
     def _utterance_bounds(self) -> "HelpListenerCfg":

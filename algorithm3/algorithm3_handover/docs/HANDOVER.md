@@ -102,7 +102,7 @@ algorithm3_handover/
           -> SoundMonitor (连续 2 个窗口同标签才成事件, 20 s 内合并)        (monitor.py, sound_package.py, embed.py)
 
 语音分支: 说话片段 -> Whisper tiny 识别 -> 回复规则 v2 -> HELP / REASSURANCE / OTHER / UNCERTAIN   (asr.py, intent_v2.py)
-   a) 喊救命监听 HelpListener:0.3 到 6 s、置信度 >= -1.0、是一句明确的求救话、30 s 冷却      (help_listener.py)
+   a) 喊救命监听 HelpListener:0.3 到 6 s、置信度 >= -1.2、是一句明确的求救话、30 s 冷却      (help_listener.py)
    b) 询问 AudioInquiryService:问"请问你怎么啦",10 s 窗口,收回答                        (inquiry.py,需要节点运行时)
    c) 声纹 CancelGate:登记了声纹才有 speaker_verified,只是证据                           (cancel_gate.py, speaker.py)
 
@@ -192,7 +192,7 @@ algorithm3_handover/
 | `audio.sound_monitor.window_s / hop_s / confirm_windows / cooldown_s` | 2.0 / 0.5 / 2 / 20 | 声音事件 |
 | 每类阈值(在模型包 `meta.json` 里) | HELP 0.42, IMPACT 0.99, ABNORMAL 0.91, DAILY 0.52 | 低于阈值记 UNKNOWN |
 | `audio.help_listener.min_utterance_s / max_utterance_s` | 0.3 / 6.0 | 喊救命监听的时长门限 |
-| `audio.help_listener.cooldown_s / min_asr_logprob` | 30 / -1.0 | 冷却;识别置信度 |
+| `audio.help_listener.cooldown_s / min_asr_logprob` | 30 / -1.2 | 冷却;识别置信度 |
 | `audio.inquiry_response_window_s` | 10 | 回答窗口 |
 | `audio.escalate_on_no_cancel` | true | 没有有效取消就升级 |
 | `audio.voiceprint.threshold` | null | **默认没有阈值,所以没有任何回复会被判为 cancel_eligible**;要用必须先用真实声音标定 |

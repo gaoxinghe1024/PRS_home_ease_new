@@ -50,3 +50,16 @@
 连续音频连接成功返回 `{"state":"listening"}`。发送 `{"pcm":"base64 little-endian float32 mono PCM","timestamp_ms":0}`，16 kHz、每块不超过 32000 点、时间递增；浏览器每块 8000 点。处理后返回原 pipeline/listener 状态及声音/求助结果。停止发送 `{"type":"stop"}` 并等待 stopped 确认。
 
 事件操作有 `acknowledge`、`contact`、`escalate`、`safe`、`resolve`。照护者更新附 `revision` 可避免覆盖并发处理。resolve 需要 `outcome`：`confirmed_fall`、`false_alarm`、`safe`、`unresolved`，可附 `note`。报告参数 `days=1..90` 与 `mode=live|replay`。
+
+## Withdrawing a self-triggered alarm
+
+`POST /api/events/{id}/action` accepts `{"action": "withdraw"}` from the older adult's page.
+
+- Only events raised by the help button (`channel: "manual"`) or a spoken call for help (`channel: "audio"`) can be withdrawn, and only within `WITHDRAW_WINDOW_S` (30 s) of detection. Otherwise the request is refused with a 409 response.
+- A withdrawal never closes or downgrades the event. It stays open at its level, the contact escalation timer stops, the caregivers get a notification, and the caregiver still confirms and resolves it.
+- `GET /api/events` and `GET /api/events/{id}` add `withdrawn`, `withdrawable` and `withdraw_left_s`; the stored event carries `withdrawal: {"at", "by"}`.
+- A later spoken call for help on the same event clears the withdrawal and restarts the escalation clock; a caregiver `escalate` overrides it.
+
+## Interface language
+
+Every page loads `static/i18n-en.js` (Chinese source text to English phrase table) and `static/i18n.js`. The language is kept in `localStorage["homeease.lang"]` and switched with the button in the page header. English mode translates the DOM text at load and as it changes; Chinese mode does nothing. `tests/test_i18n_coverage.py` fails when a Chinese string in the templates, scripts or server code has no English phrase, and `node scripts/test-i18n.cjs` checks the translator.

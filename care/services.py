@@ -19,6 +19,7 @@ from care.camera import CameraHub
 from care.config import EXERCISE, SIGNAL, VIDEO, RUNTIME, EXERCISES
 from care.events import Events
 from care.inquiry import NOT_ASKED, ANSWERED, HIGH_RISK, voice_inquiry
+from care.events import is_withdrawn, withdraw_status
 from care.records import Records
 from care.storage import Store, now
 
@@ -246,7 +247,7 @@ class System:
     @staticmethod
     def describe(event):
         """事件 + 语音问询结论。结论是只读推导，不写回数据库。"""
-        return {**event, "voice": voice_inquiry(event)}
+        return {**event, "voice": voice_inquiry(event), "withdrawn": is_withdrawn(event), **withdraw_status(event)}
 
     def describe_all(self, **filters):
         return [self.describe(event) for event in self.store.events(**filters)]
@@ -574,6 +575,7 @@ class System:
                     "sessions": len(completed), "reps": sum(s.get("count", 0) for s in completed),
                     "participation_days": len({datetime.fromisoformat(s["created_at"]).astimezone(tz).date() for s in completed}),
                     "reps_by_exercise": {key: sum(s.get("count", 0) for s in completed if s["exercise"] == key) for key in EXERCISES},
+                    "withdrawn": sum(bool(e.get("withdrawn")) for e in events),
                     "voice_answered": sum(e["voice"]["state"] == ANSWERED for e in events),
                     "voice_high_risk": sum(e["voice"]["state"] == HIGH_RISK for e in events),
                     "voice_not_asked": sum(e["voice"]["state"] == NOT_ASKED for e in events),

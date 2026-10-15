@@ -81,6 +81,11 @@ _HELP_PATTERNS: list[tuple[str, re.Pattern[str]]] = [(n, re.compile(p)) for n, p
     ("zh_down", r"\u5012\u5728\u5730|\u8eba\u5728\u5730"),
     ("zh_cry", r"\u54ce\u54df|\u54ce\u5537|\u54ce\u5466|\u5509\u54df|\u554a\u54df|\u54ce\u5440"),
 ]]
+# The recogniser (Whisper tiny) writes a bare, half-second Mandarin call for help ("jiu ming") with a homophone of its first character,
+# or as "jiu you ming le"; "bang bang wo" (help me) comes out as "dang dang wo". Such a word is a call only when it is the whole utterance (alone or repeated, with an optional particle),
+# so nothing inside a longer sentence changes.
+_ZH_BARE_CALL = re.compile(r"(?:(?:[\u6551\u5c31\u65e7\u8205\u4e5d\u4e45]\u547d|\u5c31\u6709\u547d[\u4e86\u5566\u554a\u5440\u54c7]|(?:\u5f53\u5f53|\u65b9\u65b9|\u90a6\u90a6)\u6211)[\u554a\u5440\u54c7\u5566\u5416]?){1,4}")
+
 # A refusal of help is reassurance and never a help cue. English: "I don't need help", "no need to call an ambulance". Chinese: the
 # equivalents of "I do not need help", "no need to help", "no need to call an ambulance" and "do not call the doctor" (a negator that is
 # directly followed by the help word, an optional person and an optional call).
@@ -143,6 +148,8 @@ class RuleIntentV2:
             ok_c.append("no_help_needed")
         t_help = _NO_HELP.sub(" ", t)  # 'I don't need help' must not fire the plain 'help' cue
         help_c += [n for n, pat in _HELP_PATTERNS if pat.search(t_help)]
+        if _ZH_BARE_CALL.fullmatch(t_help.replace(" ", "")):
+            help_c.append("zh_help")
         for m in _HARM_EN.finditer(t):
             neg = _negated_en(t, m.start())
             (ok_c if neg else help_c).append(("not_" if neg else "harm:") + m.group(0))

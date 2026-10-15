@@ -9,6 +9,30 @@ from care.storage import now
 sys.path.append(str(AUDIO / "src"))
 from algorithm3.policy import alarm_tag, inquiry_outcome
 
+# An alarm that the older adult raised (help button, spoken call for help) can be withdrawn by the same person for a short time, for
+# example after a button press by mistake or a television that said "help". A withdrawal never closes or downgrades the event: it
+# stays open at its level, the contact escalation stops, the caregivers are told, and only a caregiver closes it.
+WITHDRAW_WINDOW_S = 30
+SELF_TRIGGERED = ("manual", "audio")
+
+
+def is_withdrawn(event):
+    w = event.get("withdrawal")
+    return bool(w) and not w.get("overridden_at")
+
+
+def withdraw_status(event, at=None):
+    """{"withdrawable", "withdraw_left_s"}: can the older adult still withdraw this event, and for how long (server clock)."""
+    no = {"withdrawable": False, "withdraw_left_s": 0}
+    if event.get("state") != "open" or event.get("withdrawal") or event.get("channel") not in SELF_TRIGGERED:
+        return no
+    try:
+        started = datetime.fromisoformat(event["detected_at"]).timestamp()
+    except (KeyError, TypeError, ValueError):
+        return no
+    left = WITHDRAW_WINDOW_S - ((time.time() if at is None else at) - started)
+    return {"withdrawable": left > 0, "withdraw_left_s": max(0, int(left + .999))}
+
 
 class Events:
     def __init__(self, store):
@@ -53,6 +77,7 @@ class Events:
 
     def action(self, event_id, action, outcome=None, note="", actor="照护者", revision=None):
         notification = []
+        withdrawn = []
 
         def mutate(event):
             if event["state"] == "resolved":
@@ -66,8 +91,20 @@ class Events:
                 event["level"] = "EMERGENCY"
                 event["contact_index"] += 1
                 event["next_escalation_at"] = time.time() + self.store.settings()["escalation_seconds"]
+                if event.get("withdrawal"):
+                    event["withdrawal"]["overridden_at"] = now()  # the caregiver decided that it is real
                 self.timeline(event, action, note or "已升级并通知下一位联系人", actor)
                 notification.append(True)
+            elif action == "withdraw":
+                if event.get("withdrawal"):
+                    return  # already withdrawn: nothing to do
+                if event["channel"] not in SELF_TRIGGERED:
+                    raise ValueError("\u53ea\u6709\u6c42\u52a9\u6309\u94ae\u6216\u8bed\u97f3\u6c42\u52a9\u89e6\u53d1\u7684\u4e8b\u4ef6\uff0c\u624d\u53ef\u4ee5\u7531\u957f\u8005\u64a4\u56de")
+                if not withdraw_status(event)["withdrawable"]:
+                    raise ValueError(f"\u64a4\u56de\u65f6\u9650\uff08{WITHDRAW_WINDOW_S} \u79d2\uff09\u5df2\u8fc7\uff0c\u8bf7\u8054\u7cfb\u7167\u62a4\u8005")
+                event["withdrawal"] = {"at": now(), "by": "elder"}
+                self.timeline(event, action, "\u957f\u8005\u64a4\u56de\u4e86\u6c42\u52a9\uff0c\u7b49\u5f85\u7167\u62a4\u8005\u786e\u8ba4\uff1b\u4e8b\u4ef6\u7ea7\u522b\u548c\u8bb0\u5f55\u4fdd\u7559\uff0c\u4e0d\u518d\u9010\u4f4d\u901a\u77e5\u8054\u7cfb\u4eba", "\u957f\u8005")
+                withdrawn.append(True)
             elif action == "resolve":
                 if outcome not in {"confirmed_fall", "false_alarm", "safe", "unresolved"}:
                     raise ValueError("请选择处置结果")
@@ -88,6 +125,12 @@ class Events:
         event = self.store.update_event(event_id, mutate, revision)
         if notification:
             self.notify(event, "事件升级", event["contact_index"])
+        if withdrawn:
+            payload = {"title": "\u957f\u8005\u5df2\u64a4\u56de\u6c42\u52a9", "message": f"{event['room']} \u00b7 \u8bf7\u786e\u8ba4\u540e\u5173\u95ed\u4e8b\u4ef6", "contact": None,
+                       "mode": event["mode"], "level": event["level"]}
+            self.store.notify(event["id"], payload)
+            if self.store.settings().get("webhook_url") and event["mode"] == "live":
+                self.store.notify(event["id"], payload, kind="webhook")
         return event
 
     def inquiry_start(self, event_id, prompt_played, reason=None):
@@ -133,6 +176,10 @@ class Events:
                 event.update(markers=tag["markers"], channels=tag["channels"], tag=tag["tag"])
             if decision["escalate"]:
                 event["level"] = "EMERGENCY"
+            if decision["marker"] == "spoken_help" and event.get("withdrawal") and not event["withdrawal"].get("overridden_at"):
+                event["withdrawal"]["overridden_at"] = now()
+                event["next_escalation_at"] = time.time() + self.store.settings()["escalation_seconds"]
+                self.timeline(event, "withdrawal_overridden", "\u957f\u8005\u518d\u6b21\u6c42\u52a9\uff0c\u64a4\u56de\u5df2\u5931\u6548", "\u957f\u8005")
             if decision["escalate"] or decision["notify"]:
                 notification.append(True)
             event["inquiry"].update(status="completed", record=reply, result=decision, completed_at=now())
@@ -153,5 +200,6 @@ class Events:
             elif inquiry.get("status") == "processing" and time.time() >= inquiry["processing_deadline"]:
                 self.inquiry_reply(event["id"], {"status": "audio_unavailable"})
             if (event["level"] == "EMERGENCY" and not event.get("acknowledged_at") and event["mode"] == "live"
+                    and not is_withdrawn(event)
                     and time.time() >= event["next_escalation_at"] and event["contact_index"] + 1 < len(settings["contacts"])):
                 self.action(event["id"], "escalate", actor="通知调度")
