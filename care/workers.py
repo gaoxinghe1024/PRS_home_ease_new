@@ -225,6 +225,8 @@ class ExerciseWorker:
         self.client.__enter__()
         self.pose = None
         self.camera_readers = {}
+        self.video_readers = {}
+        self.diagnostics = {}
 
     def initialize(self):
         return {**self._request("get", "/health"), "device": self.device}
@@ -236,21 +238,68 @@ class ExerciseWorker:
             raise HTTPException(response.status_code, response.json())
         return response.json() if response.content else {}
 
-    def create(self, exercise, target_reps):
-        return self._request("post", "/v1/sessions", {"exercise": exercise, "target_reps": target_reps})
+    def create(self, exercise, target_reps, action_scope="open"):
+        from care.exercise import ExerciseDiagnostics
+        result = self._request("post", "/v1/sessions", {"exercise": exercise, "target_reps": target_reps,
+                                                       "action_scope": action_scope})
+        self.diagnostics[result["session_id"]] = ExerciseDiagnostics()
+        return self.diagnostics[result["session_id"]].attach(result)
 
     def frames(self, session_id, body):
-        return self._request("post", f"/v1/sessions/{session_id}/frames", body)
+        result = self._request("post", f"/v1/sessions/{session_id}/frames", body)
+        diagnostic = self.diagnostics[session_id]
+        # A retry is accepted by the original API but must not inflate diagnostics.
+        frames = [f for f in body["frames"] if not diagnostic.stamps or f["timestamp_ms"] > diagnostic.stamps[-1]]
+        diagnostic.observe(frames)
+        return diagnostic.attach(result)
 
     def snapshot(self, session_id):
-        return self._request("get", f"/v1/sessions/{session_id}")
+        return self.diagnostics[session_id].attach(self._request("get", f"/v1/sessions/{session_id}"))
 
     def control(self, session_id, action):
-        return self._request("post", f"/v1/sessions/{session_id}/control", {"action": action})
+        return self.diagnostics[session_id].attach(
+            self._request("post", f"/v1/sessions/{session_id}/control", {"action": action}))
+
+    def trace(self, session_id):
+        diagnostic = self.diagnostics[session_id]
+        return {"schema_name": "coco17", "coordinate_space": "camera_xy",
+                "frames": list(diagnostic.recent_frames), "state": self.snapshot(session_id),
+                "truncated": diagnostic.observed_frames > len(diagnostic.recent_frames)}
 
     def release(self, session_id):
         self.camera_detach(session_id)
-        return self._request("delete", f"/v1/sessions/{session_id}")
+        self.video_detach(session_id)
+        result = self._request("delete", f"/v1/sessions/{session_id}")
+        self.diagnostics.pop(session_id, None)
+        return result
+
+    def video_open(self, session_id, path):
+        import cv2
+        import math
+        self.video_detach(session_id)
+        cap = cv2.VideoCapture(path)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        if not cap.isOpened() or not math.isfinite(fps) or not 1 <= fps <= 240:
+            cap.release()
+            raise ValueError("无法打开运动视频或确定视频帧率")
+        self.video_readers[session_id] = {"capture": cap, "fps": fps, "index": 0}
+        return {"fps": fps}
+
+    def video_frame(self, session_id):
+        source = self.video_readers[session_id]
+        ok, frame = source["capture"].read()
+        if not ok:
+            return {"eof": True}
+        index = source["index"]
+        result = self._pose_frame(session_id, frame, index * 1000 / source["fps"], f"video-{index}")
+        source["index"] += 1
+        return {**result, "frame_shape": list(frame.shape)}
+
+    def video_detach(self, session_id):
+        source = self.video_readers.pop(session_id, None)
+        if source:
+            source["capture"].release()
+        return {"detached": True}
 
     def camera_detach(self, session_id):
         reader = self.camera_readers.pop(session_id, None)
@@ -282,10 +331,10 @@ class ExerciseWorker:
         if reader is None:
             reader = self.camera_readers[session_id] = FrameReader(descriptor)
         frame, sequence, stamp = reader.read()
-        if sequence == last_sequence:
+        if sequence == last_sequence or stamp < base_stamp:
             return {"duplicate": True}
         self.pose_initialize()
-        result = self._pose_frame(session_id, frame, max(0, (stamp - base_stamp) * 1000), f"camera-{sequence}")
+        result = self._pose_frame(session_id, frame, (stamp - base_stamp) * 1000, f"camera-{sequence}")
         return {**result, "capture_sequence": sequence, "frame_shape": list(frame.shape)}
 
     def _pose_frame(self, session_id, frame, timestamp_ms, request_id):
@@ -294,17 +343,18 @@ class ExerciseWorker:
         pose_ms = (time.perf_counter() - started) * 1000
         result = self.frames(session_id, {"request_id": request_id, "frames": [{"timestamp_ms": timestamp_ms,
                               "person_id": person_id, "keypoints": points.tolist()}]})
-        required = {5: "left_shoulder", 6: "right_shoulder", 11: "left_hip", 12: "right_hip",
-                    13: "left_knee", 14: "right_knee", 15: "left_ankle", 16: "right_ankle"}
-        return {**result, "keypoints": points.tolist(), "person_id": person_id,
-                "capture_diagnostics": {"timestamp_ms": timestamp_ms, "pose_ms": round(pose_ms, 2),
-                    "processing_ms": round((time.perf_counter() - started) * 1000, 2), "device": self.device,
-                    "missing_joints": [name for i, name in required.items() if points[i, 2] < .3]}}
+        diagnostic = self.diagnostics[session_id]
+        diagnostic.capture.update(pose_ms=round(pose_ms, 2),
+            processing_ms=round((time.perf_counter() - started) * 1000, 2), device=self.device)
+        return {**diagnostic.attach(result), "keypoints": points.tolist(), "person_id": person_id}
 
     def close(self):
+        for sid in list(self.video_readers):
+            self.video_detach(sid)
         for reader in self.camera_readers.values():
             reader.close()
         self.camera_readers.clear()
+        self.diagnostics.clear()
         self.client.__exit__(None, None, None)
 
 

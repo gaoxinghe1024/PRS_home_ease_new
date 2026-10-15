@@ -4,13 +4,11 @@ FastAPI + 原生 HTML/CSS/JavaScript + SQLite 电脑端系统。面向照护者�
 
 ## 从 GitHub 获取
 
-仓库包含整体系统、`algorithm1/`、`algorithm2/`、`algorithm3/` 的原始代码、模型权重、样例及随附训练资料。大体积模型与数据使用 Git LFS，克隆后需取得实际文件，不能直接使用 GitHub ZIP 下载里的 LFS 指针。
+仓库包含整体系统、`algorithm1/`、`algorithm2/`、`algorithm3/` 的原始代码、模型权重、样例及随附训练资料。本次交付将原有 35 个 LFS 文件作为实际二进制文件提交，当前版本的模型与数据不依赖 LFS 指针；历史提交仍保留原记录。
 
 ```powershell
-git lfs install
-git clone https://github.com/sunyancheng0729-eng/HomeEase-Care-System.git
-cd HomeEase-Care-System
-git lfs pull
+git clone https://github.com/gaoxinghe1024/PRS_home_ease_new.git
+cd PRS_home_ease_new
 ```
 
 虚拟环境、依赖缓存、运行数据库、历史告警录像和本机测试截图不上传；在新电脑按下方依赖说明创建环境。三个原始算法目录的文件保留原有字节内容，未做换行转换。
@@ -20,7 +18,7 @@ git lfs pull
 本机的 Python 环境与模型已经配置好。双击 `start.bat`，打开终端打印的地址，通常为 <http://127.0.0.1:8000>。端口被占用时自动选择后续端口。
 
 ```powershell
-cd E:\gc2
+cd E:\gc2_new
 .\.venv\Scripts\python.exe run.py
 ```
 
@@ -49,7 +47,7 @@ cd E:\gc2
 | 算法二：运动 | `opt_tcn_b4_w48`，原选定 `yolo11n-pose.pt` | `algorithm2/homeease/api.py`、`engine.py`、`pose.py` |
 | 算法三：声音与回复 | Silero VAD、YAMNet + LR v2、Whisper tiny、rule_v2、原 reply policy | `algorithm3/algorithm3_handover/src/algorithm3` 与原音频流水线 |
 
-算法一的两个分支独立运行，因此共有四个工作进程，仍然只有三个交付算法模块。系统不新增融合分类器、不重训模型、不修改算法目录中的核心代码、阈值或预处理。Proposal 中与实际交付算法不同的技术方案未作为新算法实现。
+算法一的两个分支独立运行，因此共有四个工作进程，仍然只有三个交付算法模块。系统不新增融合分类器、不重训模型，不修改权重、特征函数、阶段阈值或计数器。算法2增加可选的指定训练动作上下文，摄像头和上传训练使用该模式；直腿抬腿和跨步训练增加左右镜像预测取均值，深蹲和坐站保留单次推理。原 API 默认模式和原实验报告保留，详见 [部署说明](docs/exercise-integration.md)。Proposal 中与实际交付算法不同的技术方案未作为新算法实现。
 
 ## 输入与设备
 
@@ -73,7 +71,7 @@ SQLite 默认 `runtime/homeease.sqlite3`，日志在 `runtime/logs/`，上传视
 
 | 配置 | 用途 |
 | --- | --- |
-| `HOMEEASE_SYSTEM_DATA` | 独立数据、日志和桥接目录，默认 `E:\gc2\runtime` |
+| `HOMEEASE_SYSTEM_DATA` | 独立数据、日志和桥接目录，默认项目下的 `runtime` |
 | `HOMEEASE_PASSWORD` | HTTP Basic 访问密码，绑定非回环地址时必填 |
 | `HOMEEASE_VIDEO_CV_THREADS` | 视频工作进程 OpenCV 线程数，默认 4；不改变模型与检测参数 |
 | `HOMEEASE_VIDEO_DNN` | 默认 `auto`，优先用 CUDA FP32 执行原 ONNX；不可用时保留原 OpenCV 执行器。`opencv` 可显式使用原执行器 |
@@ -85,7 +83,7 @@ SQLite 默认 `runtime/homeease.sqlite3`，日志在 `runtime/logs/`，上传视
 
 ## 依赖与验证
 
-本机 `.venv` 基于 `E:\conda_envs\dl` 的 Python 3.11.15，并复用该环境已安装的 PyTorch。迁移到新电脑时创建独立 Python 3.11 环境并安装 `requirements.txt`，保留三个算法文件夹、权重和样例。`artifacts/environment.json` 与 `requirements-lock.txt` 记录本次实测环境；复现该锁定环境时，CUDA 12.8 版 PyTorch 需要对应 wheel 源。
+本机 `.venv` 基于 `E:\conda_envs\dl` 的 Python 3.11.15，并复用该环境已安装的 PyTorch。迁移到新电脑时创建独立 Python 3.11 环境并安装 `requirements.txt`，保留三个算法文件夹、权重和样例。`artifacts/environment.json` 与 `requirements-lock.txt` 记录原交付实测环境；复现该锁定环境时，CUDA 12.8 版 PyTorch 需要对应 wheel 源。
 
 ```powershell
 python -m venv .venv
@@ -100,4 +98,4 @@ python -m venv .venv
 
 详见 [架构与集成](docs/architecture.md)、[API 与数据格式](docs/api.md)、[验证记录](docs/verification.md) 和 [样例来源](samples/SOURCES.md)。目前完成了原算法一致性、API 工作流和浏览器测试；真实家庭设备、外部通知送达、七天持续运行与真实误报漏报率仍需现场验收。
 
-2026-10-15 的卡顿、零计数和实时声音接入排查见 [本次排查记录](docs/audit-20261015.md)。停止服务后，可用 `python scripts/clear_records.py` 清除视频/加速度跌倒与训练记录及关联通知、录像；资料、联系人、声音历史不受影响。验证脚本应始终使用独立数据目录。
+本次基于 GitHub 最新 `deaaf07` 版本的运动接入排查见 [运动接入排查](docs/exercise-integration.md)；四动作骨架回放通过，真人深蹲零计数仍在排查。历史的卡顿、零计数和实时声音接入排查见 [原交付排查记录](docs/audit-20261015.md)。停止服务后，可用 `python scripts/clear_records.py` 清除视频/加速度跌倒与训练记录及关联通知、录像；资料、联系人、声音历史不受影响。验证脚本应始终使用独立数据目录。

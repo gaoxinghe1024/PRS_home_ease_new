@@ -6,6 +6,10 @@
 
 HTTP API v1，默认地址 `http://127.0.0.1:8002`。接口完全由当前代码导出到 `docs/openapi.json`。启动时加载实际权重，权重缺失会使启动失败，不返回假预测。系统集成可先用 `examples/*_replay.json` 做四动作端到端验收。
 
+部署扩展：创建会话可传 `action_scope:"open"|"training"`，默认 `open` 保留原报告模式。`training` 只适用于用户已指定四种训练动作之一的场景，使用四动作内部相对支持度通过原 0.15 类别门槛；计数器和输入中断规则保持不变。SDK 的 `ExerciseSession(..., action_scope="training")` 同义，状态和导出保留该字段。动作概率仍返回模型的五类分布，因此 `recognized_exercise` 仍可能为 `other`，它不是用户选择目标的重命名。
+
+仅 `training` 的 `standing_leg_raise`、`hurdle_step` 使用 `inference_views:"mirror_average"`：分别以原输入和原训练脚本使用的左右镜像输入进行推理，平均 17 类联合概率，再运行原 decoder 与计数器。镜像变换同时反转 x、交换全部六对左右关节，不更改 y 或置信度；两套历史在每次原输入中断时一起重置。此模式增加推理开销，阶段概率和动作概率均取两视图的平均结果，不能当作单次原输入推理的概率。深蹲、坐站及全部 `open` 会话使用 `inference_views:"original"`，保留原输入路径。权重、特征函数、配置阈值与计数器均未修改。该部署扩展不继承原报告精度；最近真人直腿抬腿输入仍为零，跨步仅通过截断骨架回放观察到改善，详见部署记录。
+
 模型替换由 `artifacts/selected.json` 控制。系统端直接使用 HTTP 或 `Predictor`；窗口长度、stable80 特征、训练 mean/std 和分层概率合成都由 checkpoint 与 SDK 内部加载，系统端继续发送相机平面 COCO 17 点。不要在客户端额外做骨架归一化或写死旧版网络结构。服务重启后重新创建会话，并检查 `/health` 的 `model_id`。
 
 ### 当前优化后默认算法
@@ -54,6 +58,8 @@ Set-Location E:\gc2-project-algorithm\algorithm2
 | `squat` | 深蹲动作 | standing → lowering → squatting → rising → standing |
 | `standing_leg_raise` | 站立直腿抬腿 | standing → lifting → raised → lowering → standing |
 | `hurdle_step` | 跨步抬腿 | standing → stepping → raised → returning → standing |
+
+状态新增只读 `counter_stage`：`-1` 未确认起始姿态，`0` 起始姿态，`1` 去程，`2` 顶点，`3` 回程。它直接反映原计数器已确认的阶段，可能与瞬时最大概率的 `phase` 不同；完整返回起始姿态后 `count` 增加，阶段回到 `0`。暂停、中断或结束会清除未完成阶段到 `-1`，不会清除已完成次数。该字段仅供界面提示，不改变模型或计数。
 
 选择动作由 exercise 指定，识别模型同时返回 `recognized_exercise`。静止基线在动作之间可能相同，计数阶段按选定动作条件化；运动阶段还要求选定动作概率 ≥0.15，否则输出 other 并停止该周期。一侧完整抬起并回到基线计一周期，接口不提供左右腿分别统计。目标完成不会自动结束，额外完整周期会继续增加计数。
 
@@ -137,12 +143,15 @@ pause 清除未完成周期，已完成 count 保留。resume 同样从新周期
 | session_id | string | 会话 UUID |
 | status | string | running、paused、ended |
 | exercise | string | 系统指定的训练动作 |
+| action_scope | string | open 原报告模式；training 指定四动作训练上下文 |
+| inference_views | string | original 单视图；mirror_average 原输入及左右镜像的联合概率平均 |
 | recognized_exercise | string | 当前最可能动作或 other，静止初段可能不确定 |
 | exercise_probabilities | object | 四动作和 other 的类别概率和，合计约 1 |
 | phase | string | 当前动作阶段或 other，枚举见动作表 |
 | phase_confidence | number | 联合动作／阶段分类器的最大类别概率，未经可靠校准 |
 | phase_probabilities | object | 选定动作内的条件阶段概率；运动阶段动作支持不足时 other=1 |
 | count | integer | 已完成有效周期，不是四舍五入的回归值 |
+| counter_stage | integer | 原计数器确认的阶段，-1 未就绪，0 起始，1 去程，2 顶点，3 回程 |
 | target_reps | integer | 系统设置的目标 |
 | progress | number | min(count/target_reps,1) |
 | target_completed | boolean | count ≥ target_reps |

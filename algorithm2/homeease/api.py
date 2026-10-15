@@ -21,6 +21,7 @@ class StrictModel(BaseModel):
 class CreateSession(StrictModel):
     target_reps: int = Field(default=10, ge=1, le=10000)
     exercise: Literal["chair_sit_to_stand", "squat", "standing_leg_raise", "hurdle_step"] = "chair_sit_to_stand"
+    action_scope: Literal["open", "training"] = "open"
 
 
 class Frame(StrictModel):
@@ -70,12 +71,15 @@ class SessionState(StrictModel):
     session_id: str
     status: Literal["running", "paused", "ended"]
     exercise: Literal["chair_sit_to_stand", "squat", "standing_leg_raise", "hurdle_step"]
+    action_scope: Literal["open", "training"] = "open"
     recognized_exercise: str
+    inference_views: Literal["original", "mirror_average"] = "original"
     exercise_probabilities: dict[str, float]
     phase: str
     phase_confidence: float
     phase_probabilities: dict[str, float]
     count: int
+    counter_stage: int = Field(default=-1, ge=-1, le=3)
     target_reps: int
     progress: float
     target_completed: bool
@@ -146,7 +150,7 @@ def create_app(predictor=None):
             if len(sessions) >= 100:
                 raise HTTPException(429, "SESSION_LIMIT_REACHED")
             session_id = str(uuid.uuid4())
-            session = ExerciseSession(app.state.predictor, session_id, body.target_reps, body.exercise)
+            session = ExerciseSession(app.state.predictor, session_id, body.target_reps, body.exercise, body.action_scope)
             sessions[session_id], caches[session_id] = session, OrderedDict()
             return session.snapshot()
 

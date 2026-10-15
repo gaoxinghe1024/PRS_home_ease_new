@@ -60,15 +60,36 @@ class PhaseStream:
         return np.mean(probs, axis=0)
 
 
+class MirroredPhaseStream:
+    """Average the two views already used by the original training augmentation."""
+    def __init__(self, predictor):
+        self.original = predictor.stream()
+        self.mirrored = predictor.stream()
+
+    def reset(self):
+        self.original.reset()
+        self.mirrored.reset()
+
+    def update(self, pose, timestamp):
+        reflected = pose[[1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]].copy()
+        reflected[:, 0] *= -1
+        return (self.original.update(pose, timestamp) + self.mirrored.update(reflected, timestamp)) / 2
+
+
 class ExerciseSession:
-    def __init__(self, predictor, session_id="local", target_reps=10, exercise="chair_sit_to_stand"):
+    def __init__(self, predictor, session_id="local", target_reps=10, exercise="chair_sit_to_stand", action_scope="open"):
         if exercise not in EXERCISES:
             raise ValueError("UNSUPPORTED_EXERCISE")
         if not 1 <= target_reps <= 10000:
             raise ValueError("INVALID_TARGET")
+        if action_scope not in {"open", "training"}:
+            raise ValueError("INVALID_ACTION_SCOPE")
         self.exercise = exercise
+        self.action_scope = action_scope
         self.predictor, self.session_id, self.target_reps = predictor, session_id, target_reps
-        self.stream = predictor.stream()
+        use_mirror = action_scope == "training" and exercise in {"standing_leg_raise", "hurdle_step"}
+        self.inference_views = "mirror_average" if use_mirror else "original"
+        self.stream = MirroredPhaseStream(predictor) if self.inference_views == "mirror_average" else predictor.stream()
         self.counter = CycleCounter(min_dwell_s=predictor.selected["min_dwell_s"])
         self.status = "running"
         self.quality = "waiting_for_input"
@@ -147,7 +168,7 @@ class ExerciseSession:
                 ratio = 1 if t <= previous_t else (self.next_tick - previous_t) / (t - previous_t)
                 interpolated = previous_pose * (1 - ratio) + pose * ratio
                 p = self.stream.update(interpolated, self.next_tick)
-                phase, canonical, actions = decode(p, self.exercise)
+                phase, canonical, actions = decode(p, self.exercise, self.action_scope)
                 self.action_probabilities = actions
                 action = int(actions.argmax())
                 self.recognized_exercise = EXERCISE_NAMES[action] if action < 4 else "other"
@@ -190,11 +211,12 @@ class ExerciseSession:
 
     def snapshot(self):
         return {"api_version": "v1", "session_id": self.session_id, "status": self.status,
-                "exercise": self.exercise, "recognized_exercise": self.recognized_exercise,
+                "exercise": self.exercise, "action_scope": self.action_scope, "inference_views": self.inference_views,
+                "recognized_exercise": self.recognized_exercise,
                 "exercise_probabilities": dict(zip(EXERCISE_NAMES + ["other"], [float(v) for v in self.action_probabilities])),
                 "phase": self.phase, "phase_confidence": self.confidence,
                 "phase_probabilities": dict(zip(EXERCISES[self.exercise]["phases"] + ["other"], [float(v) for v in self.probabilities])),
-                "count": self.counter.count, "target_reps": self.target_reps,
+                "count": self.counter.count, "counter_stage": self.counter.stage, "target_reps": self.target_reps,
                 "progress": min(self.counter.count / self.target_reps, 1), "target_completed": self.counter.count >= self.target_reps,
                 "elapsed_s": 0 if self.first_timestamp is None else (self.last_timestamp - self.first_timestamp) / 1000,
                 "active_duration_s": self.active_duration_s, "valid_duration_s": self.valid_duration_s,

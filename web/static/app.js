@@ -4,6 +4,36 @@ const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({"&":"&am
 const icon = (name) => `<i data-lucide="${name}"></i>`;
 const icons = () => window.lucide?.createIcons();
 const names = {chair_sit_to_stand:"坐站训练",squat:"深蹲训练",standing_leg_raise:"站立抬腿",hurdle_step:"跨步训练"};
+const exerciseGuides = {
+  chair_sit_to_stand: {
+    title:"椅子坐站", endpoints:["坐稳","站直","再坐稳 +1"], cycle:["坐稳","起身","站直","坐下","坐稳 +1"],
+    count:"坐稳 → 站起并站直 → 再坐稳，计 1 次。只站起来还不计数。",
+    steps:["使用稳固椅子，先坐在椅子上，双脚平放，保持约 2 秒。", "身体稍前倾后站起，伸直髋部和膝盖，站稳片刻。", "缓慢屈膝，臀部重新坐到椅子上，坐稳后再开始下一次。"],
+    note:"这是椅子坐站，需要实际坐到椅子上。椅子侧放，椅背和桌子不要挡住双髋、双膝和双踝。",
+    cues:["请先坐在椅子上，双脚平放，坐稳约 2 秒。", "坐姿已确认，请从椅子上站起。", "正在起身，请站直并稳住片刻。", "站立已确认，请缓慢坐回椅子。", "请坐稳，回到坐姿后计 1 次。"]
+  },
+  squat: {
+    title:"深蹲", endpoints:["站稳","下蹲","再站稳 +1"], cycle:["站稳","下蹲","蹲下","起身","站稳 +1"],
+    count:"站稳 → 下蹲 → 起身站稳，计 1 次。停在蹲姿还不计数。",
+    steps:["双脚约与肩同宽，先自然站稳约 2 秒。", "髋部向后，屈膝下蹲，在舒适的最低位置稍停。", "起身伸直髋部和膝盖，回到站姿，站稳后再开始下一次。"],
+    note:"下蹲和起身都留在原地，双脚全程入镜。幅度以舒适、稳定为准。",
+    cues:["请先自然站立，站稳约 2 秒。", "站姿已确认，请开始下蹲。", "正在下蹲，请到舒适的最低位置稍停。", "蹲姿已确认，请起身。", "请站直并站稳，回到站姿后计 1 次。"]
+  },
+  standing_leg_raise: {
+    title:"站立直腿前抬", endpoints:["站稳","直腿前抬","落脚站稳 +1"], cycle:["站稳","前抬","抬起","放下","站稳 +1"],
+    count:"站稳 → 单腿伸直向前抬起 → 放下并站稳，计 1 次。每条腿单独完成一次算 1 次。",
+    steps:["先自然站稳约 2 秒，双腿伸直，选靠近摄像头的一条腿。", "支撑腿站稳，另一条腿膝盖尽量伸直，向身体正前方抬起，抬到舒适高度稍停。", "缓慢放下同一条腿，双脚落地并站稳，再做下一次或换腿。"],
+    note:"抬的是整条直腿，方向是身体正前方；不要弯膝提大腿，也不要向身体侧面抬。无需把腿抬到与示意图相同的高度。",
+    cues:["请先双脚落地，自然站稳约 2 秒。", "站姿已确认，请将一条直腿向身体正前方抬起。", "尚待确认抬腿顶点：膝盖尽量伸直，前抬后稍停。", "抬腿顶点已确认，请缓慢放下同一条腿。", "请双脚落地并站稳，复位后计 1 次。"]
+  },
+  hurdle_step: {
+    title:"屈膝跨步抬腿", endpoints:["站稳","屈膝前抬","回位站稳 +1"], cycle:["站稳","屈膝抬腿","抬起","回位","站稳 +1"],
+    count:"站稳 → 单腿屈膝向前抬起 → 收回原位并站稳，计 1 次。左右腿各完成一次共 2 次。",
+    steps:["先自然站稳约 2 秒，选靠近摄像头的一条腿，另一条腿支撑。", "屈膝向前抬腿，像跨过一条低横杆，大腿前抬、小腿自然下垂，在舒适高度稍停。", "把同一只脚收回原位，双脚落地并站稳，再做下一次或换腿。"],
+    note:"这个动作需要弯膝，区别于直腿前抬。原地模拟跨过即可，不需要真实障碍物；只向前迈一小步不等于完整抬腿。",
+    cues:["请先双脚落地，自然站稳约 2 秒。", "站姿已确认，请屈膝向前抬起一条腿。", "尚待确认跨步顶点：屈膝向前抬腿，在舒适高度稍停。", "跨步顶点已确认，请把同一只脚收回原位。", "请双脚回到原位并站稳，复位后计 1 次。"]
+  }
+};
 const phases = {seated:"坐姿",sitting:"坐姿",rising:"起身",standing:"站立",lowering:"下落",bottom:"最低点",descending:"下蹲",ascending:"起立",baseline:"起始姿态",lifting:"抬腿",raised:"抬起",stepping:"跨步",returning:"回落",other:"等待动作",up:"抬起",down:"落下",start:"起始",peak:"顶点"};
 const qualityNames = {good:"观察有效",waiting_for_input:"等待画面",insufficient_pose:"关键点不足，计数暂不可用",multiple_people:"画面中有多人，计数暂不可用",no_person:"未检测到人体",timestamp_gap:"画面间隔过大，等待完整动作",person_changed:"目标变化，等待完整动作",degenerate_pose:"关键点异常，计数暂不可用",paused:"已暂停",module_error:"模块异常，训练中断",service_restarted:"服务重启，训练中断"};
 const channels = {vision:"视频",accel:"加速度",audio:"音频",manual:"主动求助"};
@@ -217,7 +247,29 @@ function renderEventDetail(e){app.selectedEvent=e;const settings=app.settings;co
 async function eventAction(action,extra={}){const e=app.selectedEvent;const result=await api(`/api/events/${e.id}/action`,{method:"POST",body:{action,revision:e.revision,...extra}});renderEventDetail(result);await refresh();toast(action==="resolve"?"处置结果已记录":"操作已记录");}
 
 function renderExerciseHistory(){const sessions=app.sessions;$("exerciseHistory").innerHTML=sessions.length?`<table><thead><tr><th>训练时间</th><th>动作</th><th>次数 / 目标</th><th>有效观察</th><th>来源</th><th>状态</th><th>报告</th></tr></thead><tbody>${sessions.slice(0,30).map(s=>`<tr><td>${dateTime(s.created_at)}</td><td>${names[s.exercise]}</td><td>${s.count} / ${s.target_reps}</td><td>${duration(s.valid_duration_s)}</td><td>${modeBadge(s.mode)}</td><td>${({running:"进行中",paused:"已暂停",ended:"已结束",interrupted:"已中断"})[s.status]||s.status}</td><td><a class="icon-button" title="下载训练报告" href="/api/sessions/${s.session_id}/export.json" aria-label="下载训练报告">${icon("download")}</a></td></tr>`).join("")}</tbody></table>`:empty("暂无训练记录","activity","",true);icons();}
-function chooseExercise(key){app.selectedExercise=key;document.querySelectorAll(".exercise-option").forEach(x=>{const selected=x.dataset.exercise===key;x.classList.toggle("selected",selected);x.setAttribute("aria-pressed",selected);});}
+function renderExerciseGuide(element,key){
+  const guide=exerciseGuides[key];
+  element.dataset.exerciseGuide=key;
+  element.innerHTML=`<div class="exercise-guide-copy"><h3>${esc(guide.title)} · 动作与计数说明</h3><p class="exercise-count-rule">${esc(guide.count)}</p><ol>${guide.steps.map(step=>`<li>${esc(step)}</li>`).join("")}</ol><p class="exercise-motion-note">${esc(guide.note)}</p></div><figure><img src="/static/media/${key}-guide.png" alt="${esc(guide.title)}：起始、顶点与复位示意" width="780" height="252"><figcaption>${guide.endpoints.map(label=>`<span>${esc(label)}</span>`).join("")}</figcaption></figure><p class="exercise-camera-guide">${icon("camera")}<span><strong>摄像头位置：</strong>正对镜头为 0°，纯侧身为 90°；建议身体斜侧约 45°，左右侧均可，不必精确量角。镜头约在髋部高度、水平拍摄，头顶到双脚完整入镜，四周留空，双腿不要互相遮挡。</span></p><p class="exercise-pace">建议节奏：抬起或起身约 1～2 秒，顶点稍停，返回约 1～2 秒；每次复位后站稳或坐稳约 1 秒，再开始下一次。按舒适幅度完成。</p>`;
+}
+function chooseExercise(key){app.selectedExercise=key;document.querySelectorAll(".exercise-option").forEach(x=>{const selected=x.dataset.exercise===key;x.classList.toggle("selected",selected);x.setAttribute("aria-pressed",selected);});renderExerciseGuide($("exerciseGuide"),key);icons();}
+function renderExerciseCycle(s){
+  const guide=exerciseGuides[s.exercise];
+  const previous=app.exerciseFeedback;
+  const changed=previous?.sid===s.session_id&&s.count>previous.count;
+  const justCounted=changed?Date.now():(previous?.sid===s.session_id?previous.justCounted:0);
+  app.exerciseFeedback={sid:s.session_id,count:s.count,justCounted};
+  const stage=Number.isInteger(s.counter_stage)?s.counter_stage:-1;
+  const completed=Date.now()-justCounted<1800;
+  const active=s.status==="running"?(completed?4:stage):-1;
+  $("exerciseCycle").innerHTML=guide.cycle.map((label,index)=>`<li class="${index===active?"current":index<active?"confirmed":""}" ${index===active?'aria-current="step"':""}><b>${index+1}</b><span>${esc(label)}</span></li>`).join("");
+  let cue=guide.cues[stage+1];
+  if(s.status==="paused")cue="已暂停；继续后请从起始姿势重新开始。";
+  else if(["ended","interrupted"].includes(s.status))cue=s.status==="ended"?"训练已结束。":"训练已中断。";
+  else if(s.quality!=="good")cue="请让双肩、双髋、双膝和双踝完整入镜；恢复后从起始姿势重新开始。";
+  else if(completed)cue="完整动作已计入，请稳住后开始下一次。";
+  if($("exerciseCue").dataset.cue!==cue){$("exerciseCue").dataset.cue=cue;$("exerciseCue").textContent=cue;}
+}
 async function startExercise(ev){
   ev.preventDefault();
   await busy($("startExercise"),async()=>{
@@ -254,17 +306,30 @@ function syncExerciseControls(){const finished=["ended","interrupted"].includes(
 async function stopCamera(){ $("exerciseCamera").removeAttribute("src");$("exerciseCamera").hidden=true; }
 function renderExerciseState(s){
   app.exercise=s;$("activeExerciseName").textContent=names[s.exercise];$("exerciseMode").textContent=s.mode==="live"?"实时训练":"样例 / 回放";
+  if($("activeExerciseGuide").dataset.exerciseGuide!==s.exercise)renderExerciseGuide($("activeExerciseGuide"),s.exercise);
+  renderExerciseCycle(s);
   $("repCount").textContent=s.count;$("repTarget").textContent=s.target_reps;$("repProgress").value=s.progress;
   $("exercisePhase").textContent=phases[s.phase]||s.phase;$("exerciseDuration").textContent=duration(s.valid_duration_s);
   const q=["multiple_people","no_person"].includes(s.person_id)?s.person_id:s.quality;
   const diagnostic=s.capture_diagnostics;
   const jointNames={left_shoulder:"左肩",right_shoulder:"右肩",left_hip:"左髋",right_hip:"右髋",left_knee:"左膝",right_knee:"右膝",left_ankle:"左踝",right_ankle:"右踝"};
   let quality=qualityNames[q]||q;
-  if(diagnostic?.missing_joints.length&&q==="insufficient_pose")quality+=`：${diagnostic.missing_joints.map(n=>jointNames[n]||n).join("、")}`;
+  const unrecognized=q==="good"&&s.phase==="other";
+  if(unrecognized)quality="骨架有效，尚未确认所选动作";
+  if(diagnostic?.missing_joints?.length&&q==="insufficient_pose")quality+=`：${diagnostic.missing_joints.map(n=>jointNames[n]||n).join("、")}`;
   if(diagnostic?.gap_ms>250&&q==="good")quality="画面曾中断，当前动作重新观察";
   $("exerciseQuality").textContent=quality;
   $("exerciseQuality").title=diagnostic?`有效采样 ${diagnostic.observation_fps||0} FPS · 最近间隔 ${diagnostic.gap_ms||0} ms`:"";
-  $("exerciseQuality").classList.toggle("bad",!["good","waiting_for_input"].includes(q)||diagnostic?.gap_ms>250);
+  $("exerciseQuality").classList.toggle("bad",unrecognized||!["good","waiting_for_input"].includes(q)||diagnostic?.gap_ms>250);
+  const counts=s.counting_diagnostics,details=$("exerciseDiagnostics");
+  details.hidden=!counts;
+  if(counts){
+    const joints=Object.entries(diagnostic?.joint_confidences||{});
+    const interruptions=Object.values(counts.interruption_counts).reduce((sum,n)=>sum+n,0);
+    const last=counts.last_interruption;
+    details.innerHTML=`<summary>关键点与输入状态</summary><div class="exercise-input-stats"><span>关键点完整 <strong>${Math.round(counts.visible_pose_ratio*100)}%</strong></span><span>连续可见 <strong>${counts.uninterrupted_s.toFixed(1)} 秒</strong></span><span>采样 <strong>${diagnostic?.observation_fps||0} FPS</strong></span><span>输入中断 <strong>${interruptions} 次</strong></span></div><div class="exercise-joints">${joints.map(([name,value])=>`<span class="${value<.3?"missing":"visible"}" title="${jointNames[name]||name} · ${(value*100).toFixed(1)}%"><i aria-hidden="true"></i>${jointNames[name]||name}<small>${Math.round(value*100)}%</small></span>`).join("")}</div>${last?`<p class="exercise-last-reset">最近中断：${esc(qualityNames[last.reason]||last.reason)}</p>`:""}`;
+  }
+  $("exerciseDiagnosticExport").href=`/api/sessions/${s.session_id}/diagnostics.json`;
   $("pauseExercise").innerHTML=icon(s.status==="paused"?"play":"pause")+`<span>${s.status==="paused"?"继续":"暂停"}</span>`;
   if(["ended","interrupted"].includes(s.status)){
     $("exerciseCompleted").hidden=false;$("exerciseCompleted").querySelector("strong").textContent=s.status==="ended"?`训练已结束 · ${s.count} 次`:"训练已中断";
@@ -497,7 +562,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
   $("videoSource").onchange=()=>{$("cameraIndexField").hidden=$("videoSource").value!=="camera";$("videoUploadField").hidden=$("videoSource").value!=="upload";};$("videoForm").onsubmit=ev=>{ev.preventDefault();busy($("startVideo"),async()=>{let upload_id=null;if($("videoSource").value==="upload"){const file=$("videoUpload").files[0];if(!file)throw new Error("请选择视频文件");const form=new FormData();form.append("file",file);$("videoUploadStatus").textContent="正在上传视频…";try{const result=await api("/api/uploads/video",{method:"POST",body:form});upload_id=result.upload_id;$("videoUploadStatus").textContent=result.filename;}catch(e){$("videoUploadStatus").textContent="上传失败";throw e;}}app.videoHistory=[];await api("/api/video/start",{method:"POST",body:{source:$("videoSource").value,camera_index:Number($("videoForm").elements.camera_index.value),upload_id}});await refresh();toast("检测已启动");});};$("stopVideo").onclick=()=>busy($("stopVideo"),async()=>{await api("/api/video/stop",{method:"POST"});await refresh();});
   restoreOverlay();$("toggleBoxes").onclick=()=>setOverlay("box",!app.overlay.box);$("toggleSkeleton").onclick=()=>setOverlay("skeleton",!app.overlay.skeleton);setOverlay("box",app.overlay.box);setOverlay("skeleton",app.overlay.skeleton);
   $("signalSource").onchange=()=>$("signalUploadField").hidden=$("signalSource").value!=="upload";$("analyzeSignal").onclick=()=>busy($("analyzeSignal"),async()=>{let result;if($("signalSource").value==="sample")result=await api("/api/signal/sample",{method:"POST"});else{const file=$("signalFile").files[0];if(!file)throw new Error("请选择 CSV 文件");const form=new FormData();form.append("file",file);result=await api("/api/signal/analyze",{method:"POST",body:form});}drawLines($("signalChart"),[{values:result.waveform.ax,color:"#547bb4"},{values:result.waveform.ay,color:"#5a9877"},{values:result.waveform.az,color:"#bf9459"}],{labels:result.waveform.t.map(t=>`${t.toFixed(1)}s`)});drawLines($("signalProbabilityChart"),[{values:result.info.probs,color:"#52886d"}],{min:0,max:1,threshold:.5,labels:result.info.t_end.map(t=>`${t.toFixed(1)}s`)});$("signalState").textContent="回放分析完成";$("signalResult").innerHTML=`${result.info.n_windows} 个窗口 · ${result.records.length} 个疑似跌倒事件 ${result.records.map(e=>`<button class="text-action" data-event="${e.id}">查看 #${e.id.slice(0,6)} ${icon("arrow-right")}</button>`).join(" ")}`;await refresh();icons();});
-  $("exerciseOptions").innerHTML=Object.entries(names).map(([key,name],index)=>`<button type="button" class="exercise-option ${index===0?"selected":""}" data-exercise="${key}" aria-pressed="${index===0}"><img src="/static/media/${key}.png" alt="${name}骨架动作"><span class="selection-mark">${icon("check")}</span><div><strong>${name}</strong><small>${["坐姿 / 站立完整周期","下蹲 / 起立完整周期","抬腿 / 回落完整周期","跨步 / 复位完整周期"][index]}</small></div></button>`).join("");document.querySelectorAll("[data-exercise]").forEach(b=>b.onclick=()=>chooseExercise(b.dataset.exercise));$("exerciseSource").onchange=()=>{$("exerciseUploadField").hidden=$("exerciseSource").value!=="upload";$("exerciseCameraField").hidden=$("exerciseSource").value!=="camera";};$("exerciseForm").onsubmit=startExercise;
+  $("exerciseOptions").innerHTML=Object.entries(names).map(([key,name],index)=>`<button type="button" class="exercise-option ${index===0?"selected":""}" data-exercise="${key}" aria-pressed="${index===0}"><img src="/static/media/${key}-pose.png" alt="${name}骨架动作"><span class="selection-mark">${icon("check")}</span><div><strong>${esc(exerciseGuides[key].title)}</strong><small>${["坐姿 / 站立完整周期","下蹲 / 起立完整周期","抬腿 / 回落完整周期","跨步 / 复位完整周期"][index]}</small></div></button>`).join("");document.querySelectorAll("[data-exercise]").forEach(b=>b.onclick=()=>chooseExercise(b.dataset.exercise));$("exerciseSource").onchange=()=>{$("exerciseUploadField").hidden=$("exerciseSource").value!=="upload";$("exerciseCameraField").hidden=$("exerciseSource").value!=="camera";};$("exerciseForm").onsubmit=startExercise;
+  chooseExercise(app.selectedExercise);
   $("pauseExercise").onclick=async()=>{await busy($("pauseExercise"),()=>controlExercise(app.exercise?.status==="paused"?"resume":"pause"));syncExerciseControls();};$("endExercise").onclick=async()=>{await busy($("endExercise"),()=>controlExercise("end"));syncExerciseControls();};$("newExercise").onclick=()=>{app.sid=null;app.exercise=null;$("exerciseActive").hidden=true;$("exerciseChooser").hidden=false;};
   $("audioSource").onchange=()=>{const source=$("audioSource").value;$("audioSampleField").hidden=source!=="sample";$("audioFileField").hidden=source!=="upload";$("audioRecordField").hidden=source!=="record";$("audioPreview").removeAttribute("src");if(source==="sample")$("audioPreview").src=`/api/audio/samples/${$("audioSampleSelect").value}`;};$("audioSampleSelect").onchange=()=>$("audioPreview").src=`/api/audio/samples/${$("audioSampleSelect").value}`;$("audioFile").onchange=()=>{const file=$("audioFile").files[0];if(file)$("audioPreview").src=URL.createObjectURL(file);};$("audioForm").onsubmit=analyzeAudio;$("recordAudio").onclick=recordAudio;$("startAudioLive").onclick=startAudioLive;$("stopAudioLive").onclick=stopAudioLive;
   $("eventStateFilter").querySelectorAll("button").forEach(b=>b.onclick=()=>{app.eventFilter=b.dataset.value;$("eventStateFilter").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));renderEvents();});$("eventModeFilter").onchange=()=>{app.eventMode=$("eventModeFilter").value;renderEvents();};$("eventSearch").oninput=renderEvents;$("reportDays").querySelectorAll("button").forEach(b=>b.onclick=()=>{app.reportDays=Number(b.dataset.value);$("reportDays").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));loadReport();});$("reportMode").onchange=()=>{app.reportMode=$("reportMode").value;loadReport();};

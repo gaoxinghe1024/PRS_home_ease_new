@@ -261,9 +261,27 @@
             ],
             "title": "Exercise"
           },
+          "action_scope": {
+            "type": "string",
+            "enum": [
+              "open",
+              "training"
+            ],
+            "title": "Action Scope",
+            "default": "open"
+          },
           "recognized_exercise": {
             "type": "string",
             "title": "Recognized Exercise"
+          },
+          "inference_views": {
+            "type": "string",
+            "enum": [
+              "original",
+              "mirror_average"
+            ],
+            "title": "Inference Views",
+            "default": "original"
           },
           "exercise_probabilities": {
             "additionalProperties": {
@@ -290,6 +308,13 @@
           "count": {
             "type": "integer",
             "title": "Count"
+          },
+          "counter_stage": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": -1.0,
+            "title": "Counter Stage",
+            "default": -1
           },
           "target_reps": {
             "type": "integer",
@@ -437,6 +462,15 @@
             ],
             "title": "Exercise",
             "default": "chair_sit_to_stand"
+          },
+          "action_scope": {
+            "type": "string",
+            "enum": [
+              "open",
+              "training"
+            ],
+            "title": "Action Scope",
+            "default": "open"
           }
         },
         "additionalProperties": false,
@@ -646,9 +680,27 @@
             ],
             "title": "Exercise"
           },
+          "action_scope": {
+            "type": "string",
+            "enum": [
+              "open",
+              "training"
+            ],
+            "title": "Action Scope",
+            "default": "open"
+          },
           "recognized_exercise": {
             "type": "string",
             "title": "Recognized Exercise"
+          },
+          "inference_views": {
+            "type": "string",
+            "enum": [
+              "original",
+              "mirror_average"
+            ],
+            "title": "Inference Views",
+            "default": "original"
           },
           "exercise_probabilities": {
             "additionalProperties": {
@@ -675,6 +727,13 @@
           "count": {
             "type": "integer",
             "title": "Count"
+          },
+          "counter_stage": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": -1.0,
+            "title": "Counter Stage",
+            "default": -1
           },
           "target_reps": {
             "type": "integer",

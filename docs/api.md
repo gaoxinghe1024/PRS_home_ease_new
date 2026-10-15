@@ -31,6 +31,8 @@
 
 摄像头默认 `capture:"shared"`、`camera_index:0`，由服务统一采集，可与视频监测并行。外部图片／骨架采集客户端使用 `capture:"client"`，自行提交原输入契约。动作另有 `squat`、`standing_leg_raise`、`hurdle_step`，来源另有 `replay`、`upload`。控制为 `{"action":"pause"}`、`resume`、`end`。骨架批次遵循原算法2规范：
 
+系统摄像头和上传训练指定算法2的 `action_scope:"training"`，只在四个训练动作内部计算动作支持度；其中直腿抬腿、跨步还对原输入与左右镜像输入的模型概率取均值，状态标记 `inference_views:"mirror_average"`。深蹲、坐站和样例回放均为 `inference_views:"original"`，样例回放使用原默认 `open`。返回状态、训练报告和诊断包含这两个字段。算法2独立 API 的默认值仍为 `open`。完整差异与验证边界见 `docs/exercise-integration.md`。
+
 ```json
 {"request_id":"batch-0","frames":[{"timestamp_ms":0,"person_id":"no_person","keypoints":[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]}]}
 ```

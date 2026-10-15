@@ -110,6 +110,38 @@ def exercise():
             worker.call("release", session_id=sid)
             memory.close()
             memory.unlink()
+        # File input must give the original estimator decoded BGR pixels too.
+        cap = cv2.VideoCapture(str(ROOT / "samples" / "fall-01-cam0.mp4"))
+        sid = worker.call("create", exercise="squat", target_reps=10)["session_id"]
+        original = ExerciseSession(predictor, exercise="squat")
+        estimator = PoseEstimator(device=0 if device.startswith("cuda") else device)
+        try:
+            opened = worker.call("video_open", session_id=sid, path=str(ROOT / "samples" / "fall-01-cam0.mp4"))
+            errors = []
+            probability_errors = []
+            for index in range(10):
+                ok, image = cap.read()
+                assert ok
+                points, identity = estimator.estimate(image)
+                expected = original.update(index * 1000 / opened["fps"], points, identity)
+                actual = worker.call("video_frame", session_id=sid)
+                errors.append(float(np.max(np.abs(np.asarray(actual["keypoints"]) - points))))
+                np.testing.assert_allclose(actual["keypoints"], points, atol=1e-6, rtol=0)
+                for name in ("count", "phase", "cycles", "quality"):
+                    assert actual[name] == expected[name], (index, name)
+                keys = list(expected["phase_probabilities"])
+                before = np.asarray([expected["phase_probabilities"][key] for key in keys])
+                after = np.asarray([actual["phase_probabilities"][key] for key in keys])
+                # CPU thread reductions can differ in the last float32 bits.
+                np.testing.assert_allclose(after, before, atol=1e-7, rtol=0)
+                probability_errors.append(float(np.max(np.abs(after - before))))
+            results["uploaded_video_pose"] = {"frames": len(errors), "max_keypoint_error": max(errors),
+                                               "phases_and_counts_equal": True,
+                                               "phase_probability_max_error": max(probability_errors),
+                                               "phase_probability_atol": 1e-7}
+        finally:
+            cap.release()
+            worker.call("release", session_id=sid)
         return results
     finally:
         worker.close()

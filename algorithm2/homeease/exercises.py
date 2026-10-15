@@ -9,7 +9,7 @@ MOVEMENT_TO_INDEX = {v["movement"]: i for i, v in enumerate(EXERCISES.values())}
 NUM_CLASSES = 17
 
 
-def decode(probabilities, exercise):
+def decode(probabilities, exercise, action_scope="open"):
     import numpy as np
     p = np.asarray(probabilities)
     action_probabilities = np.array([p[i * 4:i * 4 + 4].sum() for i in range(4)] + [p[16]])
@@ -18,7 +18,12 @@ def decode(probabilities, exercise):
     phase = int(p[target * 4:target * 4 + 4].argmax())
     # Rest poses overlap across exercises. Condition phases on the user-selected
     # exercise; require supporting action evidence during the moving phases.
-    if phase != 0 and action_probabilities[target] < .15:
+    support = action_probabilities[target]
+    if action_scope == "training":
+        # The training UI supplies a known four-action context. Keep competition
+        # between those actions without letting the open-set prior erase it.
+        support /= max(action_probabilities[:4].sum(), 1e-8)
+    if phase != 0 and support < .15:
         phase = 4
     canonical = np.zeros(5)
     if phase < 4:

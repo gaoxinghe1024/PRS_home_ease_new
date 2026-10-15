@@ -1,0 +1,546 @@
+{
+  "model": "opt_tcn_b4_w48",
+  "action_scope": "training",
+  "public_inference": "batched causal windows, original EMA and 30 Hz",
+  "trace_inference": "actual streaming SDK with original input interruptions",
+  "positive_sessions": 8,
+  "positive_counts": [
+    {
+      "id": "s07_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "original_count": 9,
+      "mirror_count": 9
+    },
+    {
+      "id": "s08_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "id": "s07_m02_reconstructed",
+      "target": "hurdle_step",
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "id": "s08_m02_reconstructed",
+      "target": "hurdle_step",
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "id": "s09_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "id": "s10_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "original_count": 9,
+      "mirror_count": 10
+    },
+    {
+      "id": "s09_m02_reconstructed",
+      "target": "hurdle_step",
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "id": "s10_m02_reconstructed",
+      "target": "hurdle_step",
+      "original_count": 10,
+      "mirror_count": 10
+    }
+  ],
+  "negative_checks": 48,
+  "negative_cycles": 0,
+  "public_checks": [
+    {
+      "source": "chair_sit_to_stand",
+      "id": "s07_m05_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "chair_sit_to_stand",
+      "id": "s07_m05_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "chair_sit_to_stand",
+      "id": "s08_m05_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "chair_sit_to_stand",
+      "id": "s08_m05_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "squat",
+      "id": "s07_m01_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "squat",
+      "id": "s07_m01_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "squat",
+      "id": "s08_m01_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "squat",
+      "id": "s08_m01_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "standing_leg_raise",
+      "id": "s07_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": true,
+      "original_count": 9,
+      "mirror_count": 9
+    },
+    {
+      "source": "standing_leg_raise",
+      "id": "s07_m06_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "standing_leg_raise",
+      "id": "s08_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": true,
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "source": "standing_leg_raise",
+      "id": "s08_m06_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "hurdle_step",
+      "id": "s07_m02_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "hurdle_step",
+      "id": "s07_m02_reconstructed",
+      "target": "hurdle_step",
+      "positive": true,
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "source": "hurdle_step",
+      "id": "s08_m02_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "hurdle_step",
+      "id": "s08_m02_reconstructed",
+      "target": "hurdle_step",
+      "positive": true,
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "source": "other",
+      "id": "s07_m07_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "other",
+      "id": "s07_m07_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "other",
+      "id": "s08_m07_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "other",
+      "id": "s08_m07_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "chair_sit_to_stand",
+      "id": "s09_m05_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "chair_sit_to_stand",
+      "id": "s09_m05_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "chair_sit_to_stand",
+      "id": "s10_m05_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "chair_sit_to_stand",
+      "id": "s10_m05_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "squat",
+      "id": "s09_m01_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "squat",
+      "id": "s09_m01_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "squat",
+      "id": "s10_m01_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "squat",
+      "id": "s10_m01_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "standing_leg_raise",
+      "id": "s09_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": true,
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "source": "standing_leg_raise",
+      "id": "s09_m06_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "standing_leg_raise",
+      "id": "s10_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": true,
+      "original_count": 9,
+      "mirror_count": 10
+    },
+    {
+      "source": "standing_leg_raise",
+      "id": "s10_m06_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "hurdle_step",
+      "id": "s09_m02_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "hurdle_step",
+      "id": "s09_m02_reconstructed",
+      "target": "hurdle_step",
+      "positive": true,
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "source": "hurdle_step",
+      "id": "s10_m02_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "hurdle_step",
+      "id": "s10_m02_reconstructed",
+      "target": "hurdle_step",
+      "positive": true,
+      "original_count": 10,
+      "mirror_count": 10
+    },
+    {
+      "source": "other",
+      "id": "s09_m07_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "other",
+      "id": "s09_m07_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "other",
+      "id": "s10_m07_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "other",
+      "id": "s10_m07_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    }
+  ],
+  "static_checks": [
+    {
+      "source": "stationary",
+      "id": "s07_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s07_m06_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s08_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s08_m06_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s07_m02_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s07_m02_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s08_m02_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s08_m02_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s09_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s09_m06_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s10_m06_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s10_m06_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s09_m02_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s09_m02_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s10_m02_reconstructed",
+      "target": "standing_leg_raise",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    },
+    {
+      "source": "stationary",
+      "id": "s10_m02_reconstructed",
+      "target": "hurdle_step",
+      "positive": false,
+      "original_count": 0,
+      "mirror_count": 0
+    }
+  ],
+  "captured_traces": [
+    {
+      "source_exercise": "standing_leg_raise",
+      "frames": 534,
+      "truncated": true,
+      "input_sha256": "7df7deeb6b637fc7365a1cca7ccd8008faecb2ef4a24af0e2830b1648c267cfd",
+      "counts": {
+        "standing_leg_raise": {
+          "original": 0,
+          "mirror_average": 0
+        },
+        "hurdle_step": {
+          "original": 0,
+          "mirror_average": 0
+        }
+      }
+    },
+    {
+      "source_exercise": "hurdle_step",
+      "frames": 629,
+      "truncated": true,
+      "input_sha256": "be0a401745b10a94ac858cf6c0e546c9a4fff18bb68285a8d51f9125db36dd18",
+      "counts": {
+        "standing_leg_raise": {
+          "original": 0,
+          "mirror_average": 0
+        },
+        "hurdle_step": {
+          "original": 0,
+          "mirror_average": 3
+        }
+      }
+    }
+  ],
+  "limitation": "Captured traces can be truncated and are not independent live accuracy validation."
+}

@@ -404,7 +404,8 @@ def create_session(body: schemas.SessionStart):
         return system.start_camera_session(body.exercise, body.target_reps, body.camera_index)
     if body.source == "camera":
         system.modules["exercise"].call("pose_initialize")
-    result = system.create_session(body.exercise, body.target_reps, "live" if body.source == "camera" else "replay")
+    result = system.create_session(body.exercise, body.target_reps, "live" if body.source == "camera" else "replay",
+                                   action_scope="open" if body.source == "replay" else "training")
     sid = result["session_id"]
     if body.source == "replay":
         system.submit(system.replay, sid, body.exercise)
@@ -475,6 +476,12 @@ def export_session(sid: str):
     result.pop("keypoints", None)
     return Response(json.dumps(result, ensure_ascii=False, indent=2), media_type="application/json",
                     headers={"Content-Disposition": f'attachment; filename="exercise-{sid}.json"'})
+
+
+@app.get("/api/sessions/{sid}/diagnostics.json")
+def export_session_diagnostics(sid: str):
+    return Response(json.dumps(system.session_trace(sid), ensure_ascii=False), media_type="application/json",
+                    headers={"Content-Disposition": f'attachment; filename="exercise-input-{sid}.json"'})
 
 
 @app.get("/api/audio/samples")

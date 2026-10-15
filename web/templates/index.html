@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#15735b"><title>HomeEase · 居家照护</title>
-  <link rel="icon" href="data:,"><link rel="stylesheet" href="/static/style.css"><link rel="stylesheet" href="/static/monitoring.css">
+  <link rel="icon" href="data:,"><link rel="stylesheet" href="/static/style.css"><link rel="stylesheet" href="/static/monitoring.css"><link rel="stylesheet" href="/static/exercise.css">
   <script defer src="/static/vendor/lucide.min.js"></script><script defer src="/static/audio-transport.js"></script><script defer src="/static/i18n-en.js"></script><script defer src="/static/i18n.js"></script><script defer src="/static/app.js"></script>
 </head>
 <body>
@@ -52,8 +52,24 @@
 
       <section id="page-exercise" class="page" hidden>
         <div class="page-title"><div><div class="eyebrow">DAILY MOVEMENT</div><h1>运动训练</h1><p>今日活动，按自己的节奏进行</p></div><span class="badge blue" id="exerciseModelState">运动模块准备中</span></div>
-        <div id="exerciseChooser"><div class="exercise-options" id="exerciseOptions"></div><form id="exerciseForm" class="exercise-setup"><label>训练目标<div class="number-input"><input id="targetReps" type="number" min="1" max="10000" value="10"><span>次</span></div></label><label>输入来源<select id="exerciseSource"><option value="camera">本机共享摄像头 · 实时</option><option value="replay">随附骨架样例 · 回放</option><option value="upload">本地运动视频 · 回放</option></select></label><label id="exerciseCameraField">摄像头序号<input id="exerciseCameraIndex" type="number" min="0" max="10" value="0"></label><label id="exerciseUploadField" hidden>运动视频<input type="file" id="exerciseUpload" accept="video/*,.mkv"></label><button type="submit" class="button primary" id="startExercise"><i data-lucide="play"></i>开始训练</button></form></div>
-        <div id="exerciseActive" hidden><div class="section-heading"><h2 id="activeExerciseName">坐站训练</h2><span class="badge neutral" id="exerciseMode">实时</span></div><div class="exercise-live-grid"><div class="pose-stage"><img id="exerciseCamera" alt="实时训练画面" hidden><canvas id="poseCanvas" aria-label="运动骨架可视化"></canvas><span id="exerciseQuality" class="pose-quality">等待画面</span></div><div class="exercise-counter"><span class="muted">已完成次数</span><div class="rep-number"><span id="repCount">0</span><small>/ <span id="repTarget">10</span></small></div><progress id="repProgress" value="0" max="1"></progress><div class="counter-details"><div><span>训练阶段</span><strong id="exercisePhase">等待动作</strong></div><div><span>有效观察</span><strong id="exerciseDuration">0 秒</strong></div></div><div class="button-row"><button class="button secondary" id="pauseExercise"><i data-lucide="pause"></i><span>暂停</span></button><button class="button danger-outline" id="endExercise"><i data-lucide="square"></i>结束训练</button></div><div id="exerciseCompleted" class="completion-banner" hidden><i data-lucide="circle-check"></i><strong>训练已结束</strong><button class="text-action" id="newExercise">新的训练<i data-lucide="arrow-right"></i></button></div></div></div></div>
+        <aside class="exercise-angle-notice"><i data-lucide="camera"></i><div><strong>建议斜侧身约 45° 训练</strong><span>正对镜头为 0°，纯侧身为 90°；头顶到双脚完整入镜。</span></div></aside>
+        <div id="exerciseChooser"><div class="exercise-options" id="exerciseOptions"></div><section id="exerciseGuide" class="exercise-guide" aria-label="动作与计数说明"></section><form id="exerciseForm" class="exercise-setup"><label>训练目标<div class="number-input"><input id="targetReps" type="number" min="1" max="10000" value="10"><span>次</span></div></label><label>输入来源<select id="exerciseSource"><option value="camera">本机共享摄像头 · 实时</option><option value="replay">随附骨架样例 · 回放</option><option value="upload">本地运动视频 · 回放</option></select></label><label id="exerciseCameraField">摄像头序号<input id="exerciseCameraIndex" type="number" min="0" max="10" value="0"></label><label id="exerciseUploadField" hidden>运动视频<input type="file" id="exerciseUpload" accept="video/*,.mkv"></label><button type="submit" class="button primary" id="startExercise"><i data-lucide="play"></i>开始训练</button></form></div>
+        <div id="exerciseActive" hidden>
+          <div class="section-heading"><h2 id="activeExerciseName">坐站训练</h2><span class="badge neutral" id="exerciseMode">实时</span></div>
+          <div class="exercise-live-grid">
+            <div class="pose-stage"><img id="exerciseCamera" alt="实时训练画面" hidden><canvas id="poseCanvas" aria-label="运动骨架可视化"></canvas><span id="exerciseQuality" class="pose-quality">等待画面</span></div>
+            <div class="exercise-counter">
+              <span class="muted">已完成次数</span><div class="rep-number"><span id="repCount">0</span><small>/ <span id="repTarget">10</span></small></div>
+              <progress id="repProgress" value="0" max="1"></progress>
+              <div class="counter-details"><div><span>训练阶段</span><strong id="exercisePhase">等待动作</strong></div><div><span>有效观察</span><strong id="exerciseDuration">0 秒</strong></div></div>
+              <div class="exercise-cycle"><ol id="exerciseCycle" aria-label="本次动作进度"></ol><p id="exerciseCue" role="status"></p></div>
+              <details id="exerciseDiagnostics" class="exercise-diagnostics" hidden></details>
+              <div class="button-row"><button class="button secondary" id="pauseExercise"><i data-lucide="pause"></i><span>暂停</span></button><button class="button danger-outline" id="endExercise"><i data-lucide="square"></i>结束训练</button><a id="exerciseDiagnosticExport" class="icon-button" title="下载训练诊断" aria-label="下载训练诊断"><i data-lucide="download"></i></a></div>
+              <div id="exerciseCompleted" class="completion-banner" hidden><i data-lucide="circle-check"></i><strong>训练已结束</strong><button class="text-action" id="newExercise">新的训练<i data-lucide="arrow-right"></i></button></div>
+            </div>
+          </div>
+          <section id="activeExerciseGuide" class="exercise-guide" aria-label="动作与计数说明"></section>
+        </div>
         <div class="section-heading spaced"><h2>训练记录</h2><a href="#reports" class="text-action">运动报告<i data-lucide="arrow-right"></i></a></div><div id="exerciseHistory" class="table-container"></div>
       </section>
 

@@ -273,7 +273,7 @@ class System:
             if "snippet" not in event["evidence"]:
                 self.store.update_event(event["id"], lambda item, e=evidence: item["evidence"].update(e))
 
-    def create_session(self, exercise, target, mode):
+    def create_session(self, exercise, target, mode, action_scope="open"):
         with self.sessions_lock:
             active = [m for m in self.session_metadata.values() if m.get("active")]
             if active:
@@ -285,7 +285,7 @@ class System:
                 self.session_cancel.pop(old_sid, None)
                 self.latest_poses.pop(old_sid, None)
                 self.camera_shapes.pop(old_sid, None)
-            result = self.modules["exercise"].call("create", exercise=exercise, target_reps=target)
+            result = self.modules["exercise"].call("create", exercise=exercise, target_reps=target, action_scope=action_scope)
             sid = result["session_id"]
             self.session_metadata[sid] = {"created_at": now(), "mode": mode, "active": True}
             self.session_commands[sid] = threading.RLock()
@@ -314,9 +314,31 @@ class System:
                 self.session_cancel[sid].set()
             result = self.save_session(self.modules["exercise"].call("control", session_id=sid, action=action))
             if action == "end":
-                self.modules["exercise"].call("release", session_id=sid)
-                self.cameras.release(sid)
+                try:
+                    trace = self.modules["exercise"].call("trace", session_id=sid)
+                    directory = RUNTIME / "exercise-traces"
+                    directory.mkdir(parents=True, exist_ok=True)
+                    (directory / f"{sid}.json").write_text(json.dumps(trace), encoding="utf-8")
+                except Exception:
+                    log.exception("Could not retain exercise input diagnostics for %s", sid)
+                finally:
+                    try:
+                        self.modules["exercise"].call("release", session_id=sid)
+                    finally:
+                        self.cameras.release(sid)
             return result
+
+    def session_trace(self, sid):
+        if not any(s["session_id"] == sid for s in self.store.sessions()):
+            raise KeyError(sid)
+        if sid in self.session_metadata:
+            with self.session_commands[sid]:
+                if self.session_metadata[sid]["active"]:
+                    return self.modules["exercise"].call("trace", session_id=sid)
+        path = RUNTIME / "exercise-traces" / f"{sid}.json"
+        if not path.is_file():
+            raise ValueError("这次训练未保留骨架诊断，请开始新的训练")
+        return json.loads(path.read_text(encoding="utf-8"))
 
     def start_camera_session(self, exercise, target, index):
         with self.sessions_lock:
@@ -326,7 +348,7 @@ class System:
             descriptor = self.cameras.acquire(index, owner)
             try:
                 self.modules["exercise"].call("pose_initialize")
-                result = self.create_session(exercise, target, "live")
+                result = self.create_session(exercise, target, "live", action_scope="training")
                 sid = result["session_id"]
                 self.cameras.acquire(index, sid)
                 self.session_metadata[sid]["shared_camera"] = True
@@ -340,8 +362,6 @@ class System:
     def camera_exercise(self, sid, descriptor):
         sequence = 0
         base = time.perf_counter()
-        last_stamp = None
-        stamps = []
         try:
             while not self.session_cancel[sid].is_set() and not self.stop_event.is_set():
                 with self.session_commands[sid]:
@@ -353,13 +373,6 @@ class System:
                         if not result.get("duplicate"):
                             sequence = result.pop("capture_sequence")
                             self.latest_poses[sid] = result.pop("keypoints")
-                            diagnostics = result["capture_diagnostics"]
-                            stamp = diagnostics["timestamp_ms"]
-                            diagnostics["gap_ms"] = round(stamp - last_stamp, 2) if last_stamp is not None else None
-                            last_stamp = stamp
-                            stamps.append(stamp)
-                            stamps = stamps[-60:]
-                            diagnostics["observation_fps"] = round((len(stamps) - 1) * 1000 / (stamps[-1] - stamps[0]), 1) if len(stamps) > 1 else 0
                             self.save_session(result)
                 if self.session_cancel[sid].wait(.005):
                     break
@@ -430,31 +443,22 @@ class System:
             self.interrupt_session(sid, exc)
 
     def video_exercise(self, sid, path):
-        import cv2
-        cap = cv2.VideoCapture(str(path))
         try:
-            if not cap.isOpened():
-                raise ValueError("无法打开运动视频")
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            if not fps or not math.isfinite(fps) or not 1 <= fps <= 240:
-                raise ValueError("无法确定视频帧率")
             self.modules["exercise"].call("pose_initialize")
-            index = 0
+            self.modules["exercise"].call("video_open", session_id=sid, path=str(path))
             while not self.session_cancel[sid].is_set() and not self.stop_event.is_set():
                 with self.session_commands[sid]:
-                    snapshot = self.modules["exercise"].call("snapshot", session_id=sid)
-                    if snapshot["status"] == "paused":
+                    if self.session_cancel[sid].is_set():
+                        return
+                    if self.session_metadata[sid].get("status") == "paused":
                         paused = True
                     else:
                         paused = False
-                        ok, frame = cap.read()
-                        if not ok:
+                        result = self.modules["exercise"].call("video_frame", session_id=sid)
+                        if result.get("eof"):
                             break
-                        encoded, jpeg = cv2.imencode(".jpg", frame)
-                        if not encoded:
-                            raise ValueError("视频帧编码失败")
-                        self.session_image(sid, jpeg.tobytes(), index * 1000 / fps, f"video-{index}")
-                        index += 1
+                        self.latest_poses[sid] = result.pop("keypoints")
+                        self.save_session(result)
                 if paused and self.session_cancel[sid].wait(.2):
                     return
             if not self.session_cancel[sid].is_set():
@@ -462,7 +466,9 @@ class System:
         except Exception as exc:
             self.interrupt_session(sid, exc)
         finally:
-            cap.release()
+            with self.session_commands[sid]:
+                if self.modules["exercise"].state == "ready":
+                    self.modules["exercise"].call("video_detach", session_id=sid)
 
     def interrupt_session(self, sid, error):
         log.exception("Exercise session %s interrupted", sid)

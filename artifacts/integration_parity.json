@@ -35,6 +35,13 @@
     "shared_camera_pose": {
       "person_equal": true,
       "max_keypoint_error": 0.0
+    },
+    "uploaded_video_pose": {
+      "frames": 10,
+      "max_keypoint_error": 0.0,
+      "phases_and_counts_equal": true,
+      "phase_probability_max_error": 6.547556205549476e-08,
+      "phase_probability_atol": 1e-07
     }
   },
   "audio": {

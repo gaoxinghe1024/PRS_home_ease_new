@@ -1,0 +1,62 @@
+{
+  "baseline_commit": "deaaf07",
+  "model": "opt_tcn_b4_w48",
+  "model_sha256": "860da96e399fda20f4e2d06b3f198574ca91c1afd5e32101dece5977e35f53c5",
+  "default_sdk_action_scope": "open",
+  "system_camera_and_upload_action_scope": "training",
+  "unchanged": ["weights", "features", "selected.json", "counter", "stage_threshold", "dwell_time", "pose_visibility_gate", "training_reports"],
+  "real_landmark_replay": {
+    "submitted_frames": 975,
+    "user_reported_repetitions": 3,
+    "original_open_count": 0,
+    "training_sdk_count": 3,
+    "training_system_http_count": 3,
+    "ended_diagnostic_count": 3,
+    "raw_landmarks_in_repository": false
+  },
+  "cached_and_static_checks": {
+    "positive_sessions": 16,
+    "positive_counts_changed": 0,
+    "negative_checks": 68,
+    "training_false_cycles": 0,
+    "unconditionally_removing_action_gate_false_cycles": 414
+  },
+  "tests": {"system_passed": 42, "algorithm2_original_passed": 28, "algorithm2_additional_passed": 25},
+  "cpu_upload_parity": {"max_keypoint_error": 0, "phase_probability_max_error": 6.547556205549476e-8, "phase_probability_atol": 1e-7, "counts_and_cycles_equal": true},
+  "live_camera_verification": {
+    "squat": "user_confirmed_accurate",
+    "chair_sit_to_stand": "user_confirmed_working",
+    "standing_leg_raise": "guided_test_zero_still_unresolved",
+    "hurdle_step": "guided_test_zero_mirror_replay_improved_live_retest_pending"
+  },
+  "exercise_guides": {
+    "languages": ["zh", "en"],
+    "viewport_widths": [1440, 390],
+    "four_action_replay_counts": [9, 10, 10, 10],
+    "counter_stage_read_only": true,
+    "illustrations": "schematic_not_inference_inputs",
+    "new_counting_changes": false
+  },
+  "training_view_extension": {
+    "exercises": ["standing_leg_raise", "hurdle_step"],
+    "inference_views": "mirror_average",
+    "weights_and_counter_unchanged": true,
+    "original_phase_posteriors": "averaged_with_original_training_mirror_transform",
+    "validation": "exercise_views_validation.json",
+    "user_reported_attempts": {"standing_leg_raise": "approximately_5", "hurdle_step": "approximately_5"},
+    "user_switched_legs": true,
+    "user_changed_facing": false,
+    "latest_truncated_replay_counts": {"standing_leg_raise": 0, "hurdle_step": 3},
+    "system_http_and_saved_diagnostics_match_sdk": true,
+    "public_positive_sessions_without_regression": 8,
+    "public_negative_and_static_checks": 48,
+    "public_false_cycles": 0,
+    "cpu_latency_sample": {
+      "warmup": 30, "measured": 120, "excludes_pose_and_http": true,
+      "original_p50_ms": 2.44, "original_p95_ms": 3.23,
+      "mirror_p50_ms": 5.36, "mirror_p95_ms": 7.15
+    },
+    "live_acceptance_complete": false
+  },
+  "limitation": "Public projected skeleton checks and captured inputs do not establish accuracy on unseen home videos. Straight leg raise remains unresolved."
+}

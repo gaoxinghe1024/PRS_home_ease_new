@@ -24,7 +24,12 @@ def clear_history(root):
             "DELETE FROM notifications WHERE event_id IN (SELECT id FROM events WHERE channel IN ('vision','accel'))"
         ).rowcount
         counts["fall_events"] = conn.execute("DELETE FROM events WHERE channel IN ('vision','accel')").rowcount
+        session_ids = [row[0] for row in conn.execute("SELECT id FROM sessions")]
         counts["sessions"] = conn.execute("DELETE FROM sessions").rowcount
+    for sid in session_ids:
+        path = root / "exercise-traces" / f"{sid}.json"
+        if Path(sid).name == sid and path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(root):
+            path.unlink()
     records = root / "video_bridge" / "systems" / "records"
     database = records / "falls.db"
     if database.exists():

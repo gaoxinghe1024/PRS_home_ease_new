@@ -71,6 +71,18 @@ def drop_evidence(names):
     return removed
 
 
+def drop_exercise_traces(ids):
+    for sid in ids:
+        if Path(sid).name != sid:
+            continue
+        path = RUNTIME / "exercise-traces" / f"{sid}.json"
+        if _inside(path):
+            try:
+                path.unlink()
+            except OSError:
+                log.warning("无法删除训练诊断 %s", path)
+
+
 class Records:
     """记录删除：事件与训练各自独立，通知随事件一并删除。"""
 
@@ -97,7 +109,9 @@ class Records:
             return {"sessions": 0}
         placeholders = ",".join("?" * len(ids))
         with self.store.connection() as conn:
+            found = [row[0] for row in conn.execute(f"SELECT id FROM sessions WHERE id IN ({placeholders})", ids)]
             deleted = conn.execute(f"DELETE FROM sessions WHERE id IN ({placeholders})", ids).rowcount
+        drop_exercise_traces(found)
         return {"sessions": deleted}
 
     def scope(self, mode, since, events=True, sessions=True):
@@ -114,5 +128,7 @@ class Records:
             result.update({key: value for key, value in drop_evidence(clip_names(found)).items()})
         if sessions:
             with self.store.connection() as conn:
+                found = [row[0] for row in conn.execute("SELECT id FROM sessions WHERE mode=? AND created_at>=?", (mode, since))]
                 result["sessions"] = conn.execute("DELETE FROM sessions WHERE mode=? AND created_at>=?", (mode, since)).rowcount
+            drop_exercise_traces(found)
         return result

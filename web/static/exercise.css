@@ -1,0 +1,42 @@
+.pose-quality{max-width:calc(100% - 26px);overflow-wrap:anywhere}
+.exercise-angle-notice{display:flex;align-items:center;gap:14px;padding:15px 18px;margin-bottom:24px;border-left:4px solid #ba872d;background:#fff5db;color:#704b10}
+.exercise-angle-notice>svg{width:25px;height:25px;flex-shrink:0}
+.exercise-angle-notice strong{display:block;font-size:18px;line-height:1.5;font-weight:750}
+.exercise-angle-notice span{display:block;margin-top:3px;font-size:12px;line-height:1.7;color:#806533}
+.exercise-diagnostics{border-top:1px solid var(--line);padding:15px 0;margin-bottom:18px;font-size:11px}
+.exercise-input-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;color:var(--muted)}
+.exercise-input-stats strong{font-weight:500;color:var(--ink);white-space:nowrap}
+.exercise-joints{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;margin-top:14px}
+.exercise-joints>span{display:flex;align-items:center;gap:6px;min-width:0}
+.exercise-joints i{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.exercise-joints .missing{color:var(--red)}
+.exercise-joints .missing i{background:var(--red)}
+.exercise-joints small{margin-left:auto;color:var(--muted);font-size:10px}
+.exercise-last-reset{color:var(--muted);margin-top:12px;line-height:1.6;overflow-wrap:anywhere}
+.exercise-counter>.button-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 36px;gap:8px}
+.exercise-counter>.button-row>.button{min-width:0;justify-content:center}
+.exercise-guide{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.9fr);gap:15px 28px;padding:22px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.8}
+.exercise-guide h3{font-size:14px;font-weight:600;margin-bottom:9px}
+.exercise-count-rule{color:var(--green);font-weight:500;margin-bottom:10px}
+.exercise-guide ol{padding-left:20px;display:grid;gap:6px}
+.exercise-motion-note{margin-top:10px;color:var(--muted)}
+.exercise-guide figure{margin:0;min-width:0;align-self:center}
+.exercise-guide figure img{display:block;width:100%;height:auto;aspect-ratio:780/252;object-fit:contain}
+.exercise-guide figcaption{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center;font-size:11px;color:var(--muted);margin-top:8px}
+.exercise-camera-guide{grid-column:1/-1;display:flex;gap:9px;padding-top:13px;border-top:1px solid var(--line);color:var(--ink)}
+.exercise-camera-guide>svg{width:17px;height:17px;flex-shrink:0;margin-top:3px;color:var(--blue)}
+.exercise-pace{grid-column:1/-1;color:var(--muted)}
+#activeExerciseGuide{margin-top:26px}
+.exercise-cycle{border-top:1px solid var(--line);padding:16px 0;min-height:118px}
+.exercise-cycle ol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));list-style:none;gap:6px;margin:0;padding:0}
+.exercise-cycle li{text-align:center;font-size:10px;line-height:1.5;color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.exercise-cycle b{display:grid;place-items:center;width:22px;height:22px;margin:0 auto 6px;border:1px solid var(--line);border-radius:50%;font-weight:500}
+.exercise-cycle .confirmed b{border-color:var(--green);color:var(--green)}
+.exercise-cycle .current{color:var(--green);font-weight:600}
+.exercise-cycle .current b{background:var(--green);border-color:var(--green);color:white}
+#exerciseCue{font-size:12px;line-height:1.7;margin-top:13px;min-height:41px;color:var(--ink)}
+.exercise-diagnostics summary{cursor:pointer;color:var(--muted);font-size:11px}
+.exercise-diagnostics[open] summary{margin-bottom:14px}
+.exercise-live-grid{align-items:start}
+@media(max-width:1000px){.exercise-guide{grid-template-columns:1fr}.exercise-guide figure{max-width:520px;width:100%;justify-self:center}}
+@media(max-width:760px){.exercise-guide{gap:14px;padding:18px 0}.exercise-guide-copy{min-width:0}.exercise-guide figure{max-width:100%}.exercise-cycle{min-height:128px}.exercise-guide figcaption{font-size:10px}.exercise-counter{padding-top:0}}
