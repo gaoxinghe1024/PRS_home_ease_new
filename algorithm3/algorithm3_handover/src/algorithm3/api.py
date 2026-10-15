@@ -194,7 +194,7 @@ class Algorithm3:
 
     # ------------------------------------------------------------------ 3. spoken call for help
     def detect_spoken_help(self, samples: Any, sr: int = SR) -> dict[str, Any]:
-        """Run a recording through the speech gate and the listener rules (0.3 to 6 s, recogniser log-probability at least -1.0, a clear
+        """Run a recording through the speech gate and the listener rules (0.3 to 6 s, recogniser log-probability at least -1.2, a clear
         call, 30 s cooldown). Returns every speech segment with its verdict (``help`` or the reason it was ignored)."""
         from homeease.ml.audio.help_listener import HelpListener
 

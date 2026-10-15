@@ -219,7 +219,7 @@ audio:
     cooldown_s: 30.0
     min_utterance_s: 0.3
     max_utterance_s: 6.0
-    min_asr_logprob: -1.0
+    min_asr_logprob: -1.2
 privacy:
   persist_raw_video: false
   persist_raw_audio: false
