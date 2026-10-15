@@ -1,0 +1,144 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HomeEase 照护报告</title><link rel="icon" href="data:,"><style>body{font:13px/1.8 "Segoe UI","Microsoft YaHei",sans-serif;color:#304337;background:#f3f6f3;margin:0}main{max-width:1000px;margin:30px auto;background:white;padding:45px}h1{font-size:27px;font-weight:600;margin:12px 0}h2{font-size:17px;border-bottom:1px solid #dce5de;padding-bottom:9px;margin-top:30px}h3{font-size:14px}p{color:#758578}.brand{font-size:23px;font-weight:650;color:#1b6c4d}table{border-collapse:collapse;width:100%;font-size:11px;margin:15px 0}th,td{text-align:left;padding:10px;border-bottom:1px solid #dfe7e0;vertical-align:top;overflow-wrap:anywhere}th{background:#eff4f0;color:#6f8475;font-weight:500}.summary{display:flex;flex-wrap:wrap;gap:35px;padding:18px 0;border-block:1px solid #dfe7e0}.summary strong{font-size:27px;display:block;font-weight:500}.meta{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}.meta small{display:block;color:#86988a}.note{font-size:11px;background:#f3f6f3;padding:15px;line-height:1.9}.actions{max-width:1000px;margin:25px auto;display:flex;gap:15px}button,a{font:inherit;color:#286d4b}button{border:1px solid #c9dacd;padding:9px 18px;border-radius:4px;background:white;cursor:pointer}.badge{font-size:10px;padding:3px 8px;background:#edf3ef;color:#598264;border-radius:3px}.badge.ok{background:#e4f1e9;color:#156445}.badge.risk{background:#fce8e6;color:#b3261e;font-weight:600}.badge.muted{background:#eef1ee;color:#7b8c80}.metric-risk strong{color:#b3261e}.wave{width:100%;height:180px}.timeline{font-size:12px}.timeline li{margin-bottom:13px}footer{border-top:1px solid #dfe7e0;margin-top:40px;padding-top:15px;color:#94a297;font-size:10px}svg{max-width:100%}@media print{body{background:white}main{padding:0;margin:0;max-width:none}.actions{display:none}table{page-break-inside:auto}tr{page-break-inside:avoid}h2{break-after:avoid}footer{margin-top:25px}.note{background:white;border:1px solid #ddd}@page{margin:18mm}}@media(max-width:700px){main{padding:22px;margin:10px}.actions{margin:20px}.summary{gap:25px}.summary>div{min-width:110px}table{font-size:9px}th,td{padding:7px}.meta{gap:14px}.table-wrap{overflow-x:auto}}.record-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:11px;padding:12px 14px;background:#fdf6f5;border:1px solid #f0d9d6;border-radius:4px;margin:16px 0}.record-toolbar label{display:flex;align-items:center;gap:6px;color:#7a5a56}.record-toolbar button{font:inherit;font-size:11px;padding:7px 14px;border:1px solid #c9dacd;border-radius:4px;background:white;color:#286d4b;cursor:pointer}.record-toolbar button.danger{border-color:#e3bab6;color:#b3261e}.record-toolbar button:disabled{opacity:.45;cursor:not-allowed}.record-toolbar .hint{color:#8a9a8e}.record-toolbar .spacer{flex:1}.pick{width:36px}.pick input{width:15px;height:15px;accent-color:#286d4b}.confirm-mask{position:fixed;inset:0;background:rgba(28,44,35,.42);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}.confirm-box{background:#fff;border-radius:6px;padding:24px 26px;max-width:430px;box-shadow:0 18px 45px rgba(20,40,30,.25)}.confirm-box h3{margin:0 0 10px;font-size:15px;color:#2c463a}.confirm-box p{margin:0 0 18px;font-size:12px;line-height:1.85;color:#6a7d70}.confirm-actions{display:flex;gap:10px;justify-content:flex-end}.confirm-actions .danger{border-color:#e3bab6;color:#b3261e}.actions .danger{margin-left:auto}@media print{.no-print{display:none!important}}</style></head><body><div class="actions"><button onclick="window.print()">打印 / 另存为 PDF</button><a href="/#reports">返回照护工作台</a>{% if event %}<button type="button" id="deleteEvent" class="danger">删除此记录</button>{% endif %}</div>{% if event %}<script id="eventIdentity" type="application/json">{{ {'id': event.id} | tojson }}</script>{% endif %}<main><div class="brand">HomeEase</div>
+{% set outcome_names = {'confirmed_fall':'确认跌倒','false_alarm':'误报','safe':'核实安全','unresolved':'结果未确定'} %}
+{% if event %}<h1>事件处置报告</h1><p>#{{ event.id }} · {{ '实时记录' if event.mode == 'live' else '样例 / 回放记录' }}</p><div class="meta"><div><small>长者 / 房间</small>{{ event.resident }} / {{ event.room }}</div><div><small>事件级别 / 状态</small>{{ event.level }} / {{ event.state }}</div><div><small>发生时间</small><time>{{ event.occurred_at }}</time></div><div><small>检测时间</small><time>{{ event.detected_at }}</time></div><div><small>检测通道 / 通道标签</small>{{ event.channel }} / {{ event.tag or '主动求助' }}</div><div><small>语音问询</small><span class="badge {{ event.voice.css }}">{{ event.voice.label }}{% if event.voice.detail %} · {{ event.voice.detail }}{% endif %}</span></div><div><small>输入来源</small>{{ event.source }}</div><div><small>处置结果</small>{{ outcome_names.get(event.outcome, '待处理') }}</div><div><small>响应时长</small>{{ ('%.1f 秒' % event.response_s) if event.response_s is not none else '尚未完成' }}</div></div><h2>检测证据</h2><table><tr><th>指标</th><th>原算法输出</th></tr>{% for key,value in event.evidence.items() %}{% if key not in ['snippet','clip_url','segments','details','transcript'] and value is not mapping and value is not sequence or value is string %}<tr><td>{{ key }}</td><td>{{ value }}</td></tr>{% endif %}{% endfor %}</table>{% if event.evidence.snippet %}<h3>报警前后加速度（g）</h3><canvas id="signalReport" class="wave"></canvas><script id="signalData" type="application/json">{{ event.evidence.snippet|tojson }}</script>{% endif %}<h2>通道标记</h2><table><thead><tr><th>通道</th><th>时间</th><th>类型</th><th>计入 10 秒窗口</th></tr></thead><tbody>{% for marker in event.markers %}<tr><td>{{ marker.channel }}</td><td><time>{{ marker.at }}</time></td><td>{{ marker.kind }}</td><td>{{ '是' if marker.counted else '否' }}</td></tr>{% endfor %}</tbody></table><h2>语音询问</h2><p><span class="badge {{ event.voice.css }}">{{ event.voice.label }}{% if event.voice.detail %} · {{ event.voice.detail }}{% endif %}</span> {{ event.voice.reason }}{% if event.voice.at %} · <time>{{ event.voice.at }}</time>{% endif %}</p><p style="color:#86988a;font-size:11px">问询状态：{{ event.inquiry.status }}{% if event.inquiry.result %} · 策略结果：{{ event.inquiry.result.state }}{% endif %}{% if event.inquiry.asked_at %} · 发起时间 <time>{{ event.inquiry.asked_at }}</time>{% endif %}</p><h2>响应时间线</h2><ol class="timeline">{% for item in event.timeline %}<li><time>{{ item.at }}</time> · {{ item.actor }}<br>{{ item.note }}</li>{% endfor %}</ol>{% if event.notes %}<h2>处置备注</h2><p>{{ event.notes }}</p>{% endif %}<div class="note">语音回应不会自动关闭或降级事件。环境声音标签仅为辅助提示。原始音频和语音文字不保存。</div>
+{% else %}<h1>{{ report.days }} 天照护报告</h1><p>{{ report.resident.name or '未命名长者' }} · {{ report.resident.room }} · {{ report.series[0].date }} 至 {{ report.series[-1].date }} · {{ '实时记录' if report.mode == 'live' else '样例 / 回放记录' }}</p><div class="summary"><div>确认跌倒<strong>{{ report.summary.confirmed_falls }} <small>次</small></strong></div><div>误报<strong>{{ report.summary.false_alarms }} <small>次</small></strong></div><div>待处理<strong>{{ report.summary.open_events }} <small>条</small></strong></div><div>语音已应答<strong>{{ report.summary.voice_answered }} <small>条</small></strong></div><div{% if report.summary.voice_high_risk %} class="metric-risk"{% endif %}>高风险未应答<strong>{{ report.summary.voice_high_risk }} <small>条</small></strong></div><div>未问询<strong>{{ report.summary.voice_not_asked }} <small>条</small></strong></div><div>已完成训练<strong>{{ report.summary.sessions }} <small>次</small></strong></div><div>有效运动<strong>{{ report.summary.reps }} <small>次</small></strong></div></div><h2>每日记录</h2><table><thead><tr><th>日期</th><th>检测事件</th><th>确认跌倒</th><th>运动次数</th></tr></thead><tbody>{% for day in report.series %}<tr><td>{{ day.date }}</td><td>{{ day.events }}</td><td>{{ day.confirmed_falls }}</td><td>{{ day.reps }}</td></tr>{% endfor %}</tbody></table><h2>安全事件</h2>{% if report %}<div class="record-toolbar no-print"><label><input type="checkbox" id="selectAllRecords">全选本报告全部记录</label><span class="hint" id="recordHint">未选择记录</span><span class="spacer"></span><button type="button" id="deleteSelected" disabled>删除选中</button><button type="button" id="clearScope" class="danger">清空报告范围</button></div><script id="reportScope" type="application/json">{{ {'mode': report.mode, 'days': report.days} | tojson }}</script>{% endif %}<div class="table-wrap"><table><thead><tr><th class="pick"><input type="checkbox" class="pick-all" data-scope="event" aria-label="全选安全事件"></th><th>编号</th><th>时间</th><th>通道</th><th>级别</th><th>语音问询</th><th>结果</th><th>响应时长</th></tr></thead><tbody>{% for item in report.events %}<tr><td class="pick"><input type="checkbox" class="row-pick" data-kind="event" value="{{ item.id }}" aria-label="选择事件 {{ item.id }}"></td><td>{{ item.id }}</td><td><time>{{ item.occurred_at }}</time></td><td>{{ item.channel }}</td><td>{{ item.level }}</td><td><span class="badge {{ item.voice.css }}">{{ item.voice.label }}{% if item.voice.detail %} · {{ item.voice.detail }}{% endif %}</span>{% if item.voice.state != 'answered' %}<br><span style="color:#86988a">{{ item.voice.reason }}</span>{% endif %}</td><td>{{ outcome_names.get(item.outcome,'待处理') }}</td><td>{{ ('%.1f 秒' % item.response_s) if item.response_s is not none else '--' }}</td></tr>{% else %}<tr><td colspan="8">暂无事件记录</td></tr>{% endfor %}</tbody></table></div><h2>运动训练</h2><div class="table-wrap"><table><thead><tr><th class="pick"><input type="checkbox" class="pick-all" data-scope="session" aria-label="全选运动训练"></th><th>开始时间</th><th>动作</th><th>次数 / 目标</th><th>观察时长</th><th>有效观察</th><th>中断数</th><th>状态</th></tr></thead><tbody>{% for s in report.sessions %}<tr><td class="pick"><input type="checkbox" class="row-pick" data-kind="session" value="{{ s.session_id }}" aria-label="选择训练 {{ s.created_at }}"></td><td><time>{{ s.created_at }}</time></td><td>{{ exercises.get(s.exercise,s.exercise) }}</td><td>{{ s.count }} / {{ s.target_reps }}</td><td>{{ '%.1f' % s.elapsed_s }} 秒</td><td>{{ '%.1f' % s.valid_duration_s }} 秒</td><td>{{ s.interruptions|length }}</td><td>{{ s.status }}</td></tr>{% else %}<tr><td colspan="8">暂无训练记录</td></tr>{% endfor %}</tbody></table></div><h2>监测覆盖</h2>{% if report.mode == 'live' %}<p>{% for ch,seconds in report.summary.coverage_unavailable_s.items() %}{{ {'vision':'视频','accel':'加速度','audio':'音频'}.get(ch,ch) }}受限 / 不可用 {{ '%.1f' % (seconds/60) }} 分钟　{% endfor %}</p><table><thead><tr><th>通道</th><th>起始</th><th>结束</th><th>状态</th><th>原因</th></tr></thead><tbody>{% for c in report.coverage[:100] %}<tr><td>{{ c.channel }}</td><td><time>{{ c.started_at }}</time></td><td>{% if c.ended_at %}<time>{{ c.ended_at }}</time>{% else %}持续中{% endif %}</td><td>{{ c.state }}</td><td>{{ c.reason }}</td></tr>{% endfor %}</tbody></table>{% else %}<p>回放不计入实时监测覆盖。</p>{% endif %}<div class="note">监测时长仅统计本系统有记录的运行区间，未记录的时间不代表正常监测。样例、回放与实时数据分别统计。运动数据为活动记录，不构成医疗诊断或跌倒风险评估。</div>{% endif %}{% if report %}{% set notifications = report.notifications %}{% endif %}{% include "report_addendum.html" %}<footer>HomeEase · Group 10 · 本地照护记录{% if report %} · 生成于 <time>{{ report.generated_at }}</time>{% endif %}</footer></main><script>document.querySelectorAll('time').forEach(el=>el.textContent=new Date(el.textContent).toLocaleString('zh-CN',{hour12:false}));const data=document.getElementById('signalData');if(data){const s=JSON.parse(data.textContent),canvas=document.getElementById('signalReport'),r=canvas.getBoundingClientRect(),d=devicePixelRatio||1;canvas.width=r.width*d;canvas.height=r.height*d;const c=canvas.getContext('2d');c.scale(d,d);const all=[...s.ax,...s.ay,...s.az],min=Math.min(...all,0),max=Math.max(...all,1);c.strokeStyle='#dfe6e0';for(let i=0;i<4;i++){const y=15+i*(r.height-40)/3;c.beginPath();c.moveTo(30,y);c.lineTo(r.width-10,y);c.stroke();}['ax','ay','az'].forEach((key,j)=>{c.strokeStyle=['#557db6','#539570','#b88b50'][j];c.lineWidth=1.8;c.beginPath();s[key].forEach((v,i)=>{const x=30+i/Math.max(1,s[key].length-1)*(r.width-45),y=r.height-25-(v-min)/(max-min)*(r.height-40);if(i===0)c.moveTo(x,y);else c.lineTo(x,y);});c.stroke();});c.font='11px Segoe UI';c.fillStyle='#7b8c80';c.fillText('X / Y / Z · g',35,r.height-4);}
+/* 记录管理：报告视图的勾选删除 / 清空范围；事件报告视图的单条删除。 */
+(() => {
+  function modal(title, message, accept, cancel) {
+    return new Promise((resolve) => {
+      const mask = document.createElement("div");
+      mask.className = "confirm-mask no-print";
+      mask.innerHTML = '<div class="confirm-box" role="dialog" aria-modal="true"><h3></h3><p></p><div class="confirm-actions"></div></div>';
+      mask.querySelector("h3").textContent = title;
+      mask.querySelector("p").textContent = message;
+      const actions = mask.querySelector(".confirm-actions");
+      const close = (value) => { mask.remove(); resolve(value); };
+      if (cancel) {
+        const no = document.createElement("button");
+        no.type = "button";
+        no.textContent = cancel;
+        no.addEventListener("click", () => close(false));
+        actions.append(no);
+      }
+      const yes = document.createElement("button");
+      yes.type = "button";
+      yes.textContent = accept;
+      if (cancel) yes.className = "danger";
+      yes.addEventListener("click", () => close(true));
+      actions.append(yes);
+      mask.addEventListener("click", (event) => { if (event.target === mask) close(false); });
+      document.body.append(mask);
+      yes.focus();
+    });
+  }
+
+  async function send(path, body) {
+    const response = await fetch(path, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || result.detail || `请求失败 (${response.status})`);
+    return result;
+  }
+
+  const describe = (result) => `安全事件 ${result.events || 0} 条、运动训练 ${result.sessions || 0} 条、通知 ${result.notifications || 0} 条、录像片段 ${result.clips || 0} 个`;
+
+  /* 事件报告视图：删除页面上这一条记录，完成后回到照护工作台的报告页。 */
+  const single = document.getElementById("deleteEvent");
+  if (single) {
+    const identity = document.getElementById("eventIdentity");
+    const target = identity ? JSON.parse(identity.textContent) : null;
+    if (target && target.id) {
+      single.addEventListener("click", async () => {
+        const confirmed = await modal("删除事件记录",
+          `将永久删除事件 #${target.id}，以及随它产生的通知与录像片段。删除后无法恢复，报告的统计也会随之变化。`,
+          "永久删除", "取消");
+        if (!confirmed) return;
+        single.disabled = true;
+        try {
+          const result = await send("/api/records/delete", {event_ids: [target.id], session_ids: []});
+          await modal("删除完成", `已删除：${describe(result)}。即将返回照护工作台。`, "知道了", null);
+          location.href = "/#reports";
+        } catch (error) {
+          single.disabled = false;
+          await modal("删除失败", error.message, "知道了", null);
+        }
+      });
+    }
+  }
+
+  /* 报告视图：勾选后逐条删除，或清空整个报告范围。工具栏不存在时整段跳过。 */
+  const master = document.getElementById("selectAllRecords");
+  if (!master) return;
+  const scopeNode = document.getElementById("reportScope");
+  const scope = scopeNode ? JSON.parse(scopeNode.textContent) : {mode: "live", days: 7};
+  const hint = document.getElementById("recordHint");
+  const removeButton = document.getElementById("deleteSelected");
+  const clearButton = document.getElementById("clearScope");
+  const rows = () => Array.from(document.querySelectorAll(".row-pick"));
+  const ofKind = (kind) => rows().filter((row) => row.dataset.kind === kind);
+
+  function sync() {
+    const all = rows();
+    const picked = all.filter((row) => row.checked);
+    master.checked = all.length > 0 && picked.length === all.length;
+    master.indeterminate = picked.length > 0 && picked.length < all.length;
+    document.querySelectorAll(".pick-all").forEach((box) => {
+      const group = ofKind(box.dataset.scope);
+      box.checked = group.length > 0 && group.every((row) => row.checked);
+      box.indeterminate = group.some((row) => row.checked) && !group.every((row) => row.checked);
+    });
+    const events = picked.filter((row) => row.dataset.kind === "event").length;
+    const sessions = picked.filter((row) => row.dataset.kind === "session").length;
+    hint.textContent = picked.length ? `已选择 ${picked.length} 条记录（安全事件 ${events} · 运动训练 ${sessions}）` : "未选择记录";
+    removeButton.disabled = picked.length === 0;
+  }
+
+  master.addEventListener("change", () => {
+    rows().forEach((row) => { row.checked = master.checked; });
+    sync();
+  });
+  document.querySelectorAll(".pick-all").forEach((box) => box.addEventListener("change", () => {
+    ofKind(box.dataset.scope).forEach((row) => { row.checked = box.checked; });
+    sync();
+  }));
+  rows().forEach((row) => row.addEventListener("change", sync));
+
+  removeButton.addEventListener("click", async () => {
+    const picked = rows().filter((row) => row.checked);
+    if (!picked.length) return;
+    const confirmed = await modal("删除选中记录",
+      `将永久删除选中的 ${picked.length} 条记录，以及随事件产生的通知与录像片段。删除后无法恢复，报告的统计也会随之变化。`,
+      "永久删除", "取消");
+    if (!confirmed) return;
+    removeButton.disabled = true;
+    try {
+      const result = await send("/api/records/delete", {
+        event_ids: picked.filter((row) => row.dataset.kind === "event").map((row) => row.value),
+        session_ids: picked.filter((row) => row.dataset.kind === "session").map((row) => row.value)});
+      await modal("删除完成", `已删除：${describe(result)}。`, "知道了", null);
+      location.reload();
+    } catch (error) {
+      removeButton.disabled = false;
+      await modal("删除失败", error.message, "知道了", null);
+    }
+  });
+
+  clearButton.addEventListener("click", async () => {
+    const range = `${scope.mode === "live" ? "实时记录" : "样例与回放"} · 近 ${scope.days} 天`;
+    const confirmed = await modal("清空报告范围",
+      `将永久删除当前报告范围（${range}）内的全部安全事件与运动训练记录，含通知与录像片段。删除后无法恢复。`,
+      "清空并删除", "取消");
+    if (!confirmed) return;
+    clearButton.disabled = true;
+    try {
+      const result = await send("/api/records/clear", {mode: scope.mode, days: scope.days, events: true, sessions: true});
+      await modal("清空完成", `已清空：${describe(result)}。`, "知道了", null);
+      location.reload();
+    } catch (error) {
+      clearButton.disabled = false;
+      await modal("清空失败", error.message, "知道了", null);
+    }
+  });
+
+  sync();
+})();
+</script></body></html>
