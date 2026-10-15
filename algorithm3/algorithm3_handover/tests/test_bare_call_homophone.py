@@ -18,10 +18,12 @@ R2 = I.RuleIntentV2()
 # What Whisper tiny actually wrote for a half-second "jiu ming" in the evaluation probes, and the same homophones repeated or with a particle.
 HOMOPHONE_CALLS = [
     "\u5c31\u547d", "\u5c31\u547d\u554a", "\u5c31\u547d\u5c31\u547d", "\u5c31\u547d\uff0c\u5c31\u547d\uff01", "\u5c31\u6709\u547d\u4e86", "\u65e7\u547d", "\u8205\u547d", "\u4e5d\u547d", "\u6551\u547d", "\u6551\u547d\u554a", "\u6551\u547d\u6551\u547d", "\u6551\u547d\uff01\u6551\u547d\uff01", "\u5c31\u547d\u5440 \u5c31\u547d\u5566",
+    "\u5c31\u6709\u547d\u554a", "\u5c31\u6709\u547d\u5440", "\u5f53\u5f53\u6211", "\u7576\u7576\u6211", "\u65b9\u65b9\u6211", "\u90a6\u90a6\u6211", "\u5f53\u5f53\u6211\u554a", "\u7576\u7576\u6211 \u7576\u7576\u6211",
 ]
 # The same characters inside an ordinary sentence, or as a title: nothing calls for help.
 NOT_CALLS = [
     "\u6211\u5c31\u547d\u4ee4\u4f60\u4eec\u51fa\u53bb", "\u4e5d\u547d\u732b\u5996\u662f\u4e00\u90e8\u7535\u5f71", "\u65e7\u547d\u8fd0", "\u8fd9\u4e2a\u5c31\u547d\u540d\u4e3a\u5c0f\u660e", "\u4eca\u5929\u5c31\u547d\u540d\u5b8c\u4e86", "\u5c31\u547d\u8fd0\u6765\u8bf4",
+    "\u5f53\u5f53\u6211\u4eec\u53bb\u5403\u996d", "\u6211\u53eb\u65b9\u65b9", "\u65b9\u65b9\u6211\u4e0d\u8ba4\u8bc6", "\u90a6\u90a6\u6211\u77e5\u9053\u4e86", "\u53ee\u5f53\u6211\u6765\u4e86", "\u5f53\u5f53\u6211\u53bb\u5f00\u95e8",
 ]
 
 
@@ -71,3 +73,9 @@ def test_the_listener_still_ignores_what_it_ignored_before() -> None:
     assert _judge("\u4eca\u5929\u5929\u6c14\u4e0d\u9519") == "not_help"
     assert _judge("\u6211\u5c31\u547d\u4ee4\u4f60\u4eec\u51fa\u53bb") == "not_help"
     assert _judge("\u5c31\u547d", logprob=-1.4) == "low_confidence"  # the confidence gate is unchanged
+
+
+def test_the_listener_raises_the_alarm_for_a_misread_bang_bang_wo() -> None:
+    assert _judge("\u7576\u7576\u6211", logprob=-0.6) == "help"
+    assert _judge("\u5c31\u6709\u547d\u554a", logprob=-0.8) == "help"
+    assert _judge("\u5f53\u5f53\u6211\u4eec\u53bb\u5403\u996d", logprob=-0.6) in ("not_help", "not_a_call")

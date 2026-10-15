@@ -98,7 +98,7 @@
   "algorithm3/algorithm3_handover/src/homeease/ml/audio/help_listener.py": "1badbd0dfe8e0ea9f92c5d78c7960a0f9fd8a703efc12bdaca46224891063079",
   "algorithm3/algorithm3_handover/src/homeease/ml/audio/inquiry.py": "620a871c9ca6251389f4e0015dc46b59a5c8277b51b1b6c3152177a65b021b75",
   "algorithm3/algorithm3_handover/src/homeease/ml/audio/intent.py": "634c478fcb5c122c08d9466a8b3c49817c4a36e21e09511c14d7f43dbfc0fedd",
-  "algorithm3/algorithm3_handover/src/homeease/ml/audio/intent_v2.py": "a57365f7a65ad1166939f2f556523af2538233361c85a343a6c7221ff6853029",
+  "algorithm3/algorithm3_handover/src/homeease/ml/audio/intent_v2.py": "2219c611338d10899f6fa915b950c23ad1a7df02e713def225f2d14170d88de2",
   "algorithm3/algorithm3_handover/src/homeease/ml/audio/live.py": "69e5c1707d0759005de69df440225f105ef4671b83e60574eaaafded0e7068f6",
   "algorithm3/algorithm3_handover/src/homeease/ml/audio/monitor.py": "6e801d5a26f29cc3d73379b635c0ef12b2d68e443b44ca42e037b4e82d277e03",
   "algorithm3/algorithm3_handover/src/homeease/ml/audio/pipeline.py": "43ba744bc6fc367131083710225f1630c738a2b97585154be2af219813f1431e",
