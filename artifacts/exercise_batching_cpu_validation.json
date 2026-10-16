@@ -1,0 +1,100 @@
+{
+  "model": "opt_tcn_b4_w48",
+  "device": "cpu",
+  "probability_atol": 2e-06,
+  "method": "Both paths use identical real observations and causal 30 Hz SDK resampling. Only already-available ticks/views share model calls; counters still consume every tick in order.",
+  "all_frame_behavior_equal": true,
+  "public_checks": [],
+  "static_checks": [],
+  "captured_traces": [
+    {
+      "id": "fc48e52b-ae77-4d3b-b9e0-ebb9b17429d1",
+      "source": "standing_leg_raise",
+      "frames": 392,
+      "model_ticks": 1378,
+      "max_probability_error": 3.8743019104003906e-07,
+      "timings": {
+        "sequential": {
+          "valid_frame_phase_update": {
+            "p50_ms": 22.314799978630617,
+            "p95_ms": 32.93534000404179
+          }
+        },
+        "batched": {
+          "valid_frame_phase_update": {
+            "p50_ms": 5.13369997497648,
+            "p95_ms": 8.662720007123424
+          }
+        }
+      },
+      "checks": [
+        {
+          "target": "standing_leg_raise",
+          "positive": true,
+          "sequential_count": 3,
+          "batched_count": 3,
+          "all_frame_behavior_equal": true,
+          "cycles_equal": true
+        },
+        {
+          "target": "hurdle_step",
+          "positive": false,
+          "sequential_count": 4,
+          "batched_count": 4,
+          "all_frame_behavior_equal": true,
+          "cycles_equal": true
+        }
+      ],
+      "input_sha256": "d5971de644d50167aac6cbbe21f028a190cde597c9befd1ad53e98a0f482c8c5",
+      "truncated": false,
+      "saved_system_count": 3
+    },
+    {
+      "id": "f49719f3-2269-486f-b15e-1aadab2bbb08",
+      "source": "hurdle_step",
+      "frames": 594,
+      "model_ticks": 1341,
+      "max_probability_error": 4.6193599700927734e-07,
+      "timings": {
+        "sequential": {
+          "valid_frame_phase_update": {
+            "p50_ms": 30.277700017904863,
+            "p95_ms": 42.38098999630892
+          }
+        },
+        "batched": {
+          "valid_frame_phase_update": {
+            "p50_ms": 5.8840000128839165,
+            "p95_ms": 9.913550014607607
+          }
+        }
+      },
+      "checks": [
+        {
+          "target": "standing_leg_raise",
+          "positive": false,
+          "sequential_count": 4,
+          "batched_count": 4,
+          "all_frame_behavior_equal": true,
+          "cycles_equal": true
+        },
+        {
+          "target": "hurdle_step",
+          "positive": true,
+          "sequential_count": 1,
+          "batched_count": 1,
+          "all_frame_behavior_equal": true,
+          "cycles_equal": true
+        }
+      ],
+      "input_sha256": "c6814931d9f8bff2669c04fbfb772db4a4a209c3b753d529a45aef839ee32370",
+      "truncated": false,
+      "saved_system_count": 1
+    }
+  ],
+  "limitation": "Performance excludes pose, IPC, storage and camera scheduling. Unchanged saved-input counts do not validate live accuracy or recover missed camera frames.",
+  "max_probability_error": 4.6193599700927734e-07,
+  "public_positive_checks": 0,
+  "public_negative_checks": 0,
+  "public_negative_cycles": 0
+}

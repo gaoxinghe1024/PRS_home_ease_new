@@ -21,13 +21,13 @@
     "training_false_cycles": 0,
     "unconditionally_removing_action_gate_false_cycles": 414
   },
-  "tests": {"system_passed": 43, "algorithm2_original_passed": 28, "algorithm2_additional_passed": 41},
+  "tests": {"system_passed": 43, "algorithm2_original_passed": 28, "algorithm2_additional_passed": 44},
   "cpu_upload_parity": {"max_keypoint_error": 0, "phase_probability_max_error": 6.547556205549476e-8, "phase_probability_atol": 1e-7, "counts_and_cycles_equal": true},
   "live_camera_verification": {
     "squat": "user_confirmed_accurate",
     "chair_sit_to_stand": "user_confirmed_working",
-    "standing_leg_raise": "user_reports_improvement_but_missed_and_duplicate_counts_5_of_approximately_7_to_9",
-    "hurdle_step": "user_reports_improvement_but_missed_and_duplicate_counts_4_of_approximately_7_to_9"
+    "standing_leg_raise": "user_confirmed_working_after_batched_inference_retest",
+    "hurdle_step": "user_confirmed_working_after_batched_inference_retest"
   },
   "exercise_guides": {
     "languages": ["zh", "en"],
@@ -118,5 +118,64 @@
     "live_acceptance_complete": false
   },
   "diagnostic_retention": {"window_ms": 180000, "max_actual_frames": 1800, "stores_video": false},
-  "limitation": "Public projected skeleton checks and captured inputs do not establish live accuracy. Both leg exercises have improved per user feedback but still have missed and duplicate counts. The new hurdle continuity policy has only been verified offline. The old straight-leg prefix was discarded and cannot validate the suspected duplicates."
+  "latest_exact_five_rep_feedback": {
+    "rep_definition": "One single-leg lift and return is one repetition, not a left/right pair.",
+    "per_cycle_manual_timestamps_available": false,
+    "straight_leg_raise": {
+      "session_id": "fc48e52b-ae77-4d3b-b9e0-ebb9b17429d1",
+      "user_confirmed_repetitions": 5, "system_count": 3, "sdk_count": 3,
+      "observed_frames": 392, "visible_frames": 339,
+      "elapsed_s": 50.0967, "saved_trace_truncated": false,
+      "longest_continuous_valid_segment_s": 45.8667
+    },
+    "hurdle_step": {
+      "session_id": "f49719f3-2269-486f-b15e-1aadab2bbb08",
+      "user_confirmed_repetitions": 5, "system_count": 1, "sdk_count": 1,
+      "observed_frames": 594, "visible_frames": 254,
+      "elapsed_s": 74.0943, "saved_trace_truncated": false,
+      "longest_continuous_valid_segment_s": 33.1333
+    },
+    "raw_landmarks_in_repository": false,
+    "sdk_and_system_counts_match": true,
+    "live_acceptance_complete": false
+  },
+  "batched_training_inference": {
+    "exercises": ["standing_leg_raise", "hurdle_step"],
+    "action_scope": "training", "camera_device_unchanged": "cuda",
+    "weights_features_windows_and_counter_rules_unchanged": true,
+    "batch_scope": "Independent per-tick causal windows and both mirror views already available at the current real observation; no future-frame buffering.",
+    "custom_and_single_view_streams": "sequential_fallback",
+    "cuda_validation": "exercise_batching_validation.json",
+    "cuda_public_positive_checks": 8, "cuda_public_negative_and_static_checks": 48,
+    "cuda_public_negative_cycles": 0, "cuda_captured_traces": 5,
+    "cuda_max_probability_error": 9.5367431640625e-7,
+    "cpu_validation": "exercise_batching_cpu_validation.json",
+    "cpu_captured_traces": 2, "cpu_max_probability_error": 4.6193599700927734e-7,
+    "probability_atol": 2e-6,
+    "all_frame_behavior_and_cycles_equal_within_each_device": true,
+    "latest_exact_trace_counts_unchanged": {"standing_leg_raise": 3, "hurdle_step": 1},
+    "latency_sample": {
+      "device": "cuda", "includes_pose_ipc_storage": false,
+      "straight_leg_valid_frame_phase_p50_ms_before": 63.32,
+      "straight_leg_valid_frame_phase_p50_ms_after": 13.38,
+      "hurdle_valid_frame_phase_p50_ms_before": 84.27,
+      "hurdle_valid_frame_phase_p50_ms_after": 14.75,
+      "limitation": "Separate local runs, subject to system load. These phase timings are not end-to-end live camera FPS."
+    },
+    "live_acceptance_complete": true,
+    "acceptance_basis": "User reported no remaining issue after the optimized live retest; this is qualitative acceptance, not independently labeled accuracy."
+  },
+  "release_acceptance": {
+    "date": "2026-10-16",
+    "user_feedback": "No remaining issue; upload the current version to GitHub main.",
+    "main_update_authorized": true,
+    "latest_ended_sessions": {
+      "standing_leg_raise": {"session_id": "4d81a6f7-b69f-4539-ab4a-c50e0782dfb0", "system_count": 6},
+      "hurdle_step": {"session_id": "c3dbf562-2bcf-41ac-8eae-430b8190962f", "system_count": 6}
+    },
+    "actual_repetitions_for_latest_sessions_explicitly_confirmed": false,
+    "per_cycle_accuracy_claim": false,
+    "raw_landmarks_in_repository": false
+  },
+  "limitation": "The user accepted the latest live retest qualitatively. Public projected skeleton checks and captured inputs do not establish general live accuracy. Earlier exact-five trials remain historical 3/5 straight-leg and 1/5 hurdle captures. The latest session totals are not per-cycle ground-truth labels. Performance batching cannot recover observations absent from saved input."
 }

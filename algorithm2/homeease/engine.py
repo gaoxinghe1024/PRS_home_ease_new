@@ -46,15 +46,21 @@ class PhaseStream:
         self.extractors = [FeatureExtractor(m["mode"]) for m in self.predictor.members]
         self.buffers = [deque(maxlen=m["context"]) for m in self.predictor.members]
 
+    def _window(self, index, pose, timestamp):
+        member = self.predictor.members[index]
+        feature = self.extractors[index].update(pose, timestamp)
+        buffer = self.buffers[index]
+        buffer.append((feature - member["mean"]) / member["std"])
+        x = np.asarray(list(buffer), dtype=np.float32)
+        if len(x) < member["context"]:
+            x = np.pad(x, ((member["context"] - len(x), 0), (0, 0)), mode="edge")
+        return x
+
     def update(self, pose, timestamp):
         probs = []
         with self.predictor.lock, torch.inference_mode():
-            for member, extractor, buffer in zip(self.predictor.members, self.extractors, self.buffers):
-                feature = extractor.update(pose, timestamp)
-                buffer.append((feature - member["mean"]) / member["std"])
-                x = np.asarray(list(buffer), dtype=np.float32)
-                if len(x) < member["context"]:
-                    x = np.pad(x, ((member["context"] - len(x), 0), (0, 0)), mode="edge")
+            for index, member in enumerate(self.predictor.members):
+                x = self._window(index, pose, timestamp)
                 logits = member["model"](torch.from_numpy(x[None]).to(self.predictor.device))[:, -1]
                 probs.append(logits.softmax(-1).cpu().numpy()[0])
         return np.mean(probs, axis=0)
@@ -71,9 +77,33 @@ class MirroredPhaseStream:
         self.mirrored.reset()
 
     def update(self, pose, timestamp):
-        reflected = pose[[1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]].copy()
-        reflected[:, 0] *= -1
-        return (self.original.update(pose, timestamp) + self.mirrored.update(reflected, timestamp)) / 2
+        return self.update_many([(pose, timestamp)])[0]
+
+    def update_many(self, observations):
+        if not observations:
+            return []
+        views = []
+        for pose, timestamp in observations:
+            reflected = pose[[1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]].copy()
+            reflected[:, 0] *= -1
+            views.append((pose, reflected, timestamp))
+        streams = (self.original, self.mirrored)
+        if any(type(stream) is not PhaseStream for stream in streams):
+            return [(self.original.update(pose, timestamp) + self.mirrored.update(reflected, timestamp)) / 2
+                    for pose, reflected, timestamp in views]
+        predictor = self.original.predictor
+        probabilities = []
+        # Each tick retains its own causal window. Only independent model calls
+        # for already available ticks and views share a batch; no future frames wait.
+        with predictor.lock, torch.inference_mode():
+            for index, member in enumerate(predictor.members):
+                batch = [stream._window(index, view, timestamp)
+                         for pose, reflected, timestamp in views
+                         for stream, view in zip(streams, (pose, reflected))]
+                logits = member["model"](torch.from_numpy(np.asarray(batch)).to(predictor.device))[:, -1]
+                probabilities.append(logits.softmax(-1).cpu().numpy())
+        paired = np.mean(probabilities, axis=0).reshape(len(views), 2, -1)
+        return (paired[:, 0] + paired[:, 1]) / 2
 
 
 class ExerciseSession:
@@ -169,21 +199,26 @@ class ExerciseSession:
                 self.next_tick = t
                 self.last_pose = (t, pose.copy())
             previous_t, previous_pose = self.last_pose
-            ticks = 0
+            observations = []
             while self.next_tick <= t + 1e-8:
                 ratio = 1 if t <= previous_t else (self.next_tick - previous_t) / (t - previous_t)
                 interpolated = previous_pose * (1 - ratio) + pose * ratio
-                p = self.stream.update(interpolated, self.next_tick)
+                observations.append((interpolated, self.next_tick))
+                self.next_tick += 1 / 30
+            update_many = getattr(self.stream, "update_many", None)
+            posteriors = (update_many(observations) if update_many is not None else
+                          (self.stream.update(pose, tick) for pose, tick in observations))
+            for (_, tick), p in zip(observations, posteriors):
                 phase, canonical, actions = decode(p, self.exercise, self.action_scope)
                 hold_action_gap = False
                 if self.phase_policy == "action_gap_hold_v1":
                     target = EXERCISE_NAMES.index(self.exercise)
                     support = actions[target] / max(actions[:4].sum(), 1e-8)
                     if support >= .15:
-                        self.last_supported_action_tick = self.next_tick
+                        self.last_supported_action_tick = tick
                     hold_action_gap = (canonical[4] >= .5 and self.counter.stage > 0
                         and self.last_supported_action_tick is not None
-                        and self.next_tick - self.last_supported_action_tick <= .15)
+                        and tick - self.last_supported_action_tick <= .15)
                 self.action_probabilities = actions
                 action = int(actions.argmax())
                 self.recognized_exercise = EXERCISE_NAMES[action] if action < 4 else "other"
@@ -193,14 +228,12 @@ class ExerciseSession:
                 if hold_action_gap:
                     # Keep the confirmed stage for a brief classifier rejection;
                     # no new stage or repetition is inferred during this hold.
-                    self.counter.update(PHASES[self.counter.stage], self.next_tick)
+                    self.counter.update(PHASES[self.counter.stage], tick)
                 elif self.predictor.selected.get("decoder_strategy") in ["ordered_posterior", "ordered_transition"]:
-                    self.counter.update_probabilities(canonical, self.next_tick, self.predictor.selected["phase_evidence_threshold"],
+                    self.counter.update_probabilities(canonical, tick, self.predictor.selected["phase_evidence_threshold"],
                                                       infer_return=self.predictor.selected["decoder_strategy"] == "ordered_transition")
                 else:
-                    self.counter.update(PHASES[phase] if self.confidence >= self.predictor.selected["confidence_threshold"] else "other", self.next_tick)
-                self.next_tick += 1 / 30
-                ticks += 1
+                    self.counter.update(PHASES[phase] if self.confidence >= self.predictor.selected["confidence_threshold"] else "other", tick)
             if previous_timestamp is not None and gap_s <= .25 and self.quality == "good":
                 self.valid_duration_s += gap_s
             self.quality = "good"
