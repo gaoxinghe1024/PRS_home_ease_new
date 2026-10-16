@@ -95,7 +95,9 @@ def test_http_exposes_view_policy_and_sessions_do_not_share_histories():
         first = client.post("/v1/sessions", json={"exercise": "hurdle_step", "action_scope": "training"}).json()
         second = client.post("/v1/sessions", json={"exercise": "hurdle_step"}).json()
         assert first["inference_views"] == "mirror_average"
+        assert first["phase_policy"] == "action_gap_hold_v1"
         assert second["inference_views"] == "original"
+        assert second["phase_policy"] == "original"
         pose = [[joint, joint + 1, 1] for joint in range(17)]
         result = client.post(f'/v1/sessions/{first["session_id"]}/frames', json={
             "request_id": "one", "frames": [{"timestamp_ms": 0, "keypoints": pose}]})

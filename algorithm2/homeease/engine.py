@@ -77,7 +77,7 @@ class MirroredPhaseStream:
 
 
 class ExerciseSession:
-    def __init__(self, predictor, session_id="local", target_reps=10, exercise="chair_sit_to_stand", action_scope="open"):
+    def __init__(self, predictor, session_id="local", target_reps=10, exercise="chair_sit_to_stand", action_scope="open", phase_policy=None):
         if exercise not in EXERCISES:
             raise ValueError("UNSUPPORTED_EXERCISE")
         if not 1 <= target_reps <= 10000:
@@ -88,6 +88,11 @@ class ExerciseSession:
         self.action_scope = action_scope
         self.predictor, self.session_id, self.target_reps = predictor, session_id, target_reps
         use_mirror = action_scope == "training" and exercise in {"standing_leg_raise", "hurdle_step"}
+        use_action_hold = action_scope == "training" and exercise == "hurdle_step"
+        self.phase_policy = phase_policy or ("action_gap_hold_v1" if use_action_hold else "original")
+        if self.phase_policy not in {"original", "action_gap_hold_v1"} or (self.phase_policy != "original" and not use_action_hold):
+            raise ValueError("INVALID_PHASE_POLICY")
+        self.last_supported_action_tick = None
         self.inference_views = "mirror_average" if use_mirror else "original"
         self.stream = MirroredPhaseStream(predictor) if self.inference_views == "mirror_average" else predictor.stream()
         self.counter = CycleCounter(min_dwell_s=predictor.selected["min_dwell_s"])
@@ -111,6 +116,7 @@ class ExerciseSession:
             self.interruptions.append({"reason": reason, "timestamp_ms": timestamp})
         self.quality = reason
         self.counter.interrupt()
+        self.last_supported_action_tick = None
         self.stream.reset()
         self.last_pose = self.next_tick = None
         self.phase, self.confidence = "other", 0.0
@@ -169,13 +175,26 @@ class ExerciseSession:
                 interpolated = previous_pose * (1 - ratio) + pose * ratio
                 p = self.stream.update(interpolated, self.next_tick)
                 phase, canonical, actions = decode(p, self.exercise, self.action_scope)
+                hold_action_gap = False
+                if self.phase_policy == "action_gap_hold_v1":
+                    target = EXERCISE_NAMES.index(self.exercise)
+                    support = actions[target] / max(actions[:4].sum(), 1e-8)
+                    if support >= .15:
+                        self.last_supported_action_tick = self.next_tick
+                    hold_action_gap = (canonical[4] >= .5 and self.counter.stage > 0
+                        and self.last_supported_action_tick is not None
+                        and self.next_tick - self.last_supported_action_tick <= .15)
                 self.action_probabilities = actions
                 action = int(actions.argmax())
                 self.recognized_exercise = EXERCISE_NAMES[action] if action < 4 else "other"
                 self.probabilities = canonical
                 self.phase = EXERCISES[self.exercise]["phases"][phase] if phase < 4 else "other"
                 self.confidence = float(p.max())
-                if self.predictor.selected.get("decoder_strategy") in ["ordered_posterior", "ordered_transition"]:
+                if hold_action_gap:
+                    # Keep the confirmed stage for a brief classifier rejection;
+                    # no new stage or repetition is inferred during this hold.
+                    self.counter.update(PHASES[self.counter.stage], self.next_tick)
+                elif self.predictor.selected.get("decoder_strategy") in ["ordered_posterior", "ordered_transition"]:
                     self.counter.update_probabilities(canonical, self.next_tick, self.predictor.selected["phase_evidence_threshold"],
                                                       infer_return=self.predictor.selected["decoder_strategy"] == "ordered_transition")
                 else:
@@ -212,6 +231,7 @@ class ExerciseSession:
     def snapshot(self):
         return {"api_version": "v1", "session_id": self.session_id, "status": self.status,
                 "exercise": self.exercise, "action_scope": self.action_scope, "inference_views": self.inference_views,
+                "phase_policy": self.phase_policy,
                 "recognized_exercise": self.recognized_exercise,
                 "exercise_probabilities": dict(zip(EXERCISE_NAMES + ["other"], [float(v) for v in self.action_probabilities])),
                 "phase": self.phase, "phase_confidence": self.confidence,

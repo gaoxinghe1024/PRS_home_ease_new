@@ -21,13 +21,13 @@
     "training_false_cycles": 0,
     "unconditionally_removing_action_gate_false_cycles": 414
   },
-  "tests": {"system_passed": 42, "algorithm2_original_passed": 28, "algorithm2_additional_passed": 25},
+  "tests": {"system_passed": 43, "algorithm2_original_passed": 28, "algorithm2_additional_passed": 41},
   "cpu_upload_parity": {"max_keypoint_error": 0, "phase_probability_max_error": 6.547556205549476e-8, "phase_probability_atol": 1e-7, "counts_and_cycles_equal": true},
   "live_camera_verification": {
     "squat": "user_confirmed_accurate",
     "chair_sit_to_stand": "user_confirmed_working",
-    "standing_leg_raise": "guided_test_zero_still_unresolved",
-    "hurdle_step": "mirror_average_live_retest_zero_still_unresolved"
+    "standing_leg_raise": "user_reports_improvement_but_missed_and_duplicate_counts_5_of_approximately_7_to_9",
+    "hurdle_step": "user_reports_improvement_but_missed_and_duplicate_counts_4_of_approximately_7_to_9"
   },
   "exercise_guides": {
     "languages": ["zh", "en"],
@@ -82,7 +82,41 @@
     "canonical_arm_input": "rejected_cross_action_false_counts",
     "whole_model_camera_augmentation": "rejected_cross_action_false_counts_and_live_overcount",
     "frozen_backbone_leg_phase_heads": "latest_hurdle_3_leg_raise_0_rejected_negative_regressions",
-    "rigid_image_roll": "latest_hurdle_0_at_all_checked_angles_minus15_to_plus15"
+    "rigid_image_roll": "latest_hurdle_0_at_all_checked_angles_minus15_to_plus15",
+    "phase_ema_120ms": "rejected_public_leg_raise_counts_9_to_5_and_10_to_9",
+    "action_gap_hold_for_straight_leg_raise": "rejected_captured_hurdle_to_leg_cross_counts_2_to_3"
   },
-  "limitation": "Public projected skeleton checks and captured inputs do not establish accuracy on unseen home videos. Both leg exercises remain unresolved in live testing. New training-skeleton guidance is not a validated counting fix."
+  "latest_guided_leg_feedback": {
+    "user_reported_repetitions_each_approximate_range": [7, 9],
+    "reported_errors": ["missed_counts", "duplicate_counts"],
+    "straight_leg_raise": {
+      "system_count": 5, "elapsed_s": 84.687, "saved_trace_truncated": true,
+      "first_saved_timestamp_ms": 24869.773100013845,
+      "retained_input_sdk_count": 0,
+      "counted_prefix_missing": true,
+      "two_short_cycle_durations_s": [0.833, 0.800],
+      "short_cycles_confirmed_false": false
+    },
+    "hurdle_step": {
+      "system_count": 4, "elapsed_s": 61.776, "saved_trace_truncated": true,
+      "retained_input_sdk_original_count": 4,
+      "retained_input_sdk_continuity_count": 5
+    },
+    "raw_landmarks_in_repository": false,
+    "live_acceptance_complete": false
+  },
+  "phase_continuity_extension": {
+    "exercise": "hurdle_step", "action_scope": "training",
+    "phase_policy": "action_gap_hold_v1", "max_hold_s": 0.15,
+    "behavior": "Only hold an already confirmed stage during a brief action rejection after sufficient target-action support; do not advance phases during the hold.",
+    "unchanged": ["model_posteriors", "weights", "counter", "selected_thresholds", "input_interruptions", "other_three_exercises", "open_scope"],
+    "public_positive_sessions_without_regression": 8,
+    "public_negative_and_static_checks": 48, "public_false_cycles": 0,
+    "captured_new_cross_action_cycles": 0,
+    "captured_cross_action_errors_resolved": false,
+    "validation": "exercise_continuity_validation.json",
+    "live_acceptance_complete": false
+  },
+  "diagnostic_retention": {"window_ms": 180000, "max_actual_frames": 1800, "stores_video": false},
+  "limitation": "Public projected skeleton checks and captured inputs do not establish live accuracy. Both leg exercises have improved per user feedback but still have missed and duplicate counts. The new hurdle continuity policy has only been verified offline. The old straight-leg prefix was discarded and cannot validate the suspected duplicates."
 }

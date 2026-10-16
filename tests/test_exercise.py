@@ -64,8 +64,24 @@ def test_trace_is_bounded_by_time_and_frame_count():
     diagnostic.observe([{"timestamp_ms": t, "keypoints": points} for t in range(2000)])
     assert len(diagnostic.recent_frames) == 1800
     assert diagnostic.recent_frames[0]["timestamp_ms"] == 200
-    diagnostic.observe([{"timestamp_ms": 63000, "keypoints": points, "person_id": "new"}])
-    assert list(diagnostic.recent_frames) == [{"timestamp_ms": 63000, "keypoints": points, "person_id": "new"}]
+    diagnostic.observe([{"timestamp_ms": 183000, "keypoints": points, "person_id": "new"}])
+    assert list(diagnostic.recent_frames) == [{"timestamp_ms": 183000, "keypoints": points, "person_id": "new"}]
+
+
+def test_camera_trace_keeps_first_cycles_through_85_second_session():
+    worker = ExerciseWorker.__new__(ExerciseWorker)
+    diagnostic = ExerciseDiagnostics()
+    worker.diagnostics = {"test": diagnostic}
+    points = [[1, 1, 1] for _ in range(17)]
+    frames = [{"timestamp_ms": t, "keypoints": points} for t in range(0, 85001, 125)]
+    diagnostic.observe(frames)
+    worker._request = lambda *args: state(status="ended", count=5, elapsed_s=85,
+        last_timestamp_ms=85000, cycles=[{"rep_index": 1, "start_s": 9.6, "end_s": 15.0}])
+    trace = worker.trace("test")
+    assert not trace["truncated"]
+    assert trace["frames"][0]["timestamp_ms"] == 0
+    assert trace["frames"][-1]["timestamp_ms"] == 85000
+    assert trace["state"]["cycles"][0]["end_s"] == 15.0
 
 
 @pytest.mark.parametrize("by_scope", [False, True])

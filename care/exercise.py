@@ -4,6 +4,8 @@ from collections import Counter, deque
 
 REQUIRED_JOINTS = {5: "left_shoulder", 6: "right_shoulder", 11: "left_hip", 12: "right_hip",
                    13: "left_knee", 14: "right_knee", 15: "left_ankle", 16: "right_ankle"}
+TRACE_WINDOW_MS = 180000
+TRACE_MAX_FRAMES = 1800
 
 
 class ExerciseDiagnostics:
@@ -12,7 +14,7 @@ class ExerciseDiagnostics:
         self.visible_frames = 0
         self.missing = Counter()
         self.stamps = deque(maxlen=60)
-        self.recent_frames = deque(maxlen=1800)
+        self.recent_frames = deque(maxlen=TRACE_MAX_FRAMES)
         self.max_gap_ms = 0.0
         self.capture = {}
 
@@ -25,7 +27,7 @@ class ExerciseDiagnostics:
             self.stamps.append(stamp)
             self.recent_frames.append({"timestamp_ms": stamp, "keypoints": frame["keypoints"],
                                        "person_id": frame.get("person_id", "primary")})
-            while self.recent_frames[0]["timestamp_ms"] < stamp - 60000:
+            while self.recent_frames[0]["timestamp_ms"] < stamp - TRACE_WINDOW_MS:
                 self.recent_frames.popleft()
             points = frame["keypoints"]
             missing = [name for i, name in REQUIRED_JOINTS.items() if points[i][2] < .3]

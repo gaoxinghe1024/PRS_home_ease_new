@@ -74,6 +74,7 @@ class SessionState(StrictModel):
     action_scope: Literal["open", "training"] = "open"
     recognized_exercise: str
     inference_views: Literal["original", "mirror_average"] = "original"
+    phase_policy: Literal["original", "action_gap_hold_v1"] = "original"
     exercise_probabilities: dict[str, float]
     phase: str
     phase_confidence: float
