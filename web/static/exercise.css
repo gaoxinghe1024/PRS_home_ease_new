@@ -23,6 +23,8 @@
 .exercise-guide figure{margin:0;min-width:0;align-self:center}
 .exercise-guide figure img{display:block;width:100%;height:auto;aspect-ratio:780/252;object-fit:contain}
 .exercise-guide figcaption{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center;font-size:11px;color:var(--muted);margin-top:8px}
+.exercise-guide-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:8px;color:var(--muted);font-size:11px}
+.exercise-guide-controls .icon-button{width:36px;height:36px;flex:0 0 36px}
 .exercise-camera-guide{grid-column:1/-1;display:flex;gap:9px;padding-top:13px;border-top:1px solid var(--line);color:var(--ink)}
 .exercise-camera-guide>svg{width:17px;height:17px;flex-shrink:0;margin-top:3px;color:var(--blue)}
 .exercise-pace{grid-column:1/-1;color:var(--muted)}

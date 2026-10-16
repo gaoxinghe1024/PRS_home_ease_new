@@ -27,14 +27,18 @@
     "squat": "user_confirmed_accurate",
     "chair_sit_to_stand": "user_confirmed_working",
     "standing_leg_raise": "guided_test_zero_still_unresolved",
-    "hurdle_step": "guided_test_zero_mirror_replay_improved_live_retest_pending"
+    "hurdle_step": "mirror_average_live_retest_zero_still_unresolved"
   },
   "exercise_guides": {
     "languages": ["zh", "en"],
     "viewport_widths": [1440, 390],
     "four_action_replay_counts": [9, 10, 10, 10],
     "counter_stage_read_only": true,
-    "illustrations": "schematic_not_inference_inputs",
+    "illustrations": "chair_and_squat_schematic_leg_exercises_original_training_skeletons",
+    "original_training_reference_sources": "exercise_guide_sources.json",
+    "leg_exercise_animation_controls": "explicit_play_and_stop_default_still",
+    "reference_animation_browser_cases_passed": 8,
+    "reference_animation_checks": ["nonblank_pixels", "moves", "play_stop", "no_layout_shift", "no_text_clipping", "no_chinese_in_english_guides"],
     "new_counting_changes": false
   },
   "training_view_extension": {
@@ -58,5 +62,27 @@
     },
     "live_acceptance_complete": false
   },
-  "limitation": "Public projected skeleton checks and captured inputs do not establish accuracy on unseen home videos. Straight leg raise remains unresolved."
+  "latest_hurdle_live_retest": {
+    "user_reported_repetitions_approximate_range": [4, 5],
+    "legs": "alternating_both",
+    "inference_views": "mirror_average",
+    "truncated": false,
+    "observed_frames": 323,
+    "visible_single_person_frames": 196,
+    "valid_duration_s": 34.27401019996614,
+    "elapsed_s": 46.238667700003134,
+    "system_count": 0,
+    "sdk_count": 0,
+    "count_matches_system": true,
+    "confirmed_peak_stage_observations": 0,
+    "raw_landmarks_in_repository": false,
+    "domain_audit": "exercise_hurdle_domain_audit.json"
+  },
+  "offline_candidates_not_deployed": {
+    "canonical_arm_input": "rejected_cross_action_false_counts",
+    "whole_model_camera_augmentation": "rejected_cross_action_false_counts_and_live_overcount",
+    "frozen_backbone_leg_phase_heads": "latest_hurdle_3_leg_raise_0_rejected_negative_regressions",
+    "rigid_image_roll": "latest_hurdle_0_at_all_checked_angles_minus15_to_plus15"
+  },
+  "limitation": "Public projected skeleton checks and captured inputs do not establish accuracy on unseen home videos. Both leg exercises remain unresolved in live testing. New training-skeleton guidance is not a validated counting fix."
 }

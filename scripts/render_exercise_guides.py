@@ -1,4 +1,4 @@
-"""Create schematic start/peak/return illustrations; no inference inputs."""
+"""Render chair/squat schematics and original training leg references."""
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -14,16 +14,12 @@ SITTING = [(95, 103), (114, 100), (99, 133), (129, 130), (120, 155), (150, 151),
            (100, 168), (115, 166), (149, 174), (164, 171), (149, 226), (165, 226)]
 SQUATTING = [(109, 99), (128, 96), (137, 112), (153, 108), (161, 96), (177, 92),
              (102, 162), (117, 160), (136, 183), (151, 180), (109, 226), (135, 226)]
-STRAIGHT_RAISE = [*STANDING[:9], (171, 130), STANDING[10], (214, 127)]
-BENT_RAISE = [*STANDING[:9], (177, 131), STANDING[10], (179, 179)]
 
 
 def main():
     for exercise, baseline, peak in [
         ("chair_sit_to_stand", SITTING, STANDING),
         ("squat", STANDING, SQUATTING),
-        ("standing_leg_raise", STANDING, STRAIGHT_RAISE),
-        ("hurdle_step", STANDING, BENT_RAISE),
     ]:
         canvas = Image.new("RGB", (780, 252), "#f5f8f6")
         draw = ImageDraw.Draw(canvas)
@@ -45,6 +41,8 @@ def main():
             draw.text((ox + 14, 10), str(n + 1), fill="#4c7766", font_size=18)
         canvas.save(ROOT / f"web/static/media/{exercise}-guide.png")
         canvas.crop((260, 0, 520, 252)).save(ROOT / f"web/static/media/{exercise}-pose.png")
+    from render_training_guides import main as render_training_references
+    render_training_references()
 
 
 if __name__ == "__main__":

@@ -20,17 +20,19 @@ const exerciseGuides = {
     cues:["请先自然站立，站稳约 2 秒。", "站姿已确认，请开始下蹲。", "正在下蹲，请到舒适的最低位置稍停。", "蹲姿已确认，请起身。", "请站直并站稳，回到站姿后计 1 次。"]
   },
   standing_leg_raise: {
+    animation:true,
     title:"站立直腿前抬", endpoints:["站稳","直腿前抬","落脚站稳 +1"], cycle:["站稳","前抬","抬起","放下","站稳 +1"],
     count:"站稳 → 单腿伸直向前抬起 → 放下并站稳，计 1 次。每条腿单独完成一次算 1 次。",
-    steps:["先自然站稳约 2 秒，双腿伸直，选靠近摄像头的一条腿。", "支撑腿站稳，另一条腿膝盖尽量伸直，向身体正前方抬起，抬到舒适高度稍停。", "缓慢放下同一条腿，双脚落地并站稳，再做下一次或换腿。"],
-    note:"抬的是整条直腿，方向是身体正前方；不要弯膝提大腿，也不要向身体侧面抬。无需把腿抬到与示意图相同的高度。",
+    steps:["双臂向两侧抬至约肩高并屈肘，双手向上；双腿伸直，先站稳约 2 秒。", "支撑腿站稳，另一条腿膝盖尽量伸直，向身体正前方抬起后稍停；参考动作接近水平。", "缓慢放下同一条腿，双脚落地并站稳，再做下一次或换腿。"],
+    note:"抬的是整条直腿，不是屈膝提大腿或向侧面抬腿。双臂保持参考姿势。小幅度动作可能漏计，以舒适稳定为限，不要为计数勉强抬高。",
     cues:["请先双脚落地，自然站稳约 2 秒。", "站姿已确认，请将一条直腿向身体正前方抬起。", "尚待确认抬腿顶点：膝盖尽量伸直，前抬后稍停。", "抬腿顶点已确认，请缓慢放下同一条腿。", "请双脚落地并站稳，复位后计 1 次。"]
   },
   hurdle_step: {
+    animation:true,
     title:"屈膝跨步抬腿", endpoints:["站稳","屈膝前抬","回位站稳 +1"], cycle:["站稳","屈膝抬腿","抬起","回位","站稳 +1"],
     count:"站稳 → 单腿屈膝向前抬起 → 收回原位并站稳，计 1 次。左右腿各完成一次共 2 次。",
-    steps:["先自然站稳约 2 秒，选靠近摄像头的一条腿，另一条腿支撑。", "屈膝向前抬腿，像跨过一条低横杆，大腿前抬、小腿自然下垂，在舒适高度稍停。", "把同一只脚收回原位，双脚落地并站稳，再做下一次或换腿。"],
-    note:"这个动作需要弯膝，区别于直腿前抬。原地模拟跨过即可，不需要真实障碍物；只向前迈一小步不等于完整抬腿。",
+    steps:["双臂稍向两侧打开并屈肘，双手约肩高；双脚落地，先站稳约 2 秒。", "屈膝向前抬起一条腿，小腿自然下垂，顶点稍停；参考动作的膝盖接近髋高。", "把同一只脚收回原位，双脚落地并站稳，再做下一次或换腿。"],
+    note:"双臂保持参考姿势，原地屈膝抬腿即可，不需要障碍物。小幅度动作可能漏计，以舒适稳定为限，不要为计数勉强抬高。左右交替时，每次先双脚落地站稳。",
     cues:["请先双脚落地，自然站稳约 2 秒。", "站姿已确认，请屈膝向前抬起一条腿。", "尚待确认跨步顶点：屈膝向前抬腿，在舒适高度稍停。", "跨步顶点已确认，请把同一只脚收回原位。", "请双脚回到原位并站稳，复位后计 1 次。"]
   }
 };
@@ -250,7 +252,16 @@ function renderExerciseHistory(){const sessions=app.sessions;$("exerciseHistory"
 function renderExerciseGuide(element,key){
   const guide=exerciseGuides[key];
   element.dataset.exerciseGuide=key;
-  element.innerHTML=`<div class="exercise-guide-copy"><h3>${esc(guide.title)} · 动作与计数说明</h3><p class="exercise-count-rule">${esc(guide.count)}</p><ol>${guide.steps.map(step=>`<li>${esc(step)}</li>`).join("")}</ol><p class="exercise-motion-note">${esc(guide.note)}</p></div><figure><img src="/static/media/${key}-guide.png" alt="${esc(guide.title)}：起始、顶点与复位示意" width="780" height="252"><figcaption>${guide.endpoints.map(label=>`<span>${esc(label)}</span>`).join("")}</figcaption></figure><p class="exercise-camera-guide">${icon("camera")}<span><strong>摄像头位置：</strong>正对镜头为 0°，纯侧身为 90°；建议身体斜侧约 45°，左右侧均可，不必精确量角。镜头约在髋部高度、水平拍摄，头顶到双脚完整入镜，四周留空，双腿不要互相遮挡。</span></p><p class="exercise-pace">建议节奏：抬起或起身约 1～2 秒，顶点稍停，返回约 1～2 秒；每次复位后站稳或坐稳约 1 秒，再开始下一次。按舒适幅度完成。</p>`;
+  element.innerHTML=`<div class="exercise-guide-copy"><h3>${esc(guide.title)} · 动作与计数说明</h3><p class="exercise-count-rule">${esc(guide.count)}</p><ol>${guide.steps.map(step=>`<li>${esc(step)}</li>`).join("")}</ol><p class="exercise-motion-note">${esc(guide.note)}</p></div><figure><img src="/static/media/${key}-guide.png" alt="${esc(guide.title)}：起始、顶点与复位示意" width="780" height="252"><figcaption>${guide.endpoints.map(label=>`<span>${esc(label)}</span>`).join("")}</figcaption>${guide.animation?`<div class="exercise-guide-controls"><span>45° 动作骨架参考</span><button type="button" class="icon-button" title="播放动作示范" aria-label="播放动作示范" aria-pressed="false">${icon("play")}</button></div>`:""}</figure><p class="exercise-camera-guide">${icon("camera")}<span><strong>摄像头位置：</strong>正对镜头为 0°，纯侧身为 90°；建议身体斜侧约 45°，左右侧均可，不必精确量角。镜头约在髋部高度、水平拍摄，头顶到双脚完整入镜，四周留空，双腿不要互相遮挡。</span></p><p class="exercise-pace">建议节奏：抬起或起身约 1～2 秒，顶点稍停，返回约 1～2 秒；每次复位后站稳或坐稳约 1 秒，再开始下一次。按舒适幅度完成。</p>`;
+  const playback=element.querySelector('.exercise-guide-controls button');
+  if(playback)playback.onclick=()=>{
+    const playing=playback.getAttribute('aria-pressed')!=='true';
+    element.querySelector('figure img').src=`/static/media/${key}-guide.${playing?'gif':'png'}`;
+    playback.setAttribute('aria-pressed',String(playing));
+    playback.title=playback.ariaLabel=playing?"停止动作示范":"播放动作示范";
+    playback.innerHTML=icon(playing?'square':'play');
+    icons();
+  };
 }
 function chooseExercise(key){app.selectedExercise=key;document.querySelectorAll(".exercise-option").forEach(x=>{const selected=x.dataset.exercise===key;x.classList.toggle("selected",selected);x.setAttribute("aria-pressed",selected);});renderExerciseGuide($("exerciseGuide"),key);icons();}
 function renderExerciseCycle(s){
