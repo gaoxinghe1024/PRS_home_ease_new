@@ -11,7 +11,9 @@ from algorithm3.policy import alarm_tag, inquiry_outcome
 
 # An alarm that the older adult raised (help button, spoken call for help) can be withdrawn by the same person for a short time, for
 # example after a button press by mistake or a television that said "help". A withdrawal never closes or downgrades the event: it
-# stays open at its level, the contact escalation stops, the caregivers are told, and only a caregiver closes it.
+# stays open at its level, the contact escalation stops, the caregivers are told, and only a caregiver closes it. A fall alarm of a
+# sensor can be withdrawn too once the voice inquiry has raised it to an emergency (no answer, or a call for help), for the same
+# time counted from that moment: before that the older adult can answer the inquiry, and the caregiver decides on the rest.
 WITHDRAW_WINDOW_S = 30
 SELF_TRIGGERED = ("manual", "audio")
 
@@ -24,10 +26,16 @@ def is_withdrawn(event):
 def withdraw_status(event, at=None):
     """{"withdrawable", "withdraw_left_s"}: can the older adult still withdraw this event, and for how long (server clock)."""
     no = {"withdrawable": False, "withdraw_left_s": 0}
-    if event.get("state") != "open" or event.get("withdrawal") or event.get("channel") not in SELF_TRIGGERED:
+    if event.get("state") != "open" or event.get("withdrawal"):
+        return no
+    if event.get("channel") in SELF_TRIGGERED:
+        stamp = event.get("detected_at")
+    elif event.get("level") == "EMERGENCY" and event.get("escalated_at"):
+        stamp = event["escalated_at"]  # raised by the inquiry: the window starts when the alarm was raised
+    else:
         return no
     try:
-        started = datetime.fromisoformat(event["detected_at"]).timestamp()
+        started = datetime.fromisoformat(stamp).timestamp()
     except (KeyError, TypeError, ValueError):
         return no
     left = WITHDRAW_WINDOW_S - ((time.time() if at is None else at) - started)
@@ -98,8 +106,8 @@ class Events:
             elif action == "withdraw":
                 if event.get("withdrawal"):
                     return  # already withdrawn: nothing to do
-                if event["channel"] not in SELF_TRIGGERED:
-                    raise ValueError("\u53ea\u6709\u6c42\u52a9\u6309\u94ae\u6216\u8bed\u97f3\u6c42\u52a9\u89e6\u53d1\u7684\u4e8b\u4ef6\uff0c\u624d\u53ef\u4ee5\u7531\u957f\u8005\u64a4\u56de")
+                if not withdraw_status(event)["withdrawable"] and event["channel"] not in SELF_TRIGGERED and not event.get("escalated_at"):
+                    raise ValueError("\u53ea\u6709\u6c42\u52a9\u6309\u94ae\u3001\u8bed\u97f3\u6c42\u52a9\u6216\u5df2\u5347\u7ea7\u7684\u8dcc\u5012\u8b66\u62a5\u624d\u53ef\u4ee5\u7531\u957f\u8005\u64a4\u56de")
                 if not withdraw_status(event)["withdrawable"]:
                     raise ValueError(f"\u64a4\u56de\u65f6\u9650\uff08{WITHDRAW_WINDOW_S} \u79d2\uff09\u5df2\u8fc7\uff0c\u8bf7\u8054\u7cfb\u7167\u62a4\u8005")
                 event["withdrawal"] = {"at": now(), "by": "elder"}
@@ -175,6 +183,8 @@ class Events:
                 tag = alarm_tag([*event["markers"], {"channel": "audio", "kind": decision["marker"], "at": event["inquiry"]["asked_at"]}])
                 event.update(markers=tag["markers"], channels=tag["channels"], tag=tag["tag"])
             if decision["escalate"]:
+                if event["level"] != "EMERGENCY":
+                    event["escalated_at"] = now()
                 event["level"] = "EMERGENCY"
             if decision["marker"] == "spoken_help" and event.get("withdrawal") and not event["withdrawal"].get("overridden_at"):
                 event["withdrawal"]["overridden_at"] = now()

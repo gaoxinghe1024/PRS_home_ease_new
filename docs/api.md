@@ -57,7 +57,9 @@
 
 `POST /api/events/{id}/action` accepts `{"action": "withdraw"}` from the older adult's page.
 
-- Only events raised by the help button (`channel: "manual"`) or a spoken call for help (`channel: "audio"`) can be withdrawn, and only within `WITHDRAW_WINDOW_S` (30 s) of detection. Otherwise the request is refused with a 409 response.
+- An event raised by the help button (`channel: "manual"`) or a spoken call for help (`channel: "audio"`) can be withdrawn within `WITHDRAW_WINDOW_S` (30 s) of detection.
+- A fall alarm of a sensor (`accel`, `vision`) can be withdrawn only after the voice inquiry has raised it to an emergency (no answer, or a call for help; the event then carries `escalated_at`), within the same 30 s counted from `escalated_at`. A fall candidate that is still PENDING, one that a valid answer cancelled, and one that a caregiver escalated cannot be withdrawn.
+- Otherwise the request is refused with a 409 response.
 - A withdrawal never closes or downgrades the event. It stays open at its level, the contact escalation timer stops, the caregivers get a notification, and the caregiver still confirms and resolves it.
 - `GET /api/events` and `GET /api/events/{id}` add `withdrawn`, `withdrawable` and `withdraw_left_s`; the stored event carries `withdrawal: {"at", "by"}`.
 - A later spoken call for help on the same event clears the withdrawal and restarts the escalation clock; a caregiver `escalate` overrides it.

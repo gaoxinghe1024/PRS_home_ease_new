@@ -105,3 +105,84 @@ def test_a_closed_event_cannot_be_withdrawn(system):
     service.action(event["id"], "resolve", outcome="safe")
     with pytest.raises(ValueError):
         service.action(event["id"], "withdraw")
+
+
+def escalate_by_inquiry(store, service, event_id, reply=None):
+    """The older adult did not answer (or called for help): the inquiry raises the fall alarm to an emergency."""
+    service.inquiry_start(event_id, True)
+    service.inquiry_reply(event_id, reply or {"status": "NO_RESPONSE"})
+    return store.event(event_id)
+
+
+def age_escalation(store, event_id, seconds):
+    stamp = (datetime.now(timezone.utc) - timedelta(seconds=seconds)).isoformat(timespec="milliseconds")
+    store.update_event(event_id, lambda e: e.update(escalated_at=stamp))
+
+
+def test_a_fall_alarm_raised_by_the_inquiry_can_be_withdrawn_for_30_s(system):
+    store, service = system
+    two_contacts(store)
+    fall = service.create("vision", {"prob": .9}, "live", "camera")
+    assert withdraw_status(store.event(fall["id"]))["withdrawable"] is False  # still a candidate: the inquiry is the way to answer
+    event = escalate_by_inquiry(store, service, fall["id"])
+    assert event["level"] == "EMERGENCY" and event.get("escalated_at")
+    status = withdraw_status(event)
+    assert status["withdrawable"] is True and 0 < status["withdraw_left_s"] <= WITHDRAW_WINDOW_S
+    service.action(fall["id"], "withdraw")
+    after = store.event(fall["id"])
+    assert is_withdrawn(after) and after["level"] == "EMERGENCY" and after["state"] == "open"  # never closed or downgraded
+
+
+def test_the_window_of_an_escalated_fall_alarm_counts_from_the_escalation(system):
+    store, service = system
+    fall = service.create("vision", {"prob": .9}, "live", "camera")
+    age(store, fall["id"], 600)  # detected long ago, escalated just now
+    event = escalate_by_inquiry(store, service, fall["id"])
+    assert withdraw_status(event)["withdrawable"] is True
+    age_escalation(store, fall["id"], WITHDRAW_WINDOW_S + 5)
+    assert withdraw_status(store.event(fall["id"]))["withdrawable"] is False
+    with pytest.raises(ValueError):
+        service.action(fall["id"], "withdraw")
+    assert not store.event(fall["id"]).get("withdrawal")
+
+
+def test_a_withdrawn_fall_alarm_stops_contact_escalation(system):
+    store, service = system
+    two_contacts(store)
+    fall = service.create("vision", {"prob": .9}, "live", "camera")
+    escalate_by_inquiry(store, service, fall["id"])
+    service.action(fall["id"], "withdraw")
+    store.update_event(fall["id"], lambda e: e.update(next_escalation_at=time.time() - 2))
+    service.tick()
+    assert store.event(fall["id"])["contact_index"] == 0
+
+
+def test_a_caregiver_escalation_of_a_fall_candidate_is_not_withdrawable(system):
+    store, service = system
+    two_contacts(store)
+    fall = service.create("vision", {"prob": .9}, "live", "camera")
+    service.action(fall["id"], "escalate")
+    assert store.event(fall["id"])["level"] == "EMERGENCY"
+    assert withdraw_status(store.event(fall["id"]))["withdrawable"] is False
+    with pytest.raises(ValueError):
+        service.action(fall["id"], "withdraw")
+
+
+def test_a_fall_candidate_that_a_valid_answer_cancelled_is_not_withdrawable(system):
+    store, service = system
+    fall = service.create("vision", {"prob": .9}, "live", "camera")
+    service.inquiry_start(fall["id"], True)
+    service.inquiry_reply(fall["id"], {"status": "RESPONDED", "intent": "REASSURANCE", "trusted_reassurance": True, "asr_avg_logprob": -.3})
+    event = store.event(fall["id"])
+    assert event["level"] == "PENDING" and not event.get("escalated_at")
+    assert withdraw_status(event)["withdrawable"] is False
+
+
+def test_a_later_spoken_call_overrides_the_withdrawal_of_an_escalated_fall_alarm(system):
+    store, service = system
+    fall = service.create("vision", {"prob": .9}, "live", "camera")
+    escalate_by_inquiry(store, service, fall["id"])
+    service.action(fall["id"], "withdraw")
+    service.inquiry_start(fall["id"], True)
+    service.inquiry_reply(fall["id"], {"status": "RESPONDED", "intent": "HELP", "asr_avg_logprob": -.4})
+    assert not is_withdrawn(store.event(fall["id"]))
