@@ -151,12 +151,13 @@ class Algorithm3:
 
         Returns a reply record with ``status`` (RESPONDED | NO_RESPONSE | audio_unavailable), ``intent`` (HELP | REASSURANCE | OTHER |
         UNCERTAIN), ``intent_reason``, ``cues``, ``transcript``, ``asr_avg_logprob``, the voiceprint evidence (``cancel_eligible``,
-        ``cancel_reasons``) and ``trusted_reassurance`` (the node's valid-cancel test)."""
+        ``cancel_reasons``), ``bare_reassurance`` (the whole reply is a short standard Mandarin "I am fine": the cancel test allows it a little
+        lower recogniser confidence) and ``trusted_reassurance`` (the node's valid-cancel test)."""
         from homeease.ml.audio.intent_v2 import RuleIntentV2
 
         rec: dict[str, Any] = {"status": "RESPONDED", "intent": None, "transcript": None, "asr_avg_logprob": None,
                                "cancel_eligible": False, "cancel_reasons": ["no_enrollment"], "speaker_verified": None,
-                               "voiceprint_enrolled": enrollment is not None}
+                               "voiceprint_enrolled": enrollment is not None, "bare_reassurance": False}
         if text is not None:
             res = {"text": text, "avg_logprob": None}
             x = None
@@ -179,7 +180,8 @@ class Algorithm3:
         it = intent_model.predict(res["text"], res.get("avg_logprob"))
         cues = it.get("cues") or []
         rec.update(intent=it["intent"], intent_reason=it.get("reason"), cues=list(cues), transcript=(res["text"] or "")[:200],
-                   asr_avg_logprob=res.get("avg_logprob"), language=res.get("language"))
+                   asr_avg_logprob=res.get("avg_logprob"), language=res.get("language"),
+                   bare_reassurance=bool(it["intent"] == "REASSURANCE" and intent_model.is_bare_reassurance(res["text"] or "")))
         if x is not None:
             try:
                 from homeease.ml.audio.cancel_gate import CancelGate
