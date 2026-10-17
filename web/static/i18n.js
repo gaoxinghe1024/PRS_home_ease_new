@@ -73,7 +73,7 @@
     b.setAttribute("aria-label", b.title);
     b.style.cssText = "min-width:44px;font-weight:600";
     b.addEventListener("click", function () { setLang(lang === "en" ? "zh" : "en"); });
-    var host = d.querySelector(".topbar-right") || d.querySelector(".elder-header");
+    var host = d.querySelector(".home-header") || d.querySelector(".topbar-right") || d.querySelector(".elder-header");
     if (host) host.insertBefore(b, host.firstChild);
     else { b.style.cssText += ";position:fixed;right:12px;top:10px;z-index:50"; d.body.appendChild(b); }
   }

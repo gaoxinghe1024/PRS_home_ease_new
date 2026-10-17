@@ -51,6 +51,7 @@ class Store:
                     action TEXT NOT NULL, payload TEXT NOT NULL
                 );
                 CREATE TABLE IF NOT EXISTS runtime_state (id INTEGER PRIMARY KEY, last_heartbeat TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS home_monitoring (id INTEGER PRIMARY KEY CHECK(id=1), enabled INTEGER NOT NULL, camera_index INTEGER NOT NULL);
             """)
             defaults = {
                 "resident": {"name": "", "room": "客厅", "notes": ""},
@@ -77,6 +78,16 @@ class Store:
     def settings(self):
         with self.connection() as conn:
             return json.loads(conn.execute("SELECT value FROM settings WHERE id=1").fetchone()[0])
+
+    def home_monitoring(self):
+        with self.connection() as conn:
+            row = conn.execute("SELECT enabled,camera_index FROM home_monitoring WHERE id=1").fetchone()
+        return {"enabled": bool(row[0]), "camera_index": row[1]} if row else {"enabled": False, "camera_index": 0}
+
+    def save_home_monitoring(self, enabled, camera_index):
+        with self.connection() as conn:
+            conn.execute("INSERT INTO home_monitoring VALUES (1,?,?) ON CONFLICT(id) DO UPDATE SET enabled=excluded.enabled,camera_index=excluded.camera_index",
+                         (int(enabled), camera_index))
 
     def save_settings(self, value):
         with self.connection() as conn:

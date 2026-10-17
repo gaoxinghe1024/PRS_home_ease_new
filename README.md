@@ -24,7 +24,15 @@ cd E:\gc2_new
 
 停止：双击 `stop.bat`，或执行 `.\.venv\Scripts\python.exe run.py --stop`。等待服务退出后再启动，可让视频、音频、模型和后台任务正常释放。启动时各模块独立加载；在设置页查看状态及重新初始化。
 
-电脑浏览器入口：照护工作台 `/`，简化长者操作台 `/elder`，外部加速度数据接入 `/sensor`，交互 API 文档 `/docs`。
+电脑浏览器入口：家属照护工作台 `/`，老人家庭入口 `/home`，原简化长者操作台 `/elder`，外部加速度数据接入 `/sensor`，交互 API 文档 `/docs`。
+
+### 家庭日常使用
+
+打开 `/home`，选择“安心守护”即可自动开启算法1视频跌倒检测，并在取得音频授权及浏览器麦克风权限后自动开启算法3声音、求助监听和语音问询。也可直接收藏 `/home#safety`。守护开关和摄像头序号会保存在本机，服务重启后自动恢复视频守护；摄像头掉线后每15秒尝试恢复。
+
+老人选择“运动训练”并手动点击开始，才会运行算法2训练。守护与运动共享同一台摄像头，结束训练不会关闭守护。查看报告、处理事件、修改档案仍在原家属工作台；家庭入口有直接链接。
+
+声音和自动语音问询需要家庭页面保持打开、麦克风可用。关闭页面后视频守护仍在本机后台运行，声音监听停止；电脑休眠、关机或服务退出时无法监测。加速度检测仍需外部传感器输入，不会模拟连接。详见 [家庭入口说明](docs/home-use.md)。
 
 ## 首次使用
 
@@ -94,7 +102,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe scripts\acceptance.py
 ```
 
-浏览器测试：`npm ci`、`npx playwright install chromium`，启动独立测试数据目录的服务器后设置 `HOMEEASE_TEST_URL`，执行 `npm run test:browser`。测试会创建事件与训练记录，应使用隔离数据目录。
+浏览器测试：`npm ci`、`npx playwright install chromium`，启动独立测试数据目录的服务器后设置 `HOMEEASE_TEST_URL`，执行 `npm run test:browser`。家庭入口联合测试执行 `npm run test:home`，需要服务能访问摄像头0；浏览器麦克风使用测试音源。测试会创建事件与训练记录，应使用隔离数据目录。
 
 详见 [架构与集成](docs/architecture.md)、[API 与数据格式](docs/api.md)、[验证记录](docs/verification.md) 和 [样例来源](samples/SOURCES.md)。目前完成了原算法一致性、API 工作流和浏览器测试；真实家庭设备、外部通知送达、七天持续运行与真实误报漏报率仍需现场验收。
 

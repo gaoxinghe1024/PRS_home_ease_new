@@ -6,6 +6,7 @@
 | --- | --- |
 | 状态、配置 | `GET /api/health`、`GET /api/status`、`GET/PUT /api/settings` |
 | 模块恢复 | `POST /api/modules/{name}/initialize` |
+| 家庭守护 | `PUT /api/home/monitoring`、`POST /api/home/audio-consent` |
 | 视频 | `POST /api/uploads/video`、`POST /api/video/start`、`POST /api/video/stop`、`GET /api/video/frame` |
 | 连续画面 | `GET /api/video/stream`、`GET /api/sessions/{sid}/camera/stream`，MJPEG |
 | 证据片段 | `GET /api/video/clip/{event_id}` |
@@ -22,6 +23,10 @@
 | 训练导出 | `GET /api/sessions/{sid}/export.json` |
 
 视频开始请求 `{"source":"sample"}` 或 `{"source":"camera","camera_index":0}`；上传后使用 `{"source":"upload","upload_id":"上传接口返回的值"}`。
+
+家庭入口 `/home#safety` 请求 `PUT /api/home/monitoring`，body 为 `{"enabled":true,"camera_index":0}`。设置持久保存，后台调度自动启动真实摄像头并在故障后限速重试，与预览页面是否打开无关。`GET /api/status` 中的 `home_monitoring` 包含 `enabled`、`camera_index` 和最近启动错误 `error`。`enabled:false` 暂停守护；原 `POST /api/video/stop` 同样暂停自动恢复。守护开启时禁止用视频样例替换实时监测，须先暂停。
+
+`POST /api/home/audio-consent` 仅将本机设置中的 `audio_consent` 置为 true，保留资料、联系人等其他配置；浏览器仍需独立授予麦克风权限，音频通过原 `/ws/audio` 监听。进入家庭运动页不自动新建训练，也不中断已开启的守护。
 
 训练开始请求：
 

@@ -1,6 +1,6 @@
 {
   "name": "homeease-browser-checks",
   "private": true,
-  "scripts": {"test:browser": "node scripts/browser-check.cjs"},
+  "scripts": {"test:browser": "node scripts/browser-check.cjs", "test:home": "node scripts/check-home.cjs"},
   "devDependencies": {"playwright": "^1.58.0"}
 }

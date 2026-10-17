@@ -44,6 +44,11 @@ class VideoStart(Model):
     upload_id: str | None = Field(default=None, pattern=r"^[0-9a-f]{32}\.[a-z0-9]+$")
 
 
+class HomeMonitoring(Model):
+    enabled: bool
+    camera_index: int = Field(default=0, ge=0, le=10)
+
+
 class SessionStart(Model):
     exercise: Literal["chair_sit_to_stand", "squat", "standing_leg_raise", "hurdle_step"]
     target_reps: int = Field(default=10, ge=1, le=10000)

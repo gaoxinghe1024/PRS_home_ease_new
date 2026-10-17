@@ -1,5 +1,6 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
+const household = document.body.dataset.household === "true";
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const icon = (name) => `<i data-lucide="${name}"></i>`;
 const icons = () => window.lucide?.createIcons();
@@ -93,10 +94,10 @@ async function busy(button, fn){if(button.disabled)return;const wasDisabled=butt
 function metric(title,value,unit,sym,note="",cls=""){return `<div class="metric${cls?` ${cls}`:""}"><div class="metric-header">${icon(sym)}${esc(title)}</div><div class="metric-value">${esc(value)}<small>${esc(unit)}</small></div><div class="metric-note">${esc(note)}</div></div>`;}
 function channelRow(row){const active=row?.state==="active";return `<div class="channel-item">${icon({vision:"video",accel:"activity",audio:"mic"}[row.channel])}<div><strong>${channels[row.channel]}</strong><small><span class="dot ${active?"green":"amber"}"></span>${active?"输入有效":row.state==="reduced"?"覆盖受限":"未连接"}</small></div></div>`;}
 
-function navigate(){const requested=location.hash.slice(1).split("?")[0]||"overview";app.page=$("page-"+requested)?requested:"overview";document.querySelectorAll(".page").forEach(x=>x.hidden=x.id!==`page-${app.page}`);document.querySelectorAll("nav [data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===app.page));const label=document.querySelector(`nav [data-page="${app.page}"]`)?.textContent.replace(/\d+$/,"")||"照护总览";$("pageCrumb").textContent=label;document.title=`${label} · HomeEase`;$("sidebar").classList.remove("open");$("navBackdrop").hidden=true;renderCurrent();if(app.page==="reports")loadReport();if(app.page==="settings")loadDiagnostics();window.scrollTo(0,0);}
+function navigate(){const requested=location.hash.slice(1).split("?")[0]||(household?"home":"overview");app.page=household?(["home","safety","exercise"].includes(requested)?requested:"home"):($("page-"+requested)?requested:"overview");document.querySelectorAll(".page").forEach(x=>x.hidden=x.id!==`page-${app.page}`);document.querySelectorAll("nav [data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===app.page));const label=household?({home:"安心在家",safety:"安心守护",exercise:"运动训练"})[app.page]:document.querySelector(`nav [data-page="${app.page}"]`)?.textContent.replace(/\d+$/,"")||"照护总览";$("pageCrumb").textContent=label;document.title=`${label} · HomeEase`;$("sidebar").classList.remove("open");$("navBackdrop").hidden=true;renderCurrent();if(app.page==="reports")loadReport();if(app.page==="settings")loadDiagnostics();window.HomeMonitoring?.navigate();window.scrollTo(0,0);}
 
 async function refresh(){if(refreshBusy)return;refreshBusy=true;try{const results=await Promise.allSettled([api("/api/status",{timeout:12000}),api("/api/events"),api("/api/sessions"),api("/api/notifications"),app.page==="audio"?api("/api/sounds"):Promise.resolve(app.sounds),api("/api/settings")]);if(results[0].status==="rejected")throw results[0].reason;app.status=results[0].value;if(results[5].status==="fulfilled"){app.settings=results[5].value;if(!app.settings.audio_consent){if(app.audioStream)stopAudioLive();if(app.audioRecorder?.state==="recording")app.audioRecorder.stop();app.recordingStream?.getTracks().forEach(t=>t.stop());app.recordedBlob=null;}}if(results[1].status==="fulfilled")app.events=results[1].value;if(results[2].status==="fulfilled")app.sessions=results[2].value;if(results[3].status==="fulfilled")app.notices=results[3].value;if(results[4].status==="fulfilled")app.sounds=results[4].value;$("connectionState").innerHTML='<span class="dot green"></span>系统已连接';const n=app.events.filter(e=>e.state==="open"&&e.mode==="live").length;$("navEventCount").textContent=n;$("navEventCount").hidden=!n;$("noticeDot").hidden=!app.notices.some(n=>n.status!=="seen"&&n.kind==="inapp");for(const notice of app.notices){if(app.ready&&!app.noticeIds.has(notice.id)&&notice.kind==="inapp"&&notice.mode==="live"){toast(`${notice.title} · ${notice.message}`);if("Notification" in window&&Notification.permission==="granted")new Notification(notice.title,{body:notice.message,tag:notice.event_id});}app.noticeIds.add(notice.id);}app.ready=true;renderCurrent();if(app.selectedEvent&&$("eventDialog").open){const latest=app.events.find(e=>e.id===app.selectedEvent.id);if(latest&&latest.revision!==app.selectedEvent.revision&&!$("eventDetail").contains(document.activeElement)){renderEventDetail(latest);}}}catch(e){$("connectionState").innerHTML='<span class="dot red"></span>系统连接中断';}finally{refreshBusy=false;}}
-function renderCurrent(){if(!app.status)return;if(!["overview","monitor"].includes(app.page)){for(const id of ["overviewFrame","monitorFrame"]){const image=$(id);if(image.dataset.streaming){image.removeAttribute("src");delete image.dataset.streaming;}}}renderModuleIndicators();if(app.page==="overview")renderOverview();if(app.page==="monitor")renderMonitor();if(app.page==="exercise")renderExerciseHistory();if(app.page==="audio")renderAudioHistory();if(app.page==="events")renderEvents();icons();}
+function renderCurrent(){if(!app.status)return;if(!["overview","monitor"].includes(app.page)){for(const id of ["overviewFrame","monitorFrame"]){const image=$(id);if(image.dataset.streaming){image.removeAttribute("src");delete image.dataset.streaming;}}}renderModuleIndicators();if(app.page==="overview")renderOverview();if(app.page==="monitor")renderMonitor();if(app.page==="exercise")renderExerciseHistory();if(app.page==="audio")renderAudioHistory();if(app.page==="events")renderEvents();window.HomeMonitoring?.render();icons();}
 function renderModuleIndicators(){for(const m of app.status.modules){if(m.id==="exercise"){$("exerciseModelState").textContent=`运动模块${stateNames[m.state]||m.state}`;$("exerciseModelState").className=`badge ${m.state==="ready"?"green":"amber"}`;}}const consent=app.settings?.audio_consent;$("audioConsentBadge").textContent=consent?"已授权本地音频":"未授权音频";$("audioConsentBadge").className=`badge ${consent?"green":"neutral"}`;$("audioConsentBanner").hidden=!!consent;if(app.page==="settings")renderModules();}
 function renderOverview(){const s=app.status;const coverage={active:["监测已开启","视频与加速度输入有效"],reduced:["监测覆盖受限",s.coverage.filter(x=>x.channel!=="audio"&&x.state!=="active").map(x=>x.reason).join("；")],unavailable:["监测尚未开启","视频与加速度输入未连接"]}[s.coverage_state];$("coverageTitle").textContent=coverage[0];$("coverageDescription").textContent=coverage[1];$("coverageBanner").classList.toggle("is-active",s.coverage_state==="active");const today=new Date().toLocaleDateString("en-CA");const live=app.events.filter(e=>e.mode==="live");const dayEvents=live.filter(e=>new Date(e.created_at).toLocaleDateString("en-CA")===today);const todaySessions=app.sessions.filter(s=>s.mode==="live"&&s.status==="ended"&&new Date(s.created_at).toLocaleDateString("en-CA")===today);const open=live.filter(e=>e.state==="open");$("dashboardMetrics").innerHTML=metric("待处理事件",open.length,"条","bell-ring",open.some(e=>e.level==="EMERGENCY")?"有紧急求助待响应":"当前实时记录")+metric("今日确认跌倒",dayEvents.filter(e=>e.outcome==="confirmed_fall").length,"次","shield-check","以照护者处置结果为准")+metric("今日运动",todaySessions.reduce((sum,s)=>sum+s.count,0),"次","activity",`${todaySessions.length} 次已完成训练`)+metric("有效监测通道",s.coverage.filter(x=>x.state==="active"&&x.channel!=="audio").length,"/ 2","radio","视频 / 加速度");$("dashboardChannels").innerHTML=s.coverage.sort((a,b)=>["vision","accel","audio"].indexOf(a.channel)-["vision","accel","audio"].indexOf(b.channel)).map(channelRow).join("");$("openEventCount").textContent=open.length;$("attentionList").innerHTML=open.length?open.slice(0,4).map(e=>`<div class="event-item" role="button" tabindex="0" data-event="${e.id}"><span class="event-icon ${e.level==="EMERGENCY"?"red":""}">${icon(e.level==="EMERGENCY"?"bell-ring":"triangle-alert")}</span><div class="event-body"><div class="event-title"><strong>${esc(e.room)} · ${e.level==="EMERGENCY"?"紧急求助":"疑似跌倒"}</strong>${levelBadge(e)}${e.voice?.high_risk?voiceChip(e.voice):""}</div><p>${channels[e.channel]}${e.channel==="manual"?"":"检测"} · ${esc(e.resident)}</p><div class="event-meta"><span>${dateTime(e.occurred_at)}</span><span>#${e.id.slice(0,6)}</span></div></div>${icon("chevron-right")}</div>`).join(""):empty("暂无待处理事件","circle-check","实时事件将显示在这里");$("recentSessions").innerHTML=app.sessions.filter(s=>s.mode==="live").slice(0,3).map(s=>`<div class="session-row"><span class="session-icon">${icon("activity")}</span><div>${names[s.exercise]}<small>${dateTime(s.created_at)} · ${s.status==="ended"?"已完成":s.status==="interrupted"?"已中断":"进行中"}</small></div><span class="session-count">${s.count}<small> 次</small></span></div>`).join("")||empty("今日还没有训练记录","activity","",true);const running=s.video.state==="running";$("overviewVideoMode").textContent=running?(s.video_mode==="live"?"实时监测":"样例 / 回放"):"未开启";$("overviewVideoMode").className=`badge ${running?"green":"neutral"}`;$("cameraSourceLabel").textContent=running?(s.video_mode==="live"?"实时画面":"样例 / 回放"):"样例预览";$("cameraIdle").hidden=running;loadFrame("overviewFrame");if(app.report)drawBars($("overviewChart"),app.report.series,"reps","#579579");else loadReport(true);}
 function renderMonitor(){
@@ -398,20 +399,26 @@ async function recordAudio(){await busy($("recordAudio"),async()=>{
   }finally{clearInterval(interval);stream.getTracks().forEach(t=>t.stop());app.audioRecorder=null;app.recordingStream=null;}
 });}
 async function startAudioLive(){
+  if(app.audioStream||app.audioStarting||app.audioStopping)return;
+  app.audioStarting=true;
+  try{
   await busy($("startAudioLive"),async()=>{
+    let stream,context;
+    try{
     if(!app.settings.audio_consent)throw new Error("请先取得音频处理授权");
     if(!navigator.mediaDevices?.getUserMedia)throw new Error("麦克风需要 localhost 或 HTTPS 访问");
-    const stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:false,noiseSuppression:false,autoGainControl:true}});
-    const context=new AudioContext({sampleRate:16000});
-    try{
+    stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:false,noiseSuppression:false,autoGainControl:true}});
+    context=new AudioContext({sampleRate:16000});
       if(context.sampleRate!==16000)throw new Error("浏览器不支持 16 kHz 音频输入");
       await context.audioWorklet.addModule("/static/pcm-worklet.js");
       const socket=new WebSocket(`${location.protocol==="https:"?"wss":"ws"}://${location.host}/ws/audio`);
       app.audioStream=stream;app.audioContext=context;app.audioSocket=socket;
       await new Promise((resolve,reject)=>{
-        socket.onmessage=event=>{const r=JSON.parse(event.data);if(r.error)reject(new Error(r.error));else if(r.state==="listening")resolve();};
-        socket.onerror=()=>reject(new Error("声音监听连接失败"));
-        socket.onclose=()=>reject(new Error("声音监听未连接，请检查授权和模块状态"));
+        const timer=setTimeout(()=>fail(new Error("声音监听连接超时")),20000);
+        const fail=error=>{clearTimeout(timer);reject(error);};
+        socket.onmessage=event=>{const r=JSON.parse(event.data);if(r.error)fail(new Error(r.error));else if(r.state==="listening"){clearTimeout(timer);resolve();}};
+        socket.onerror=()=>fail(new Error("声音监听连接失败"));
+        socket.onclose=()=>fail(new Error("声音监听未连接，请检查授权和模块状态"));
       });
       app.liveCalls=[];
       const queue=new AudioChunkQueue(message=>socket.send(JSON.stringify(message)));app.audioQueue=queue;
@@ -430,10 +437,11 @@ async function startAudioLive(){
         queue.acknowledge();
       };
       socket.onclose=()=>{queue.close();stopAudioLive();};socket.onerror=()=>toast("麦克风连接中断",true);
-      $("startAudioLive").disabled=true;$("stopAudioLive").disabled=false;renderLiveAudio({});await context.resume();
-    }catch(e){stream.getTracks().forEach(t=>t.stop());await context.close();app.audioSocket?.close();app.audioSocket=null;app.audioStream=null;app.audioContext=null;throw e;}
+      $("startAudioLive").disabled=true;$("stopAudioLive").disabled=false;renderLiveAudio({});await context.resume();window.HomeMonitoring?.audioReady();
+    }catch(e){stream?.getTracks().forEach(t=>t.stop());if(context&&context.state!=="closed")await context.close();app.audioSocket?.close();app.audioSocket=null;app.audioStream=null;app.audioContext=null;window.HomeMonitoring?.audioFailed(e);throw e;}
   });
   if(app.audioStream)$("startAudioLive").disabled=true;
+  }finally{app.audioStarting=false;}
 }
 async function stopAudioLive(){
   if(app.audioStopping)return app.audioStopping;

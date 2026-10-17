@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-17",
+  "baseline_main": "ac728de4608e9e386f06367f3d64733423691699",
+  "system_tests": {"passed": 58, "failed": 0},
+  "algorithm_integrity": {"checked": 116, "changed": []},
+  "browser": {
+    "engine": "Chromium",
+    "widths": [1440, 820, 390, 320],
+    "languages": ["zh", "en"],
+    "layout_checks": 28,
+    "page_errors": [],
+    "overflow": false,
+    "missing_images": [],
+    "clipped_controls": [],
+    "workflows": {
+      "automatic_video_and_consented_audio": true,
+      "manual_exercise_replay": true,
+      "shared_camera_and_independent_exercise_stop": true,
+      "pause_resume_refresh_reconnect": true,
+      "automatic_inquiry_and_withdrawal": true,
+      "consent_revocation": true,
+      "video_survives_page_close": true,
+      "original_caregiver_reports": true,
+      "permission_denied_without_repeated_prompts": true
+    }
+  },
+  "live_service_checks": {
+    "saved_monitoring_restored_after_restart": true,
+    "video_processing_restored_after_worker_termination": true
+  },
+  "inputs": {
+    "camera": "Server camera index 0 through the existing shared CameraHub",
+    "microphone": "Chromium fake media device; original algorithm3 processing",
+    "speech_synthesis": "Completion callback stub for browser automation",
+    "exercise_replay": "Bundled skeleton sample through original algorithm2"
+  },
+  "limits": [
+    "No seven-day endurance or real household accuracy claim",
+    "Sound monitoring and automatic inquiry require an open home page and microphone permission",
+    "Video monitoring requires the local service and computer to remain running",
+    "External acceleration sensors were not connected during this validation"
+  ]
+}

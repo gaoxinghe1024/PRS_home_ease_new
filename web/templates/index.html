@@ -5,8 +5,13 @@
   <meta name="theme-color" content="#15735b"><title>HomeEase · 居家照护</title>
   <link rel="icon" href="data:,"><link rel="stylesheet" href="/static/style.css"><link rel="stylesheet" href="/static/monitoring.css"><link rel="stylesheet" href="/static/exercise.css">
   <script defer src="/static/vendor/lucide.min.js"></script><script defer src="/static/audio-transport.js"></script><script defer src="/static/i18n-en.js"></script><script defer src="/static/i18n.js"></script><script defer src="/static/app.js"></script>
+  {% if household %}<link rel="stylesheet" href="/static/elder.css"><link rel="stylesheet" href="/static/home.css"><script defer src="/static/elder.js"></script><script defer src="/static/home.js"></script>{% endif %}
 </head>
-<body>
+<body{% if household %} class="household" data-household="true"{% endif %}>
+  {% if household %}
+  <header class="home-header"><a class="brand" href="#home"><span class="brand-mark"><i data-lucide="house"></i></span><span>HomeEase<small>安心在家</small></span></a><nav aria-label="家庭导航"><a href="#home"><i data-lucide="house"></i>首页</a><a href="#safety"><i data-lucide="shield-check"></i>安心守护</a><a href="#exercise"><i data-lucide="activity"></i>运动训练</a></nav><a href="/" target="_blank" rel="noopener" class="home-caregiver"><i data-lucide="users"></i><span>家属工作台</span></a></header>
+  <div class="home-monitor-strip" role="status"><span class="dot amber" id="homeMonitorDot"></span><strong id="homeMonitorSummary">守护尚未开启</strong><span id="homeMicSummary">麦克风未连接</span></div>
+  {% endif %}
   <aside class="sidebar" id="sidebar">
     <a class="brand" href="#overview"><span class="brand-mark"><i data-lucide="house"></i></span><span>HomeEase<small>居家照护工作台</small></span></a>
     <div class="nav-label">照护空间</div>
@@ -19,7 +24,7 @@
       <a href="#reports" data-page="reports"><i data-lucide="chart-no-axes-combined"></i>照护报告</a>
       <a href="#settings" data-page="settings"><i data-lucide="settings-2"></i>档案与设置</a>
     </nav>
-    <div class="sidebar-bottom"><a href="/elder" target="_blank"><i data-lucide="accessibility"></i><span>长者操作台</span><i data-lucide="arrow-up-right"></i></a><div class="local-label"><span class="dot green"></span>本地处理 · 家庭照护</div></div>
+    <div class="sidebar-bottom"><a href="/home" target="_blank"><i data-lucide="accessibility"></i><span>家庭使用入口</span><i data-lucide="arrow-up-right"></i></a><div class="local-label"><span class="dot green"></span>本地处理 · 家庭照护</div></div>
   </aside>
   <div id="navBackdrop" class="nav-backdrop" hidden></div>
   <div class="workspace">
@@ -28,8 +33,9 @@
       <div class="topbar-right"><span id="headerDate" class="muted desktop-date"></span><button class="icon-button notification-button" id="notificationButton" title="通知" aria-label="查看通知"><i data-lucide="bell"></i><span id="noticeDot" hidden></span></button><span class="avatar" title="照护者">护</span></div>
     </header>
     <main>
-      <section id="page-overview" class="page">
-        <div class="page-title"><div><div class="eyebrow" id="overviewRoom">HOME CARE</div><h1>照护总览</h1><p id="overviewSubtitle">今天的安全与活动记录</p></div><a class="button secondary" href="/elder" target="_blank"><i data-lucide="accessibility"></i>长者操作台<i data-lucide="arrow-up-right"></i></a></div>
+      {% if household %}{% include "home.html" %}{% endif %}
+      <section id="page-overview" class="page"{% if household %} hidden{% endif %}>
+        <div class="page-title"><div><div class="eyebrow" id="overviewRoom">HOME CARE</div><h1>照护总览</h1><p id="overviewSubtitle">今天的安全与活动记录</p></div><a class="button secondary" href="/home" target="_blank"><i data-lucide="accessibility"></i>家庭使用入口<i data-lucide="arrow-up-right"></i></a></div>
         <div class="setup-banner" id="setupBanner" hidden><i data-lucide="clipboard-list"></i><span>照护档案待完善</span><a href="#settings">完善档案<i data-lucide="arrow-right"></i></a></div>
         <div class="coverage-banner" id="coverageBanner"><span class="status-symbol"><i data-lucide="shield-alert"></i></span><div><strong id="coverageTitle">监测尚未开启</strong><p id="coverageDescription">视频与加速度输入未连接</p></div><a href="#monitor" class="text-action">查看监测<i data-lucide="arrow-right"></i></a></div>
         <div class="metrics" id="dashboardMetrics"></div>
@@ -104,6 +110,7 @@
         <section class="settings-section"><div><h2>训练与通知</h2><p class="muted">默认目标与通知通道</p></div><div class="form-grid"><label>默认训练目标<div class="number-input"><input id="defaultTarget" type="number" min="1" max="10000" value="10"><span>次</span></div></label><label class="full-span">Webhook 地址（选填）<input id="webhookUrl" type="url" placeholder="https://" maxlength="2000"></label><div class="full-span button-row"><button class="button secondary" type="button" id="testNotification"><i data-lucide="bell-ring"></i>发送测试通知</button><span class="muted small" id="notificationTestStatus">尚未测试</span></div></div></section></form>
         <section class="settings-section"><div><h2>算法运行状态</h2><p class="muted">原始最佳版本</p></div><div id="moduleList"></div></section><section class="settings-section"><div><h2>运行记录</h2><p class="muted">最近调用与状态变化</p></div><div id="diagnosticsList" class="diagnostics-list"></div></section>
       </section>
+      {% if household %}{% include "home-alerts.html" %}{% endif %}
     </main>
     <footer class="workspace-footer"><span>HomeEase <span class="muted">/</span> Group 10</span><span id="connectionState"><span class="dot green"></span>系统连接中</span></footer>
   </div>

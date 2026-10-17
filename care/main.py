@@ -102,6 +102,24 @@ def index(request: Request):
     return templates.TemplateResponse(request=request, name="index.html", context={})
 
 
+@app.get("/home", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse(request=request, name="index.html", context={"household": True})
+
+
+@app.put("/api/home/monitoring")
+def home_monitoring(body: schemas.HomeMonitoring):
+    return system.set_home_monitoring(body.enabled, body.camera_index)
+
+
+@app.post("/api/home/audio-consent")
+def home_audio_consent():
+    with system.store.lock:
+        value = system.store.settings()
+        value["audio_consent"] = True
+        return system.store.save_settings(value)
+
+
 @app.get("/elder", response_class=HTMLResponse)
 def elder(request: Request):
     return templates.TemplateResponse(request=request, name="elder.html", context={})
@@ -257,6 +275,9 @@ def start_video(body: schemas.VideoStart):
 
 @app.post("/api/video/stop")
 def stop_video():
+    if system.home_monitoring["enabled"]:
+        system.set_home_monitoring(False, system.home_monitoring["camera_index"])
+        return system.video
     return system.video_stop()
 
 

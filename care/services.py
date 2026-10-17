@@ -76,6 +76,9 @@ class System:
         self.video_last_frame_at = 0
         self.video_event_keys = {}
         self.video_lock = threading.RLock()
+        self.home_monitoring = {**self.store.home_monitoring(), "error": None}
+        self.home_retry_at = 0
+        self.home_initializing = None
         self.cameras = CameraHub()
         self.camera_shapes = {}
         self.sensor_lock = threading.Lock()
@@ -131,6 +134,7 @@ class System:
     def _loop(self):
         while not self.stop_event.wait(1):
             for name, operation in (("events", self.events.tick), ("video", self.poll_video),
+                                    ("home_monitoring", self.ensure_home_monitoring),
                                     ("coverage", self.check_coverage), ("sessions", self.check_sessions),
                                     ("notifications", self.deliver_webhooks), ("heartbeat", self.store.heartbeat)):
                 try:
@@ -152,6 +156,8 @@ class System:
 
     def video_start(self, source, mode):
         with self.video_lock:
+            if self.home_monitoring["enabled"] and mode != "live":
+                raise ValueError("请先暂停居家守护，再播放视频样例")
             if self.video.get("state") == "running":
                 raise ValueError("视频检测正在运行")
             self.video_mode = mode
@@ -188,6 +194,8 @@ class System:
                 status = self.modules["video"].call("status", timeout=12)
             except Exception as exc:
                 self.video.update(state="error", error=str(exc))
+                if self.home_monitoring["enabled"]:
+                    self.video_finalized = True
                 self.cameras.release("video")
                 raise
             self.video = {k: v for k, v in status.items() if k != "records"}
@@ -240,9 +248,46 @@ class System:
         active = sum(r["state"] == "active" for r in coverage if r["channel"] in {"vision", "accel"})
         return {"modules": [m.health() for m in self.modules.values()], "video": self.video,
                 "video_mode": self.video_mode, "sensor": self.sensor, "coverage": coverage,
-                "cameras": self.cameras.status(),
+                "cameras": self.cameras.status(), "home_monitoring": dict(self.home_monitoring),
                 "coverage_state": "active" if active == 2 else "reduced" if active else "unavailable",
                 "server_time": now(), "audio_consent": self.store.settings()["audio_consent"]}
+
+    def set_home_monitoring(self, enabled, camera_index=0):
+        with self.video_lock:
+            changed_camera = self.home_monitoring["camera_index"] != camera_index
+            self.store.save_home_monitoring(enabled, camera_index)
+            self.home_monitoring.update(enabled=enabled, camera_index=camera_index, error=None)
+            self.home_retry_at = 0
+            if self.video.get("state") == "running" and (not enabled or changed_camera or self.video_mode != "live"):
+                self.video_stop()
+            self.store.audit("home", "monitoring_enabled" if enabled else "monitoring_disabled", {"camera_index": camera_index})
+        # Startup/recovery runs on the scheduler, never on a page-viewer lease.
+        return dict(self.home_monitoring)
+
+    def ensure_home_monitoring(self):
+        with self.video_lock:
+            if self.stop_event.is_set() or not self.home_monitoring["enabled"]:
+                return
+            if self.video.get("state") == "running" and self.video.get("processing", True):
+                return
+            if time.monotonic() < self.home_retry_at:
+                return
+            if self.home_initializing and not self.home_initializing.done():
+                return
+            module = self.modules["video"]
+            if module.state in {"loading", "not_initialized"}:
+                return
+            self.home_retry_at = time.monotonic() + 15
+            try:
+                if module.state != "ready":
+                    module.close()
+                    self.home_initializing = self.submit(self.initialize, "video")
+                    return
+                self.video_start({"type": "camera", "index": self.home_monitoring["camera_index"]}, "live")
+                self.home_monitoring["error"] = None
+            except Exception as exc:
+                self.home_monitoring["error"] = str(exc)
+                self.store.audit("home", "monitoring_retry", {"error": str(exc)})
 
     @staticmethod
     def describe(event):

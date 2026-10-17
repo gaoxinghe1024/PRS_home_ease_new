@@ -1,0 +1,25 @@
+<section id="page-home" class="page">
+  <div class="home-greeting"><div><p id="elderDate" class="muted"></p><h1 id="elderGreeting">您好</h1></div><i data-lucide="sun"></i></div>
+  <div class="home-choices">
+    <a href="#safety" class="home-choice safety-choice"><div class="home-choice-visual"><img src="/static/media/room-preview.jpg" alt="居家监测画面"></div><div class="home-choice-title"><i data-lucide="shield-check"></i><h2>安心守护</h2><i data-lucide="arrow-right"></i></div><span class="home-choice-note">日常居家</span></a>
+    <a href="#exercise" class="home-choice exercise-choice"><div class="home-choice-visual"><img src="/static/media/chair_sit_to_stand-guide.png" alt="椅子坐站动作"></div><div class="home-choice-title"><i data-lucide="activity"></i><h2>运动训练</h2><i data-lucide="arrow-right"></i></div><span class="home-choice-note">今天动一动</span></a>
+  </div>
+  <div class="home-family"><span id="elderExerciseCount">0 次训练</span><a href="/#reports" target="_blank" rel="noopener"><i data-lucide="chart-no-axes-combined"></i>家属查看报告<i data-lucide="arrow-up-right"></i></a></div>
+  <div id="elderContacts" class="elder-contacts"></div>
+</section>
+<section id="page-safety" class="page" hidden>
+  <div class="page-title"><div><h1>安心守护</h1><p id="homeSafetyStatus">正在开启守护</p></div><span class="badge amber" id="homeGuardBadge">连接中</span></div>
+  <div class="home-safety-layout">
+    <div class="home-camera"><img id="homeFrame" alt="实时居家画面" hidden><div id="homeCameraEmpty"><i data-lucide="video"></i><span>等待摄像头</span></div><span class="home-camera-label"><span class="dot green"></span><span id="homeRoom">客厅</span></span></div>
+    <div class="home-channels" aria-label="守护状态">
+      <div><i data-lucide="video"></i><span>跌倒监测</span><strong id="homeVideoState">等待连接</strong></div>
+      <div><i data-lucide="mic"></i><span>声音与求助</span><strong id="homeAudioState">等待连接</strong></div>
+      <div><i data-lucide="speech"></i><span>语音问询</span><strong id="homeInquiryState">等待连接</strong></div>
+      <div><i data-lucide="activity"></i><span>加速度传感器</span><strong id="homeSensorState">未连接</strong></div>
+    </div>
+  </div>
+  <div id="homeAudioNotice" class="home-permission" hidden><i data-lucide="mic-off"></i><div><strong id="homeAudioReason">麦克风尚未授权</strong><p id="homeAudioPrivacy">允许本地音频处理，原始音频与语音文字不保存。</p></div><button id="homeAllowAudio" class="button primary"><i data-lucide="mic"></i><span>允许麦克风</span></button></div>
+  <div class="home-safety-actions"><button id="homeRetry" class="button secondary"><i data-lucide="rotate-cw"></i>重新连接</button><button id="homePause" class="button secondary"><i data-lucide="pause"></i><span>暂停守护</span></button><a href="#exercise" class="button primary"><i data-lucide="activity"></i>去运动</a></div>
+  <p class="home-runtime-note">视频守护在本机服务运行时持续工作。声音与语音问询需要此页面保持打开、麦克风可用；电脑休眠或关机时无法监测。</p>
+  <details class="home-devices"><summary>摄像头设置</summary><label>摄像头序号<input id="homeCameraIndex" type="number" value="0" min="0" max="10"></label><button id="homeCameraApply" class="button secondary"><i data-lucide="check"></i>应用</button></details>
+</section>
