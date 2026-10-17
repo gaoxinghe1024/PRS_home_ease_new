@@ -24,6 +24,10 @@ from homeease.backend.services import alarm_tags
 
 INQUIRY_JUDGED = ("RESPONDED", "NO_RESPONSE", "UNCERTAIN")  # records that say how the person answered
 DEFAULT_MIN_ASR_LOGPROB = -1.0  # audio.voiceprint.min_asr_logprob
+# A reply that is only a short, standard Mandarin "I am fine" (record flag ``bare_reassurance``, set by ``classify_reply``) is averaged
+# over a handful of tokens and lands 0.0 to 0.25 below the gate although it was understood; it may be that much lower (relative to the
+# configured gate). Everything else, including every other language and every longer sentence, keeps the gate as it is.
+BARE_REASSURANCE_SLACK = 0.3
 
 
 def voice_cancel_verdict(rec: dict[str, Any], min_asr_logprob: float = DEFAULT_MIN_ASR_LOGPROB) -> bool:
@@ -36,8 +40,9 @@ def voice_cancel_verdict(rec: dict[str, Any], min_asr_logprob: float = DEFAULT_M
         return False
     conf = rec.get("asr_avg_logprob")
     if conf is not None:
+        floor = min_asr_logprob - (BARE_REASSURANCE_SLACK if rec.get("bare_reassurance") else 0.0)
         try:
-            if not float(conf) >= min_asr_logprob:  # also catches NaN
+            if not float(conf) >= floor:  # also catches NaN
                 return False
         except (TypeError, ValueError):
             return False
