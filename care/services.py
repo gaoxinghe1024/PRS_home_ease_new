@@ -4,6 +4,8 @@ import io
 import json
 import logging
 import math
+import os
+import sys
 import threading
 import time
 import uuid
@@ -11,19 +13,22 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
-
 import httpx
 
 from care.adapters.process import AlgorithmProcess, ModuleError
 from care.camera import CameraHub
-from care.config import EXERCISE, SIGNAL, VIDEO, RUNTIME, EXERCISES
+from care.config import EXERCISE, SIGNAL, VIDEO, RUNTIME, EXERCISES, ALGORITHM_KEYS
 from care.events import Events
 from care.inquiry import NOT_ASKED, ANSWERED, HIGH_RISK, voice_inquiry
 from care.events import is_withdrawn, withdraw_status
 from care.records import Records
-from care.storage import Store, now
+from care.storage import Store, now, ALGORITHM_DEFAULTS, PLAN_DEFAULTS
 
 log = logging.getLogger(__name__)
+
+EXERCISE_KEYS = tuple(EXERCISES)
+# 摄像头打不开（没插、被别的软件占用）时的统一标记，用来区分「设备问题」和「暂时失败」。
+FAILED = "摄像头不可用"
 
 
 def canonical_csv(data):
@@ -61,6 +66,25 @@ def canonical_csv(data):
     return output.getvalue().encode("utf-8")
 
 
+def _camera_partners(sid):
+    """与本会话共用同一物理摄像头的其它会话；独占前需要它们先释放。"""
+    if sid == "video":
+        return {"exercise-opening"}
+    return {"video", "exercise-opening"}
+
+
+def _launcher():
+    """重启时用的解释器：Windows 下优先 pythonw.exe，避免弹出控制台窗口。"""
+    if os.name != "nt":
+        return sys.executable
+    candidate = Path(sys.executable).with_name("pythonw.exe")
+    return str(candidate) if candidate.is_file() else sys.executable
+
+
+def _script():
+    return Path(__file__).resolve().parents[1] / "run.py"
+
+
 class System:
     def __init__(self, store=None):
         self.store = store or Store()
@@ -93,6 +117,20 @@ class System:
         self.audio_quality = {"state": "active", "reason": "麦克风输入有效"}
         self.jobs = set()
         self.jobs_lock = threading.RLock()
+        # 后台算法开关：只记录开关状态与调度结果，不参与原算法的判定。
+        self.algorithms_lock = threading.RLock()
+        self.algorithms = {key: item["enabled"] for key, item in self.store.algorithms().items()}
+        self.remote_access = False
+        # 后台常驻时自动运行的两条通道。``stop`` 指向各自的收尾函数，
+        # 关闭开关时只需调用它，不必在路由层判断当前是哪种模式。
+        self.exercises_lock = threading.RLock()
+        self.sensor_session = {"active": False, "sid": None, "error": None, "stop": lambda reason: None}
+        self.exercise_session = {"active": False, "sid": None, "key": None, "last_key": None, "error": None,
+                                 "retry_at": 0, "started_at": None, "stop": lambda reason: None}
+        self.resident = {"state": "off", "error": None, "started_at": None, "last_open_at": None,
+                         "restarted_at": None, "exited_at": None}
+        self.resident_retry_at = 0
+        self.vision_retry_at = 0
         self.store.recover_coverage()
         for channel in ("vision", "accel", "audio"):
             self.store.set_coverage(channel, "unavailable", "尚未连接实时输入")
@@ -100,6 +138,12 @@ class System:
             if old["status"] in {"running", "paused"}:
                 old.update(status="interrupted", quality="service_restarted", ended_at=now())
                 self.store.save_session(old)
+        # 老版本只有「家庭守护」开关：升级后把它对齐到「视频跌倒检测」，
+        # 保持既有的监测行为不变，不因为新增开关而默默关闭正在用的守护。
+        legacy = self.store.home_monitoring()
+        if legacy["enabled"] and not self.algorithms.get("vision", True):
+            self.algorithms["vision"] = True
+            self.store.save_algorithm("vision", True)
 
     def start(self):
         for name in self.modules:
@@ -134,13 +178,393 @@ class System:
     def _loop(self):
         while not self.stop_event.wait(1):
             for name, operation in (("events", self.events.tick), ("video", self.poll_video),
-                                    ("home_monitoring", self.ensure_home_monitoring),
+                                    ("algorithms", self.ensure_algorithms),
                                     ("coverage", self.check_coverage), ("sessions", self.check_sessions),
                                     ("notifications", self.deliver_webhooks), ("heartbeat", self.store.heartbeat)):
                 try:
                     operation()
                 except Exception as exc:
                     log.exception("%s scheduler operation failed", name)
+
+    # ------------------------------------------------------------------ 后台算法开关
+    def algorithm_channel(self, key):
+        """读取一个开关；未知键返回 None，由路由层报 404。"""
+        with self.algorithms_lock:
+            return self.algorithms.get(key)
+
+    def set_algorithms(self, changes):
+        """只改被提交的开关，并立即生效（不必等调度下一轮）。
+
+        开启「后台常驻」时只打开常驻本身，视频/加速度仍按各自的开关决定；
+        关闭常驻等价于「自己开着的通道全部停掉」，但开关本身保留，下次再开还在。
+        """
+        changes = {key: bool(value) for key, value in changes.items() if value is not None}
+        previous = {}
+        with self.algorithms_lock:
+            for key, value in changes.items():
+                if key not in ALGORITHM_DEFAULTS:
+                    raise KeyError(key)
+                previous[key] = self.algorithms.get(key, ALGORITHM_DEFAULTS[key])
+                if previous[key] != value:
+                    self.store.save_algorithm(key, value)
+                self.algorithms[key] = value
+        try:
+            if "vision" in changes and not changes["vision"]:
+                self.stop_vision("视频跌倒检测已关闭", switch=True)
+            if "accel" in changes and not changes["accel"]:
+                self.stop_session_channel(self.sensor_session, "加速度跌倒检测已关闭")
+            for key, value in changes.items():
+                if key in EXERCISE_KEYS and not value:
+                    self.stop_session_channel(self.exercise_session, f"{EXERCISES[key]}检测已关闭")
+            if changes.get("resident"):
+                self.resident["state"] = "starting"
+                self.resident["error"] = None
+                self.store.audit("resident", "enabled", {"remote_access": self.remote_access})
+            elif "resident" in changes and not changes["resident"]:
+                self.stop_vision("后台常驻已关闭", switch=True)
+                self.stop_session_channel(self.sensor_session, "后台常驻已关闭")
+                for key in EXERCISE_KEYS:
+                    self.stop_session_channel(self.exercise_session, "后台常驻已关闭")
+                self.resident.update(state="off", error=None)
+                self.store.audit("resident", "disabled", {})
+            self.sync_home_monitoring()
+            self.ensure_algorithms()
+        except Exception:
+            log.exception("Could not apply algorithm switches %s", changes)
+        return self.algorithm_status()
+
+    def sync_home_monitoring(self):
+        """后台常驻与「家庭守护」是同一个视频跌倒监测，保持两边一致。
+
+        家庭页的暂停按钮、工作台的停止检测按钮都走这里，避免出现
+        「开关显示开启、实际已暂停」或反之的矛盾状态。
+        """
+        with self.algorithms_lock:
+            vision = self.algorithms.get("vision", True)
+            resident = self.algorithms.get("resident", False)
+        desired = bool(vision and (resident or self.home_monitoring["enabled"]))
+        if desired != bool(self.home_monitoring["enabled"]):
+            self.set_home_monitoring(desired, self.home_monitoring.get("camera_index", 0))
+        return dict(self.home_monitoring)
+
+    def stop_vision(self, reason, switch=False):
+        """停下视频检测。
+
+        ``switch=False`` 用于后台轮播这类内部让位：只停运行状态，绝不能顺手把
+        「视频跌倒检测」开关也关掉 —— 否则镜头交出去之后，就没谁再把它拉回来了。
+        只有照护者主动关开关时才传 ``switch=True``。
+        """
+        if self.video.get("state") != "running" and not self.home_monitoring["enabled"]:
+            return
+        # 注意 set_home_monitoring(False) 不会反向改 vision 开关，
+        # 「关掉开关」这件事由调用方（set_algorithms）自己写库。
+        self.set_home_monitoring(False, self.home_monitoring.get("camera_index", 0))
+        self.store.audit("video", "stopped_by_switch", {"reason": reason, "switch": switch})
+
+    @staticmethod
+    def stop_session_channel(state, reason):
+        """关掉一个后台通道：有会话就先结束它，没有就只清掉「已开启」标记。
+
+        状态先标为不再活跃，避免调度在同一秒里又把它拉起来；真正的收尾
+        （结束会话、释放摄像头）交给通道自己的 ``stop``。
+        """
+        stop = state.get("stop")
+        state["active"] = False
+        if callable(stop):
+            try:
+                stop(reason)
+                return
+            except Exception:
+                log.exception("Could not stop background session %s", state.get("sid"))
+        state["sid"] = None
+
+    def ensure_algorithms(self):
+        """调度：把开了开关、但当前没在运行的通道都交给原算法跑起来。
+
+        所有启动都经过既有的 video_start / start_camera_session，输入来源、
+        采样与判定完全沿用原算法；这里只决定「启不启动、什么时候启动」。
+        """
+        if self.stop_event.is_set():
+            return
+        with self.algorithms_lock:
+            switches = dict(self.algorithms)
+        self.ensure_resident(switches)
+        if not switches.get("resident"):
+            return
+        self.ensure_vision(switches)
+        self.ensure_sensor(switches)
+        self.ensure_exercises(switches)
+
+    def ensure_resident(self, switches):
+        if not switches.get("resident"):
+            if self.resident["state"] != "off":
+                self.resident.update(state="off", error=None)
+            return
+        now_mono = time.monotonic()
+        if self.resident["state"] == "exited" and now_mono - (self.resident.get("exited_at") or 0) < 15:
+            return
+        if now_mono < self.resident_retry_at or not (_script().is_file()):
+            return
+        self.resident_retry_at = now_mono + 30
+        if self.resident.get("error") == FAILED:
+            self.resident.update(error=None)  # 给一次重试机会：设备可能刚插回来
+        # 已经能读到本机状态就只做自检，不重复拉起进程。
+        self.store.heartbeat()
+        self.resident.update(state="running", error=None, started_at=self.resident.get("started_at") or now())
+        self.store.audit("resident", "alive", {"pid": os.getpid()})
+
+    def ensure_vision(self, switches):
+        with self.video_lock:
+            if not (switches.get("resident") and switches.get("vision", True)):
+                return
+            if not self.modules["video"].state == "ready":
+                return
+            if self.video.get("state") == "running":
+                return
+            if self.exercise_session.get("active"):
+                return  # 摄像头正被运动训练独占，训练结束后再接管
+            if time.monotonic() < self.vision_retry_at:
+                return
+            if self.resident.get("error") == FAILED:
+                self.resident.update(error=None)  # 先解除失联标记，让下一轮真正去试一次
+            # 复用既有的守护启动路径：同样的输入、同样的限速重试与错误上报。
+            if self.home_monitoring["enabled"]:
+                self.ensure_home_monitoring()
+                return
+            self.vision_retry_at = time.monotonic() + 15
+            try:
+                if self.modules["video"].state != "ready":
+                    return
+                self.video_start({"type": "camera", "index": self.home_monitoring.get("camera_index", 0)}, "live")
+                self.store.save_home_monitoring(True, self.home_monitoring.get("camera_index", 0))
+                self.home_monitoring.update(enabled=True, error=None)
+                self.store.audit("resident", "vision_started", {})
+            except Exception as exc:
+                self.resident["error"] = str(exc)
+                self.store.audit("resident", "vision_retry", {"error": str(exc)})
+
+    def ensure_sensor(self, switches):
+        """加速度通道没有本机采集设备：后台常驻时只确认「谁在提供数据」。
+
+        真实的三轴数据来自手机端 /sensor（浏览器把加速度推到 /ws/sensor），
+        或用 CSV 回放。这里不伪造数据，只把状态与原因如实报给设置页。
+        """
+        state = self.sensor_session
+        wanted = bool(switches.get("resident") and switches.get("accel", True))
+        if state.get("active") and not wanted:
+            self.stop_session_channel(state, "加速度跌倒检测已关闭")
+            return
+        connected = self.sensor["state"] == "connected"
+        with self.exercises_lock:
+            state["active"] = bool(wanted and connected)
+            state["sid"] = "sensor" if state["active"] else None
+            state["error"] = None if not wanted or connected else "本机没有三轴采集设备：请在手机上打开 /sensor 并保持页面在前台，数据会实时推送到这里"
+        if state["active"]:
+            state["stop"] = self._stop_sensor_channel
+        else:
+            state["stop"] = lambda reason: None
+
+    def _stop_sensor_channel(self, reason):
+        """关闭加速度检测不打断已连上的设备，只停止把它算作「后台通过」的依据。"""
+        with self.exercises_lock:
+            self.sensor_session.update(active=False, sid=None, stop=lambda value: None)
+        self.store.audit("resident", "accel_stopped", {"reason": reason})
+
+    def ensure_exercises(self, switches):
+        if self.exercise_session.get("error") == FAILED:
+            return  # 本机没有可用摄像头，后台轮播只会反复开机关机，等设备恢复再说
+        state = self.exercise_session
+        wanted = [key for key in EXERCISE_KEYS if switches.get(key, True)]
+        if not switches.get("resident"):
+            wanted = []
+        if state.get("active"):
+            if state.get("key") in wanted:
+                return
+            self.stop_session_channel(state, "该运动检测已关闭")
+            return
+        if wanted and state.get("error") and (state.get("retry_at") or 0) > time.monotonic():
+            return
+        if not wanted or self.modules["exercise"].state != "ready":
+            return
+        # 运动检测只接管「后台自己开着的」那路画面。若照护者正在监测工作台看实时画面，
+        # 就把摄像头留给它，等视频停下后再接上，而不是抢占正在被观看的画面。
+        handover = None
+        if self.resident.get("error") == FAILED:
+            return  # 摄像头打不开，视频和训练都别每轮重试
+        if self.video.get("state") == "running" and self.video_mode == "live" and switches.get("vision", True):
+            busy = self.cameras.busy("video")
+            live = {sid for sid, meta in self.session_metadata.items() if meta.get("active")}
+            if busy & live:
+                return  # 真人正在用工作台做训练，别把他手上的会话换成后台轮播
+            if not busy:
+                handover = "video"  # 只有后台视频在占用，可以直接把镜头转过来
+        target = self._next_exercise(wanted)
+        if target is None:
+            return
+        try:
+            result = self.start_camera_session(target, self.store.settings().get("exercise_target", 10),
+                                               self.home_monitoring.get("camera_index", 0), handover=handover)
+        except Exception as exc:
+            state.update(active=False, sid=None, key=None, error=str(exc), retry_at=time.monotonic() + 60)
+            self.store.audit("resident", "exercise_failed", {"exercise": target, "error": str(exc)})
+            return
+        sid = result["session_id"]
+        with self.exercises_lock:
+            state.update(active=True, sid=sid, key=target, error=None, retry_at=0, started_at=now())
+            state["stop"] = lambda reason, sid=sid: self.end_background_exercise(sid, reason)
+        self.store.audit("resident", "exercise_started", {"session_id": sid, "exercise": target,
+                                                          "handover": bool(handover)})
+        if handover:
+            # 画面已交给训练会话，视频通道腾出镜头；训练结束后下一轮调度再接管。
+            # keep_camera: 采集线程此刻正被训练会话使用，不能拆机。
+            with self.video_lock:
+                self.stop_vision("摄像头交由后台运动检测使用")
+
+    def _next_exercise(self, wanted):
+        """按计划顺序轮转；某动作本轮已完成，就让给下一个，让长者不用等。"""
+        with self.exercises_lock:
+            last = self.exercise_session.get("last_key")
+        plan = self.store.exercise_plan()
+        order = [item["exercise"] for item in plan["items"] if item["enabled"] and item["exercise"] in wanted]
+        order = order or list(wanted)
+        if last in order:
+            order = order[order.index(last) + 1:] + order[:order.index(last) + 1]
+        return order[0]
+
+    def clear_stale_sessions(self):
+        """清理没有活动训练、却还标着 running 的旧会话。
+
+        这类残留来自上一次进程异常退出或调度竞态：它们没有对应的内存状态，
+        既不会自己结束，又会一直挡着「开始新的训练」。
+        """
+        for item in self.store.sessions(mode="live"):
+            sid = item["session_id"]
+            if item["status"] in {"running", "paused"} and not self.session_metadata.get(sid, {}).get("active"):
+                item.update(status="interrupted", quality="service_restarted", ended_at=now())
+                self.store.save_session(item)
+                self.store.audit("exercise", "stale_session_closed", {"session_id": sid})
+                self.cameras.release(sid)
+
+    def end_background_exercise(self, sid, reason):
+        if sid not in self.session_metadata:
+            return None
+        # 先结束会话，再释放通道标记：反过来的话，会话万一结束失败
+        # 就没有人记得它还在跑，会把摄像头一直占着。
+        try:
+            result = self.session_control(sid, "end")
+        except Exception as exc:
+            log.exception("Could not end background exercise %s", sid)
+            result = {"session_id": sid, "status": "interrupted", "error": str(exc)}
+        finally:
+            with self.exercises_lock:
+                state = self.exercise_session
+                if state.get("sid") == sid:
+                    state.update(active=False, sid=None, last_key=state.get("key"), error=None)
+        self.store.audit("resident", "exercise_ended", {"session_id": sid, "reason": reason,
+                                                        "count": result.get("count", 0)})
+        return result
+
+    def algorithm_status(self):
+        """给设置页用的完整状态：开关 + 后台此刻实际在跑什么 + 做不到的原因。"""
+        with self.algorithms_lock:
+            switches = dict(self.algorithms)
+        vision_on = self.video.get("state") == "running" and self.video_mode == "live"
+        sensor = self.sensor_session
+        exercise = self.exercise_session
+        channels = [
+            {"key": "vision", "type": "algorithm", "active": vision_on,
+             "detail": self.video.get("error") or ("实时视频检测中" if vision_on else "未运行")},
+            {"key": "accel", "type": "algorithm",
+             "active": bool(sensor.get("active")) or self.sensor["state"] == "connected",
+             "detail": sensor.get("error") or ("后台采集运行中" if sensor.get("active") else
+                                               "手机端已连接" if self.sensor["state"] == "connected" else "未运行")},
+        ]
+        current = exercise.get("key") if exercise.get("active") else None
+        for key in EXERCISE_KEYS:
+            running = current == key
+            channels.append({"key": key, "type": "exercise", "active": running,
+                             "detail": "随后台常驻识别动作" if running else
+                                       "待识别" if switches.get("resident") and switches.get(key) else "未运行"})
+        reasons = self.algorithm_blockers(switches)
+        return {"switches": switches, "channels": channels, "resident": dict(self.resident),
+                "resident_ready": self.resident_available(), "blockers": reasons,
+                "remote_access": self.remote_access}
+
+    def resident_available(self):
+        return _script().is_file()
+
+    def sensors_connected(self):
+        """加速度通道的数据来自三轴设备（手机端 /sensor），本机没有第二个采集源。"""
+        return self.sensor["state"] == "connected"
+
+    def plan_progress(self, plan=None):
+        """今天各动作的完成情况；完成判定沿用既有训练记录（status=ended, mode=live）。"""
+        plan = plan or self.store.exercise_plan()
+        tz = ZoneInfo("Asia/Shanghai")
+        today = datetime.now(tz).date()
+        sessions = [s for s in self.store.sessions(mode="live", limit=2000)
+                    if s.get("status") == "ended"
+                    and datetime.fromisoformat(s["created_at"]).astimezone(tz).date() == today]
+        items = []
+        for item in plan["items"]:
+            done = [s for s in sessions if s["exercise"] == item["exercise"]]
+            reps = sum(s.get("count", 0) for s in done)
+            target = max(1, item["target_reps"])
+            items.append({**item, "reps": reps, "sessions": len(done),
+                          "done": bool(done) and reps >= target,
+                          "disabled": not self.exercise_enabled(item["exercise"])})
+        return {"date": today.isoformat(), "items": items,
+                "completed": sum(1 for i in items if i["done"] and i["enabled"]),
+                "total": sum(1 for i in items if i["enabled"]),
+                "skipped": today.isoformat() in (plan.get("skipped_dates") or [])}
+
+    def save_plan(self, value, updated_by="caregiver"):
+        plan = {**PLAN_DEFAULTS, **value, "updated_at": now(), "updated_by": updated_by}
+        self.store.save_exercise_plan(plan)
+        return {**plan, "progress": self.plan_progress(plan)}
+
+    def shift_plan(self, delta):
+        """长者端「今天不做了」：只把这次跳过记到今天为止，不动计划内容。
+
+        不把计划本身挪到明天 —— 计划是照护者安排的每日日程，需要顺延的是
+        「今天这一份」。跳过日期落库后，今天的长者端就不再显示，明天照常出现。
+        """
+        plan = self.store.exercise_plan()
+        tz = ZoneInfo("Asia/Shanghai")
+        today = datetime.now(tz).date()
+        skipped = {d for d in (plan.get("skipped_dates") or []) if d >= today.isoformat()}
+        for step in range(1, max(1, int(delta)) + 1):
+            skipped.add((today + timedelta(days=step - 1)).isoformat())
+        plan.update(skipped_dates=sorted(skipped), updated_at=now(), updated_by="elder")
+        self.store.save_exercise_plan(plan)
+        self.store.audit("plan", "deferred", {"dates": sorted(skipped)})
+        return {**plan, "progress": self.plan_progress(plan)}
+
+    def algorithm_blockers(self, switches):
+        blockers = []
+        if not switches.get("resident"):
+            blockers.append("「后台常驻」未开启，视频、加速度与运动检测不会自动运行")
+            return blockers
+        if not self.resident_available():
+            blockers.append("找不到启动脚本，后台常驻无法自动恢复")
+        if self.resident.get("error") and self.resident["error"] != FAILED:
+            blockers.append(self.resident["error"])
+        if self.resident.get("error") and self.resident["error"] == FAILED:
+            blockers.append("本机摄像头不可用，插上或释放占用后会自动恢复")
+        elif switches.get("vision") and self.modules["video"].state != "ready":
+            blockers.append("视频算法尚未就绪，启动后会自动接管")
+        if self.exercise_session.get("error"):
+            blockers.append(self.exercise_session["error"])
+        return blockers
+
+    def exercise_enabled(self, key):
+        with self.algorithms_lock:
+            return bool(self.algorithms.get(key, True))
+
+    def set_remote_access(self, value):
+        self.remote_access = bool(value)
+        if value:
+            self.store.audit("resident", "remote_access_reported", {"pid": os.getpid()})
 
     def video_pose(self):
         """当前帧的人体框与 17 个关键点（归一化 0–1），供前端叠加层使用。
@@ -165,22 +589,29 @@ class System:
             self.video_finalized = False
             self.video_event_keys = {}
             if source.get("type") == "camera":
+                # 先占位再开机：acquire 返回时采集线程已经在出帧，交接时就能直接复用，
+                # 万一视频模块启动失败也不会留下一路没人认领的摄像头。
                 source = {**source, "shared_camera": self.cameras.acquire(source.get("index", 0), "video")}
-            try:
+                try:
+                    self.video = self.modules["video"].call("start", source=source)
+                except Exception:
+                    self.cameras.release("video")
+                    raise
+            else:
                 self.video = self.modules["video"].call("start", source=source)
-            except Exception:
-                self.cameras.release("video")
-                raise
             self.video_last_frame_at = time.time()
             self.store.audit("video", "started", {"mode": mode, "source": source.get("type")})
             return self.video
 
-    def video_stop(self):
+    def video_stop(self, keep_camera=None):
         with self.video_lock:
             try:
                 self.video = self.modules["video"].call("stop", timeout=20)
             finally:
-                self.cameras.release("video")
+                # keep_camera: 这一路画面马上要交给后台运动检测，先不拆机。
+                self.cameras.release("video", accept=[keep_camera] if keep_camera else ())
+            self.video_finalized = True
+            self.video_run = None
             self.poll_video(force=True)
             self.store.set_coverage("vision", "unavailable", "实时视频已停止")
             return self.video
@@ -246,13 +677,36 @@ class System:
     def status(self):
         coverage = [r for r in self.store.coverage() if r["ended_at"] is None]
         active = sum(r["state"] == "active" for r in coverage if r["channel"] in {"vision", "accel"})
+        with self.algorithms_lock:
+            switches = dict(self.algorithms)
         return {"modules": [m.health() for m in self.modules.values()], "video": self.video,
                 "video_mode": self.video_mode, "sensor": self.sensor, "coverage": coverage,
                 "cameras": self.cameras.status(), "home_monitoring": dict(self.home_monitoring),
                 "coverage_state": "active" if active == 2 else "reduced" if active else "unavailable",
-                "server_time": now(), "audio_consent": self.store.settings()["audio_consent"]}
+                "server_time": now(), "audio_consent": self.store.settings()["audio_consent"],
+                "algorithms": switches,
+                "resident": {"enabled": bool(switches.get("resident")), **{k: v for k, v in self.resident.items() if k != "state"},
+                             "state": self.resident["state"]},
+                "background": {"sensor": {"active": bool(self.sensor_session.get("active")),
+                                          "error": self.sensor_session.get("error"),
+                                          "connected": self.sensor["state"] == "connected"},
+                               "exercise": {"active": bool(self.exercise_session.get("active")),
+                                            "key": self.exercise_session.get("key"),
+                                            "error": self.exercise_session.get("error")}}}
 
     def set_home_monitoring(self, enabled, camera_index=0):
+        """开启/停止「家庭守护」。它与设置页的「视频跌倒检测」是同一个开关。"""
+        if not enabled:
+            # 停下来时只写运行状态，不反向关闭 vision 开关：交门给运动检测属于
+            # 内部让位，关掉开关会导致训练结束后再没人把视频拉回来。
+            self.store.save_home_monitoring(False, camera_index)
+            with self.video_lock:
+                self.home_monitoring.update(enabled=False, camera_index=camera_index, error=None)
+                self.home_retry_at = 0
+                if self.video.get("state") == "running" and self.video_mode == "live":
+                    self.video_stop()
+            self.store.audit("home", "monitoring_disabled", {"camera_index": camera_index})
+            return dict(self.home_monitoring)
         with self.video_lock:
             changed_camera = self.home_monitoring["camera_index"] != camera_index
             self.store.save_home_monitoring(enabled, camera_index)
@@ -261,6 +715,11 @@ class System:
             if self.video.get("state") == "running" and (not enabled or changed_camera or self.video_mode != "live"):
                 self.video_stop()
             self.store.audit("home", "monitoring_enabled" if enabled else "monitoring_disabled", {"camera_index": camera_index})
+        # 「家庭守护」与设置页的「视频跌倒检测」是同一件事，开关保持同步。
+        if self.algorithms.get("vision", True) != bool(enabled):
+            with self.algorithms_lock:
+                self.algorithms["vision"] = bool(enabled)
+            self.store.save_algorithm("vision", bool(enabled))
         # Startup/recovery runs on the scheduler, never on a page-viewer lease.
         return dict(self.home_monitoring)
 
@@ -385,17 +844,17 @@ class System:
             raise ValueError("这次训练未保留骨架诊断，请开始新的训练")
         return json.loads(path.read_text(encoding="utf-8"))
 
-    def start_camera_session(self, exercise, target, index):
+    def start_camera_session(self, exercise, target, index, handover=None):
         with self.sessions_lock:
             if any(meta["active"] for meta in self.session_metadata.values()):
                 raise ValueError("请先结束当前运动训练")
             owner = "exercise-opening"
-            descriptor = self.cameras.acquire(index, owner)
+            descriptor = None if handover else self.cameras.acquire(index, owner)
             try:
                 self.modules["exercise"].call("pose_initialize")
                 result = self.create_session(exercise, target, "live", action_scope="training")
                 sid = result["session_id"]
-                self.cameras.acquire(index, sid)
+                descriptor = descriptor or self.handover_camera(handover, sid, index)
                 self.session_metadata[sid]["shared_camera"] = True
                 self.session_metadata[sid]["last_viewer"] = time.monotonic()
                 self.camera_shapes[sid] = descriptor["shape"]
@@ -403,6 +862,22 @@ class System:
                 return {**result, "shared_camera": True, "frame_shape": descriptor["shape"]}
             finally:
                 self.cameras.release(owner)
+
+    def handover_camera(self, owner, sid, index):
+        """把一路正在采样的画面从 ``owner`` 直接交给训练会话，不关设备、不丢帧。
+
+        后台常驻在视频跌倒与运动检测之间轮换，两者用的是同一个摄像头；
+        原来的 ``acquire/release`` 会拆机重开，画面要重新协商（约一秒黑屏），
+        这里改为只替换占用者编号，像素管道保持不动。
+        """
+        descriptor = self.cameras.descriptor(owner)
+        if descriptor is None:
+            return self.cameras.acquire(index, sid)
+        # 「exercise-opening」只是短暂的占位编号，交接后不应继续挂在设备上。
+        self.cameras.release_except({sid})
+        if sid not in self.cameras.users(sid):
+            return self.cameras.acquire(index, sid)
+        return descriptor
 
     def camera_exercise(self, sid, descriptor):
         sequence = 0

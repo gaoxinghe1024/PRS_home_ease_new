@@ -125,6 +125,22 @@ def elder(request: Request):
     return templates.TemplateResponse(request=request, name="elder.html", context={})
 
 
+@app.get("/api/elder/context")
+def elder_context():
+    """长者端一次拿到需要的全部内容：称呼、房间、计划与今天的完成情况。"""
+    settings = system.store.settings()
+    plan = system.store.exercise_plan()
+    return {"resident": settings["resident"], "contacts": settings["contacts"],
+            "plan": {**plan, "progress": system.plan_progress(plan)}}
+
+
+@app.post("/api/elder/open")
+def elder_open():
+    """长者端打开即上报：只记录活动时间，用来解释「后台常驻」的自检状态。"""
+    system.resident["last_open_at"] = now()
+    return {"ok": True}
+
+
 @app.get("/sensor", response_class=HTMLResponse)
 def sensor_page(request: Request):
     return templates.TemplateResponse(request=request, name="sensor.html", context={})
@@ -138,6 +154,40 @@ def health():
 @app.get("/api/status")
 def status():
     return system.status()
+
+
+@app.get("/api/algorithms")
+def algorithms():
+    """后台算法开关与此刻的实际运行状态。"""
+    return system.algorithm_status()
+
+
+@app.put("/api/algorithms")
+def update_algorithms(body: schemas.AlgorithmUpdate):
+    changes = body.model_dump(exclude_none=True)
+    if not changes:
+        return system.algorithm_status()
+    return system.set_algorithms(changes)
+
+
+@app.get("/api/plan")
+def exercise_plan():
+    plan = system.store.exercise_plan()
+    return {**plan, "progress": system.plan_progress(plan)}
+
+
+@app.put("/api/plan")
+def update_exercise_plan(body: schemas.ExercisePlan):
+    value = body.model_dump()
+    value.pop("updated_at", None)
+    value.pop("updated_by", None)
+    return system.save_plan(value, "caregiver")
+
+
+@app.post("/api/plan/defer")
+def defer_exercise_plan(body: schemas.PlanDefer | None = None):
+    """长者端：今天先不做。只记下被跳过的日期，计划内容仍是照护者设定的样子。"""
+    return system.shift_plan((body.days if body else 1))
 
 
 @app.get("/api/settings")
@@ -420,6 +470,9 @@ def exercises():
 
 @app.post("/api/sessions", status_code=201)
 def create_session(body: schemas.SessionStart):
+    # 设置页关掉的运动不再接收新的训练请求，避免计了数却没人看。
+    if not system.exercise_enabled(body.exercise):
+        raise ValueError(f"{EXERCISES[body.exercise]}检测已在设置中关闭，请先开启")
     path = uploaded(body.upload_id) if body.source == "upload" else None
     if body.source == "camera" and body.capture == "shared":
         return system.start_camera_session(body.exercise, body.target_reps, body.camera_index)

@@ -1,5 +1,10 @@
 <section id="page-home" class="page">
   <div class="home-greeting"><div><p id="elderDate" class="muted"></p><h1 id="elderGreeting">您好</h1></div><i data-lucide="sun"></i></div>
+  <section id="homePlan" class="home-plan" hidden aria-labelledby="homePlanTitle">
+    <div class="home-plan-head"><div><span class="home-plan-eyebrow">照护者安排</span><h2 id="homePlanTitle">今天的运动计划</h2><p id="homePlanNote" class="muted"></p></div><span class="badge green" id="homePlanCount">0 / 0 已完成</span></div>
+    <ol id="homePlanItems" class="home-plan-items"></ol>
+    <div class="home-plan-foot"><span id="homePlanHint" class="muted">按顺序开始，做完一项会自动打勾</span><div class="button-row"><label class="home-plan-days"><span>休息</span><select id="homePlanDeferDays" aria-label="不做训练的天数"><option value="1">今天</option><option value="2">今明两天</option><option value="3">三天</option></select></label><button type="button" class="button secondary" id="homePlanDefer"><i data-lucide="calendar-clock"></i>先不做</button><a href="#exercise" class="button primary" id="homePlanStart"><i data-lucide="play"></i>开始训练</a></div></div>
+  </section>
   <div class="home-choices">
     <a href="#safety" class="home-choice safety-choice"><div class="home-choice-visual"><img src="/static/media/room-preview.jpg" alt="居家监测画面"></div><div class="home-choice-title"><i data-lucide="shield-check"></i><h2>安心守护</h2><i data-lucide="arrow-right"></i></div><span class="home-choice-note">日常居家</span></a>
     <a href="#exercise" class="home-choice exercise-choice"><div class="home-choice-visual"><img src="/static/media/chair_sit_to_stand-guide.png" alt="椅子坐站动作"></div><div class="home-choice-title"><i data-lucide="activity"></i><h2>运动训练</h2><i data-lucide="arrow-right"></i></div><span class="home-choice-note">今天动一动</span></a>
