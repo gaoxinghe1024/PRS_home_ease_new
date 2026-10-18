@@ -139,10 +139,54 @@ class CameraHub:
             log.info("Camera %s attached to %s", index, owner)
             return capture.descriptor()
 
-    def release(self, owner):
+    def descriptor(self, owner):
+        """``owner`` 当前使用的那一路画面描述（供交接时直接复用）。"""
+        with self.lock:
+            capture = next((c for c in self.devices.values() if owner in c.users), None)
+            return capture.descriptor() if capture else None
+
+    def users(self, owner):
+        with self.lock:
+            capture = next((c for c in self.devices.values() if owner in c.users), None)
+            return set(capture.users) if capture else set()
+
+    def busy(self, owner):
+        """占用这一路画面的其它用户（布尔判断可直接用，也便于看出是谁在用）。"""
+        return self.users(owner) - {owner, "exercise-opening"}
+
+    def release(self, owner, accept=()):
+        """释放一个使用者；``accept`` 里的编号视为同一任务的延续，接手这一路画面。
+
+        后台常驻会把视频占用的画面交给运动检测：两者共用一路物理摄像头时，
+        只需要重新绑定编号，不必拆机重开，画面也就不会中断。
+        """
+        with self.lock:
+            keep = set(accept)
+            for index, capture in list(self.devices.items()):
+                if owner not in capture.users:
+                    continue
+                capture.users.discard(owner)
+                if not keep:
+                    if not capture.users:
+                        capture.close()
+                        del self.devices[index]
+                    continue
+                capture.users |= keep
+                if not capture.users:
+                    capture.close()
+                    del self.devices[index]
+
+    def release_except(self, owners):
+        """释放除 ``owners`` 之外的其它占用者，设备与像素管道保持不动。
+
+        只摘掉占用者编号 —— 交接时这里要是关了机，新的使用者拿到的就是一个
+        已经停采样的管道，第一帧就会报画面中断。真正没人用的那一路由
+        ``release`` 负责关闭。
+        """
+        keep = set(owners)
         with self.lock:
             for index, capture in list(self.devices.items()):
-                capture.users.discard(owner)
+                capture.users &= keep
                 if not capture.users:
                     capture.close()
                     del self.devices[index]

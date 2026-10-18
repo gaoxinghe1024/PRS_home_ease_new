@@ -72,7 +72,79 @@
     if (!desired && app.audioStream && !app.audioStopping) stopAudioLive();
     voiceState();
     connectAudio();
+    renderPlan();
   }
+  /* 照护者安排的运动计划：长者端首页展示，点一项直接带着这个动作开始训练。
+     完成与否只看当天有该动作的已结束训练，不做额外判定。 */
+  let planBusy = false;
+  function planSignature(plan) {
+    return JSON.stringify([plan?.enabled, plan?.title, plan?.note, plan?.updated_at, (plan?.items || []).map(i => [i.exercise, i.target_reps, i.enabled]),
+      (plan?.progress?.items || []).map(i => [i.exercise, i.reps, i.done]), plan?.progress?.skipped]);
+  }
+  let planPaint = "";
+  function renderPlan() {
+    const plan = app.plan;
+    if (!plan || !$("homePlan")) return;
+    const signature = planSignature(plan);
+    if (signature === planPaint) return;
+    planPaint = signature;
+    const progress = plan.progress || {items: [], completed: 0, total: 0};
+    const rows = (progress.items || []).filter(item => item.enabled);
+    // 长者点过「今天先不做」，当天就不再显示这张卡片，明天照常出现。
+    $("homePlan").hidden = !plan.enabled || !rows.length || !!progress.skipped;
+    if ($("homePlan").hidden) return;
+    $("homePlanTitle").textContent = plan.title || "今天的运动计划";
+    $("homePlanNote").textContent = plan.note || "";
+    $("homePlanNote").hidden = !plan.note;
+    const done = rows.filter(item => item.done).length;
+    $("homePlanCount").textContent = `${done} / ${rows.length} 已完成`;
+    $("homePlanCount").className = `badge ${done === rows.length ? "green" : "amber"}`;
+    $("homePlanItems").innerHTML = rows.map((item, index) => {
+      const guide = exerciseGuides[item.exercise];
+      const percent = Math.min(100, Math.round(100 * (item.reps || 0) / Math.max(1, item.target_reps)));
+      const state = item.done ? "已完成" : item.reps ? `已做 ${item.reps} 次` : "还没开始";
+      return `<li class="home-plan-item ${item.done ? "is-done" : ""}">
+        <button type="button" class="home-plan-button" data-plan-start="${item.exercise}" ${item.disabled ? "disabled" : ""} aria-label="${item.done ? "再做一次" : "开始"}${names[item.exercise]}">
+          <span class="home-plan-order">${item.done ? icon("circle-check") : index + 1}</span>
+          <img src="/static/media/${item.exercise}-guide.png" alt="${names[item.exercise]}动作示意">
+          <span class="home-plan-copy"><strong>${names[item.exercise]}</strong><small>${item.disabled ? "该动作检测已关闭，请联系家属" : `${state} · 目标 ${item.target_reps} 次`}</small>
+            <span class="home-plan-bar"><span style="width:${percent}%"></span></span></span>
+          <span class="home-plan-go">${item.done ? "再做一次" : item.reps ? "继续" : "开始"}${icon("arrow-right")}</span>
+        </button></li>`;
+    }).join("");
+    $("homePlanHint").textContent = done === rows.length
+      ? "今天的计划已经完成，辛苦了"
+      : done ? `还剩 ${rows.length - done} 项，慢慢来` : "按顺序开始，做完一项会自动打勾";
+    $("homePlanStart").hidden = done === rows.length;
+    icons();
+    document.querySelectorAll("[data-plan-start]").forEach(button => {
+      button.onclick = () => startFromPlan(button.dataset.planStart);
+    });
+  }
+  function startFromPlan(key) {
+    // 先把动作选好再切页：hashchange 之后 app.js 才渲染运动页，
+    // 那时再塞标记就晚了，长者会看到默认的第一个动作。
+    sessionStorage.setItem("homeease.plan", key);
+    if (typeof chooseExercise === "function") chooseExercise(key);
+    location.hash = "#exercise";
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    $("homePlanDefer").onclick = async () => {
+      if (planBusy) return;
+      // 顺延几天交给长者自己定，别替他猜「明天一定有空」。
+      const days = Number($("homePlanDeferDays")?.value || 1);
+      if (days > 1 && !confirm("这几天都不做训练，确定吗？")) return;
+      planBusy = true;
+      try {
+        await api("/api/plan/defer", {method: "POST", body: {days}});
+        app.plan = await api("/api/plan");
+        planPaint = "";
+        render();
+        toast(days > 1 ? `好的，休息 ${days} 天，之后照常提醒` : "好的，今天先休息，计划改到明天");
+      } catch (error) { toast(error.message, true); }
+      finally { planBusy = false; }
+    };
+  });
   window.HomeMonitoring = {
     render,
     navigate() {

@@ -16,6 +16,15 @@ EXERCISES = {
     "standing_leg_raise": "站立抬腿",
     "hurdle_step": "跨步训练",
 }
+# 后台常驻时自动运行的算法通道。只决定「是否交给原算法运行」，不涉及任何
+# 模型、阈值或判定条件；未开启的通道算法完全不会收到输入。
+ALGORITHM_CHANNELS = {
+    "resident": "后台常驻",
+    "vision": "视频跌倒检测",
+    "accel": "加速度跌倒检测",
+}
+# 运动检测通道的键名沿用原算法2的动作编号，便于前端与 EXERCISES 对齐。
+ALGORITHM_KEYS = tuple(ALGORITHM_CHANNELS) + tuple(EXERCISES)
 
 
 def prepare():

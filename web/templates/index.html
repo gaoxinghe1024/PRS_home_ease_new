@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#15735b"><title>HomeEase · 居家照护</title>
-  <link rel="icon" href="data:,"><link rel="stylesheet" href="/static/style.css"><link rel="stylesheet" href="/static/monitoring.css"><link rel="stylesheet" href="/static/exercise.css">
+  <link rel="icon" href="data:,"><link rel="stylesheet" href="/static/style.css"><link rel="stylesheet" href="/static/monitoring.css"><link rel="stylesheet" href="/static/exercise.css"><link rel="stylesheet" href="/static/settings-ext.css?v=12">
   <script defer src="/static/vendor/lucide.min.js"></script><script defer src="/static/audio-transport.js"></script><script defer src="/static/i18n-en.js"></script><script defer src="/static/i18n.js"></script><script defer src="/static/app.js"></script>
   {% if household %}<link rel="stylesheet" href="/static/elder.css"><link rel="stylesheet" href="/static/home.css"><script defer src="/static/elder.js"></script><script defer src="/static/home.js"></script>{% endif %}
 </head>
@@ -22,6 +22,8 @@
       <a href="#audio" data-page="audio"><i data-lucide="audio-lines"></i>声音与问询</a>
       <a href="#events" data-page="events"><i data-lucide="bell-ring"></i>事件中心<span class="nav-count" id="navEventCount" hidden>0</span></a>
       <a href="#reports" data-page="reports"><i data-lucide="chart-no-axes-combined"></i>照护报告</a>
+      <a href="#plan" data-page="plan"><i data-lucide="clipboard-check"></i>运动计划</a>
+      <a href="#algorithms" data-page="algorithms"><i data-lucide="cpu"></i>后台算法</a>
       <a href="#settings" data-page="settings"><i data-lucide="settings-2"></i>档案与设置</a>
     </nav>
     <div class="sidebar-bottom"><a href="/home" target="_blank"><i data-lucide="accessibility"></i><span>家庭使用入口</span><i data-lucide="arrow-up-right"></i></a><div class="local-label"><span class="dot green"></span>本地处理 · 家庭照护</div></div>
@@ -100,6 +102,27 @@
         <div class="filterbar"><div class="segmented" id="reportDays"><button data-value="1">今日</button><button data-value="7" class="active">近 7 天</button><button data-value="30">近 30 天</button></div><label class="compact-label">数据来源<select id="reportMode"><option value="live">实时记录</option><option value="replay">样例与回放</option></select></label></div>
         <div class="metrics" id="reportMetrics"></div><div class="section-heading spaced"><h2>报告记录</h2><span class="muted small">勾选后可逐条删除，或清空当前报告范围</span></div><div class="record-toolbar no-print"><label><input type="checkbox" id="selectAllRecords">全选本报告全部记录</label><span class="hint" id="recordHint">未选择记录</span><span class="spacer"></span><button type="button" class="button danger-outline" id="deleteSelectedRecords" disabled><i data-lucide="trash-2"></i>删除选中</button><button type="button" class="button danger-outline" id="clearReportScope"><i data-lucide="eraser"></i>清空报告范围</button></div><div id="reportRecords" class="table-container"></div><div class="reports-grid"><section><div class="section-heading"><h2>安全事件趋势</h2><span class="muted small">次</span></div><div class="chart-wrap"><canvas id="safetyChart" aria-label="安全事件趋势"></canvas></div></section><section><div class="section-heading"><h2>每日运动次数</h2><span class="muted small">次</span></div><div class="chart-wrap"><canvas id="exerciseReportChart" aria-label="运动次数趋势"></canvas></div></section></div>
         <section class="coverage-report"><div class="section-heading"><h2>监测覆盖记录</h2><span class="muted small">仅包含本系统运行期间</span></div><div id="coverageSummary"></div><div id="coverageHistory" class="table-container"></div></section><div class="section-heading spaced"><h2>运动汇总</h2></div><div id="exerciseSummary"></div>
+      </section>
+
+      <section id="page-algorithms" class="page" hidden>
+        <div class="page-title"><div><div class="eyebrow">BACKGROUND ALGORITHMS</div><h1>后台算法</h1><p>决定哪些原算法在后台一直运行，与页面是否打开无关</p></div><span class="badge neutral" id="algorithmsSummary">读取中</span></div>
+        <div class="coverage-banner" id="algorithmsBanner"><span class="status-symbol"><i data-lucide="cpu"></i></span><div><strong id="algorithmsBannerTitle">后台常驻未开启</strong><p id="algorithmsBannerText">开启后视频、加速度与运动检测由后台调度自动运行</p></div><a href="#monitor" class="text-action">查看监测<i data-lucide="arrow-right"></i></a></div>
+        <section class="settings-section"><div><h2>常驻与安全检测</h2><p class="muted">总开关与两路跌倒检测</p></div><div class="switch-list" id="algorithmSwitches">
+          <label class="toggle-row switch-card" data-switch="resident"><span><strong>后台常驻</strong><small>服务运行期间，下面开着的算法自动启动；关闭页面、锁屏都不影响</small></span><input id="algorithmResident" type="checkbox" class="switch" role="switch"></label>
+          <label class="toggle-row switch-card" data-switch="vision"><span><strong>视频跌倒检测</strong><small>本机摄像头持续推理，与「家庭守护」是同一个开关</small></span><input id="algorithmVision" type="checkbox" class="switch" role="switch"></label>
+          <label class="toggle-row switch-card" data-switch="accel"><span><strong>加速度跌倒检测</strong><small>数据来自手机：打开 /sensor 页面后手机成为三轴采集源，数据只在本机处理；电脑本身没有加速度计，不开手机就不会有数据</small></span><input id="algorithmAccel" type="checkbox" class="switch" role="switch"></label>
+        </div></section>
+        <section class="settings-section"><div><h2>运动检测</h2><p class="muted">四种动作分别开关</p></div><div class="switch-list" id="exerciseSwitches"></div></section>
+        <section class="settings-section"><div><h2>此刻运行状态</h2><p class="muted">由后台调度实时汇报</p></div><div><div id="algorithmChannels" class="channel-status"></div><div id="algorithmBlockers" class="blocker-list"></div><div class="resident-note"><i data-lucide="info"></i><span>开关只决定原算法是否运行，不改变模型、阈值与判定条件。后台常驻只在本机服务工作进程存活期间有效：电脑关机、断电或休眠后需要重新启动服务。</span></div></div></section>
+      </section>
+
+      <section id="page-plan" class="page" hidden>
+        <div class="page-title"><div><div class="eyebrow">DAILY MOVEMENT PLAN</div><h1>运动计划</h1><p>照护者安排，长者端按此逐项完成</p></div><button type="submit" form="planForm" class="button primary" id="savePlan"><i data-lucide="save"></i>保存计划</button></div>
+        <form id="planForm">
+          <section class="settings-section"><div><h2>计划开关</h2><p class="muted">关闭后长者端不显示计划</p></div><div><label class="toggle-row"><span><strong>向长者展示今天的运动计划</strong><small>关闭时长者端保持原有首页，不做打扰</small></span><input type="checkbox" id="planEnabled" class="switch" role="switch"></label><div class="form-grid plan-basics"><label>计划标题<input id="planTitle" maxlength="60" value="今天的运动计划"></label><label>给长者的话（选填）<input id="planNote" maxlength="300" placeholder="例如：慢慢来，不舒服就休息"></label><label>默认每次目标<div class="number-input"><input id="planTarget" type="number" min="1" max="10000" value="10"><span>次</span></div></label></div></div></section>
+          <section class="settings-section"><div><h2>训练项目</h2><p class="muted">勾选并设定次数，顺序即长者端的完成顺序</p></div><div><div id="planItems" class="plan-editor"></div><div class="button-row plan-actions"><button type="button" class="button secondary" id="planTargetFromDefault"><i data-lucide="wand-sparkles"></i>次数统一为默认值</button><span class="muted small">长者端完成后会自动打勾，判据是当天有该动作的已结束训练</span></div></div></section>
+        </form>
+        <section class="settings-section"><div><h2>今天的完成情况</h2><p class="muted" id="planProgressDate">—</p></div><div id="planProgress" class="plan-progress"></div></section>
       </section>
 
       <section id="page-settings" class="page" hidden>

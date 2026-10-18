@@ -7,6 +7,29 @@ from datetime import datetime, timezone
 
 from care.config import DB_PATH
 
+# 首次运行时的开关默认值。后台常驻默认关闭，避免升级后立刻打开摄像头；
+# 已部署的库若在家守护里已开启，会由 services 在启动时对齐为开启。
+ALGORITHM_DEFAULTS = {
+    "resident": False,
+    "vision": True,
+    "accel": True,
+    "chair_sit_to_stand": True,
+    "squat": True,
+    "standing_leg_raise": True,
+    "hurdle_step": True,
+}
+DEFAULT_PLAN_ITEMS = ["chair_sit_to_stand", "squat", "standing_leg_raise", "hurdle_step"]
+PLAN_DEFAULTS = {
+    "enabled": False,
+    "title": "今天的运动计划",
+    "note": "",
+    "target_reps": 10,
+    "items": [{"exercise": key, "target_reps": 10, "enabled": True} for key in DEFAULT_PLAN_ITEMS],
+    "skipped_dates": [],
+    "updated_at": None,
+    "updated_by": "caregiver",
+}
+
 
 def now():
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
@@ -52,6 +75,12 @@ class Store:
                 );
                 CREATE TABLE IF NOT EXISTS runtime_state (id INTEGER PRIMARY KEY, last_heartbeat TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS home_monitoring (id INTEGER PRIMARY KEY CHECK(id=1), enabled INTEGER NOT NULL, camera_index INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS algorithms (
+                    key TEXT PRIMARY KEY, enabled INTEGER NOT NULL, updated_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS exercise_plans (
+                    id INTEGER PRIMARY KEY CHECK(id=1), enabled INTEGER NOT NULL, payload TEXT NOT NULL
+                );
             """)
             defaults = {
                 "resident": {"name": "", "room": "客厅", "notes": ""},
@@ -59,6 +88,41 @@ class Store:
                 "escalation_seconds": 60, "webhook_url": "", "notification_test_at": None,
             }
             conn.execute("INSERT OR IGNORE INTO settings VALUES (1,?)", (encode(defaults),))
+            # 既有部署升级时补齐新表；未被写入过的开关取这里的默认值（后台常驻默认关闭）。
+            for key, enabled in ALGORITHM_DEFAULTS.items():
+                conn.execute("INSERT OR IGNORE INTO algorithms VALUES (?,?,?)", (key, int(enabled), now()))
+
+    def algorithms(self):
+        """返回全部算法开关；新增的键在此处按默认值补齐，旧库无需手工迁移。"""
+        with self.connection() as conn:
+            rows = conn.execute("SELECT key,enabled,updated_at FROM algorithms").fetchall()
+        saved = {row["key"]: row for row in rows}
+        return {key: {"enabled": bool(saved[key]["enabled"]) if key in saved else default,
+                      "updated_at": saved[key]["updated_at"] if key in saved else None}
+                for key, default in ALGORITHM_DEFAULTS.items()}
+
+    def save_algorithm(self, key, enabled):
+        stamp = now()
+        with self.connection() as conn:
+            conn.execute("INSERT INTO algorithms VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET enabled=excluded.enabled,updated_at=excluded.updated_at",
+                         (key, int(enabled), stamp))
+            self._audit(conn, "algorithms", "updated", {"key": key, "enabled": bool(enabled)})
+        return {"enabled": bool(enabled), "updated_at": stamp}
+
+    def exercise_plan(self):
+        with self.connection() as conn:
+            row = conn.execute("SELECT payload FROM exercise_plans WHERE id=1").fetchone()
+        if not row:
+            return dict(PLAN_DEFAULTS)
+        return {**PLAN_DEFAULTS, **json.loads(row[0])}
+
+    def save_exercise_plan(self, value):
+        with self.connection() as conn:
+            conn.execute("INSERT INTO exercise_plans VALUES (1,?,?) ON CONFLICT(id) DO UPDATE SET enabled=excluded.enabled,payload=excluded.payload",
+                         (int(value["enabled"]), encode(value)))
+            self._audit(conn, "plan", "updated", {"enabled": value["enabled"], "items": len(value["items"]),
+                                                  "updated_by": value.get("updated_by")})
+        return value
 
     @contextlib.contextmanager
     def connection(self):

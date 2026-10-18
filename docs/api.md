@@ -13,6 +13,9 @@
 | 信号回放 | `POST /api/signal/sample`、`POST /api/signal/analyze`，后者 multipart `file` |
 | 实时信号 | `WS /ws/sensor` |
 | 训练 | `POST /api/sessions`、`GET /api/sessions/{sid}`、`POST /api/sessions/{sid}/control` |
+| 后台算法 | `GET/PUT /api/algorithms` |
+| 运动计划 | `GET/PUT /api/plan`、`POST /api/plan/defer` |
+| 长者端 | `GET /api/elder/context`、`POST /api/elder/open` |
 | 训练输入 | `POST /api/sessions/{sid}/frames`、`POST /api/sessions/{sid}/image` |
 | 音频 | `POST /api/audio/sample`、`POST /api/audio/analyze`、`WS /ws/audio` |
 | 事件 | `GET /api/events`、`GET /api/events/{id}`、`POST /api/events/{id}/action` |
@@ -68,6 +71,46 @@
 - A withdrawal never closes or downgrades the event. It stays open at its level, the contact escalation timer stops, the caregivers get a notification, and the caregiver still confirms and resolves it.
 - `GET /api/events` and `GET /api/events/{id}` add `withdrawn`, `withdrawable` and `withdraw_left_s`; the stored event carries `withdrawal: {"at", "by"}`.
 - A later spoken call for help on the same event clears the withdrawal and restarts the escalation clock; a caregiver `escalate` overrides it.
+
+## 后台算法与运动计划
+
+`GET /api/algorithms` 返回按通道拆分的开关和运行状态，`PUT` 只提交要改的键（未提交的保持原值）：
+
+```json
+{"switches":{"resident":true,"vision":true,"accel":true,"chair_sit_to_stand":true,"squat":true,"standing_leg_raise":true,"hurdle_step":false},
+ "channels":{"resident":{"label":"后台常驻","enabled":true,"state":"running","detail":"…"}},
+ "blockers":["…"],"resident_ready":true}
+```
+
+`resident` 是总闸；只有它开启时才会按各自的开关拉起视频、加速度与四种运动检测。运动轮播与视频检测共用一路摄像头：真人工作台的训练会话优先，没人用时镜头直接交接，交接过程不拆设备、不断帧。`channels` 的 `state` 取 `running`、`starting`、`idle`、`unavailable` 等；`blockers` 说明为什么某个通道跑不起来（如摄像头被占用）。被关闭的动作不能新建训练，`POST /api/sessions` 返回 409。
+
+`GET/PUT /api/plan` 读写照护者设定的每日计划，返回体附带 `progress`（今天的完成情况）。`items` 最多 4 项、同一动作只能出现一次，重复或未知动作返回 422：
+
+```json
+{"enabled":true,"title":"今天的康复计划","note":"…","target_reps":10,
+ "items":[{"exercise":"chair_sit_to_stand","target_reps":10,"enabled":true}],
+ "skipped_dates":["2026-10-18"]}
+```
+
+`progress.items[]` 的 `reps` 来自当天已结束（`status:"ended"`、`mode:"live"`）的训练记录，`reps` 达到 `target_reps` 才算 `done`；`disabled` 表示该动作的检测开关已关闭。`progress.skipped` 为 true 表示长者今天选择了「先不做」。
+
+`POST /api/plan/defer` 供长者端记录跳过，body 可省略：
+
+```json
+{"days":1}
+```
+
+`days` 取 1–7，默认 1，写入 `skipped_dates`（今天起 `days` 天）。计划内容不变，被跳过的日期里长者端不显示计划卡片，次日自动恢复；照护者端仍能看到计划与今天的完成情况。`GET /api/elder/context` 一次返回称呼、房间、计划与进度；`POST /api/elder/open` 记录长者端打开时间。
+
+## 清空报告范围
+
+`POST /api/records/clear` 会整段删除范围内的安全事件、训练记录、通知与录像片段，**不可撤销**。因为各字段都有默认值，空 body 就等于「近 7 天实时记录全清」，所以 `confirm` 是必填的字面量确认词：
+
+```json
+{"mode":"live","days":7,"events":true,"sessions":true,"confirm":"DELETE"}
+```
+
+缺少 `confirm` 或值不等于 `DELETE` 时返回 422，什么都不会删。
 
 ## Interface language
 

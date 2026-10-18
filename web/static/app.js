@@ -62,7 +62,7 @@ const voiceChip = (voice) => {
   const tone = voice.css === "ok" ? "green" : voice.css === "risk" ? "red" : "neutral";
   return `<span class="badge ${tone}">语音：${esc(voice.label)}${voice.detail?` · ${esc(voice.detail)}`:""}</span>`;
 };
-const app = {page:"overview",settings:null,status:null,events:[],sessions:[],notices:[],sounds:[],report:null,eventFilter:"open",eventMode:"live",reportDays:7,reportMode:"live",selectedExercise:"chair_sit_to_stand",sid:null,exercise:null,camera:null,capturing:false,exerciseSource:null,audioStream:null,audioSocket:null,audioContext:null,audioRecorder:null,recordedBlob:null,videoHistory:[],selectedEvent:null,noticeIds:new Set(),ready:false,overlay:{box:true,skeleton:true},pose:null,poseBusy:false};
+const app = {page:"overview",settings:null,status:null,events:[],sessions:[],notices:[],sounds:[],report:null,eventFilter:"open",eventMode:"live",reportDays:7,reportMode:"live",selectedExercise:"chair_sit_to_stand",sid:null,exercise:null,camera:null,capturing:false,exerciseSource:null,audioStream:null,audioSocket:null,audioContext:null,audioRecorder:null,recordedBlob:null,videoHistory:[],selectedEvent:null,noticeIds:new Set(),ready:false,overlay:{box:true,skeleton:true},pose:null,poseBusy:false,algorithms:null,plan:null};
 let toastTimer, refreshBusy=false, exercisePollBusy=false;
 
 async function api(path, options={}) {
@@ -94,11 +94,26 @@ async function busy(button, fn){if(button.disabled)return;const wasDisabled=butt
 function metric(title,value,unit,sym,note="",cls=""){return `<div class="metric${cls?` ${cls}`:""}"><div class="metric-header">${icon(sym)}${esc(title)}</div><div class="metric-value">${esc(value)}<small>${esc(unit)}</small></div><div class="metric-note">${esc(note)}</div></div>`;}
 function channelRow(row){const active=row?.state==="active";return `<div class="channel-item">${icon({vision:"video",accel:"activity",audio:"mic"}[row.channel])}<div><strong>${channels[row.channel]}</strong><small><span class="dot ${active?"green":"amber"}"></span>${active?"输入有效":row.state==="reduced"?"覆盖受限":"未连接"}</small></div></div>`;}
 
-function navigate(){const requested=location.hash.slice(1).split("?")[0]||(household?"home":"overview");app.page=household?(["home","safety","exercise"].includes(requested)?requested:"home"):($("page-"+requested)?requested:"overview");document.querySelectorAll(".page").forEach(x=>x.hidden=x.id!==`page-${app.page}`);document.querySelectorAll("nav [data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===app.page));const label=household?({home:"安心在家",safety:"安心守护",exercise:"运动训练"})[app.page]:document.querySelector(`nav [data-page="${app.page}"]`)?.textContent.replace(/\d+$/,"")||"照护总览";$("pageCrumb").textContent=label;document.title=`${label} · HomeEase`;$("sidebar").classList.remove("open");$("navBackdrop").hidden=true;renderCurrent();if(app.page==="reports")loadReport();if(app.page==="settings")loadDiagnostics();window.HomeMonitoring?.navigate();window.scrollTo(0,0);}
+function navigate(){const requested=location.hash.slice(1).split("?")[0]||(household?"home":"overview");app.page=household?(["home","safety","exercise"].includes(requested)?requested:"home"):($("page-"+requested)?requested:"overview");document.querySelectorAll(".page").forEach(x=>x.hidden=x.id!==`page-${app.page}`);document.querySelectorAll("nav [data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===app.page));const label=household?({home:"安心在家",safety:"安心守护",exercise:"运动训练"})[app.page]:document.querySelector(`nav [data-page="${app.page}"]`)?.textContent.replace(/\d+$/,"")||"照护总览";$("pageCrumb").textContent=label;document.title=`${label} · HomeEase`;$("sidebar").classList.remove("open");$("navBackdrop").hidden=true;renderCurrent();if(app.page==="reports")loadReport();if(app.page==="settings")loadDiagnostics();if(app.page==="algorithms"||app.page==="plan")loadAlgorithms();else if(app.page==="plan"){renderPlan(app.plan);renderPlanProgress(app.plan?.progress);}window.HomeMonitoring?.navigate();window.scrollTo(0,0);}
 
-async function refresh(){if(refreshBusy)return;refreshBusy=true;try{const results=await Promise.allSettled([api("/api/status",{timeout:12000}),api("/api/events"),api("/api/sessions"),api("/api/notifications"),app.page==="audio"?api("/api/sounds"):Promise.resolve(app.sounds),api("/api/settings")]);if(results[0].status==="rejected")throw results[0].reason;app.status=results[0].value;if(results[5].status==="fulfilled"){app.settings=results[5].value;if(!app.settings.audio_consent){if(app.audioStream)stopAudioLive();if(app.audioRecorder?.state==="recording")app.audioRecorder.stop();app.recordingStream?.getTracks().forEach(t=>t.stop());app.recordedBlob=null;}}if(results[1].status==="fulfilled")app.events=results[1].value;if(results[2].status==="fulfilled")app.sessions=results[2].value;if(results[3].status==="fulfilled")app.notices=results[3].value;if(results[4].status==="fulfilled")app.sounds=results[4].value;$("connectionState").innerHTML='<span class="dot green"></span>系统已连接';const n=app.events.filter(e=>e.state==="open"&&e.mode==="live").length;$("navEventCount").textContent=n;$("navEventCount").hidden=!n;$("noticeDot").hidden=!app.notices.some(n=>n.status!=="seen"&&n.kind==="inapp");for(const notice of app.notices){if(app.ready&&!app.noticeIds.has(notice.id)&&notice.kind==="inapp"&&notice.mode==="live"){toast(`${notice.title} · ${notice.message}`);if("Notification" in window&&Notification.permission==="granted")new Notification(notice.title,{body:notice.message,tag:notice.event_id});}app.noticeIds.add(notice.id);}app.ready=true;renderCurrent();if(app.selectedEvent&&$("eventDialog").open){const latest=app.events.find(e=>e.id===app.selectedEvent.id);if(latest&&latest.revision!==app.selectedEvent.revision&&!$("eventDetail").contains(document.activeElement)){renderEventDetail(latest);}}}catch(e){$("connectionState").innerHTML='<span class="dot red"></span>系统连接中断';}finally{refreshBusy=false;}}
+async function refresh(){if(refreshBusy)return;refreshBusy=true;try{const results=await Promise.allSettled([api("/api/status",{timeout:12000}),api("/api/events"),api("/api/sessions"),api("/api/notifications"),app.page==="audio"?api("/api/sounds"):Promise.resolve(app.sounds),api("/api/settings")]);if(results[0].status==="rejected")throw results[0].reason;app.status=results[0].value;if(results[5].status==="fulfilled"){app.settings=results[5].value;if(!app.settings.audio_consent){if(app.audioStream)stopAudioLive();if(app.audioRecorder?.state==="recording")app.audioRecorder.stop();app.recordingStream?.getTracks().forEach(t=>t.stop());app.recordedBlob=null;}}if(results[1].status==="fulfilled")app.events=results[1].value;if(results[2].status==="fulfilled")app.sessions=results[2].value;if(results[3].status==="fulfilled")app.notices=results[3].value;if(results[4].status==="fulfilled")app.sounds=results[4].value;$("connectionState").innerHTML='<span class="dot green"></span>系统已连接';const n=app.events.filter(e=>e.state==="open"&&e.mode==="live").length;$("navEventCount").textContent=n;$("navEventCount").hidden=!n;$("noticeDot").hidden=!app.notices.some(n=>n.status!=="seen"&&n.kind==="inapp");syncExerciseSwitches();if(app.page==="algorithms"||app.page==="plan")loadAlgorithms();for(const notice of app.notices){if(app.ready&&!app.noticeIds.has(notice.id)&&notice.kind==="inapp"&&notice.mode==="live"){toast(`${notice.title} · ${notice.message}`);if("Notification" in window&&Notification.permission==="granted")new Notification(notice.title,{body:notice.message,tag:notice.event_id});}app.noticeIds.add(notice.id);}app.ready=true;renderCurrent();if(app.selectedEvent&&$("eventDialog").open){const latest=app.events.find(e=>e.id===app.selectedEvent.id);if(latest&&latest.revision!==app.selectedEvent.revision&&!$("eventDetail").contains(document.activeElement)){renderEventDetail(latest);}}}catch(e){$("connectionState").innerHTML='<span class="dot red"></span>系统连接中断';}finally{refreshBusy=false;}}
 function renderCurrent(){if(!app.status)return;if(!["overview","monitor"].includes(app.page)){for(const id of ["overviewFrame","monitorFrame"]){const image=$(id);if(image.dataset.streaming){image.removeAttribute("src");delete image.dataset.streaming;}}}renderModuleIndicators();if(app.page==="overview")renderOverview();if(app.page==="monitor")renderMonitor();if(app.page==="exercise")renderExerciseHistory();if(app.page==="audio")renderAudioHistory();if(app.page==="events")renderEvents();window.HomeMonitoring?.render();icons();}
-function renderModuleIndicators(){for(const m of app.status.modules){if(m.id==="exercise"){$("exerciseModelState").textContent=`运动模块${stateNames[m.state]||m.state}`;$("exerciseModelState").className=`badge ${m.state==="ready"?"green":"amber"}`;}}const consent=app.settings?.audio_consent;$("audioConsentBadge").textContent=consent?"已授权本地音频":"未授权音频";$("audioConsentBadge").className=`badge ${consent?"green":"neutral"}`;$("audioConsentBanner").hidden=!!consent;if(app.page==="settings")renderModules();}
+function renderModuleIndicators(){for(const m of app.status.modules){if(m.id==="exercise"){$("exerciseModelState").textContent=`运动模块${stateNames[m.state]||m.state}`;$("exerciseModelState").className=`badge ${m.state==="ready"?"green":"amber"}`;}}const consent=app.settings?.audio_consent;$("audioConsentBadge").textContent=consent?"已授权本地音频":"未授权音频";$("audioConsentBadge").className=`badge ${consent?"green":"neutral"}`;$("audioConsentBanner").hidden=!!consent;if(app.page==="settings")renderModules();syncExerciseSwitches();}
+/* 设置页关掉的动作，在工作台上标出来并禁止开始，避免「练了却不计数」。 */
+function syncExerciseSwitches(){
+  // /api/status 给的是开关表本身，/api/algorithms 套了一层 switches，这里两种都要认。
+  const status=app.status?.algorithms;
+  const switches=status?.switches||(status&&!Array.isArray(status)?status:app.algorithms?.switches);
+  if(!switches||!$("exerciseOptions"))return;
+  document.querySelectorAll("[data-switch-card]").forEach(card=>{
+    const closed=switches[card.dataset.switchCard]===false;
+    card.classList.toggle("is-disabled",closed);
+    const badge=card.querySelector(".exercise-off-badge");if(badge)badge.hidden=!closed;
+  });
+  const chooseVisible=$("exerciseChooser")&&!$("exerciseChooser").hidden;
+  if(chooseVisible&&$("startExercise"))$("startExercise").disabled=switches[app.selectedExercise]===false;
+  if($("exerciseGuide"))$("exerciseGuide").classList.toggle("is-disabled",chooseVisible&&switches[app.selectedExercise]===false);
+}
 function renderOverview(){const s=app.status;const coverage={active:["监测已开启","视频与加速度输入有效"],reduced:["监测覆盖受限",s.coverage.filter(x=>x.channel!=="audio"&&x.state!=="active").map(x=>x.reason).join("；")],unavailable:["监测尚未开启","视频与加速度输入未连接"]}[s.coverage_state];$("coverageTitle").textContent=coverage[0];$("coverageDescription").textContent=coverage[1];$("coverageBanner").classList.toggle("is-active",s.coverage_state==="active");const today=new Date().toLocaleDateString("en-CA");const live=app.events.filter(e=>e.mode==="live");const dayEvents=live.filter(e=>new Date(e.created_at).toLocaleDateString("en-CA")===today);const todaySessions=app.sessions.filter(s=>s.mode==="live"&&s.status==="ended"&&new Date(s.created_at).toLocaleDateString("en-CA")===today);const open=live.filter(e=>e.state==="open");$("dashboardMetrics").innerHTML=metric("待处理事件",open.length,"条","bell-ring",open.some(e=>e.level==="EMERGENCY")?"有紧急求助待响应":"当前实时记录")+metric("今日确认跌倒",dayEvents.filter(e=>e.outcome==="confirmed_fall").length,"次","shield-check","以照护者处置结果为准")+metric("今日运动",todaySessions.reduce((sum,s)=>sum+s.count,0),"次","activity",`${todaySessions.length} 次已完成训练`)+metric("有效监测通道",s.coverage.filter(x=>x.state==="active"&&x.channel!=="audio").length,"/ 2","radio","视频 / 加速度");$("dashboardChannels").innerHTML=s.coverage.sort((a,b)=>["vision","accel","audio"].indexOf(a.channel)-["vision","accel","audio"].indexOf(b.channel)).map(channelRow).join("");$("openEventCount").textContent=open.length;$("attentionList").innerHTML=open.length?open.slice(0,4).map(e=>`<div class="event-item" role="button" tabindex="0" data-event="${e.id}"><span class="event-icon ${e.level==="EMERGENCY"?"red":""}">${icon(e.level==="EMERGENCY"?"bell-ring":"triangle-alert")}</span><div class="event-body"><div class="event-title"><strong>${esc(e.room)} · ${e.level==="EMERGENCY"?"紧急求助":"疑似跌倒"}</strong>${levelBadge(e)}${e.voice?.high_risk?voiceChip(e.voice):""}</div><p>${channels[e.channel]}${e.channel==="manual"?"":"检测"} · ${esc(e.resident)}</p><div class="event-meta"><span>${dateTime(e.occurred_at)}</span><span>#${e.id.slice(0,6)}</span></div></div>${icon("chevron-right")}</div>`).join(""):empty("暂无待处理事件","circle-check","实时事件将显示在这里");$("recentSessions").innerHTML=app.sessions.filter(s=>s.mode==="live").slice(0,3).map(s=>`<div class="session-row"><span class="session-icon">${icon("activity")}</span><div>${names[s.exercise]}<small>${dateTime(s.created_at)} · ${s.status==="ended"?"已完成":s.status==="interrupted"?"已中断":"进行中"}</small></div><span class="session-count">${s.count}<small> 次</small></span></div>`).join("")||empty("今日还没有训练记录","activity","",true);const running=s.video.state==="running";$("overviewVideoMode").textContent=running?(s.video_mode==="live"?"实时监测":"样例 / 回放"):"未开启";$("overviewVideoMode").className=`badge ${running?"green":"neutral"}`;$("cameraSourceLabel").textContent=running?(s.video_mode==="live"?"实时画面":"样例 / 回放"):"样例预览";$("cameraIdle").hidden=running;loadFrame("overviewFrame");if(app.report)drawBars($("overviewChart"),app.report.series,"reps","#579579");else loadReport(true);}
 function renderMonitor(){
   const v=app.status.video,running=v.state==="running",sensor=app.status.sensor;
@@ -264,7 +279,10 @@ function renderExerciseGuide(element,key){
     icons();
   };
 }
-function chooseExercise(key){app.selectedExercise=key;document.querySelectorAll(".exercise-option").forEach(x=>{const selected=x.dataset.exercise===key;x.classList.toggle("selected",selected);x.setAttribute("aria-pressed",selected);});renderExerciseGuide($("exerciseGuide"),key);icons();}
+function chooseExercise(key){app.selectedExercise=key;document.querySelectorAll(".exercise-option").forEach(x=>{const selected=x.dataset.exercise===key;x.classList.toggle("selected",selected);x.setAttribute("aria-pressed",selected);});renderExerciseGuide($("exerciseGuide"),key);icons();syncExerciseSwitches();
+  // 从长者端计划进来时，把计划里的次数先填好，别让人以为要按默认值做。
+  const planned=household?app.plan?.items?.find(item=>item.exercise===key&&item.enabled):null;
+  if(planned&&$("targetReps"))$("targetReps").value=planned.target_reps;}
 function renderExerciseCycle(s){
   const guide=exerciseGuides[s.exercise];
   const previous=app.exerciseFeedback;
@@ -287,6 +305,9 @@ async function startExercise(ev){
   await busy($("startExercise"),async()=>{
     const source=$("exerciseSource").value;
     let uploadId=null;
+    // 从长者端的计划卡片进来时，目标次数取计划里的设定。
+    const planItem=household&&app.plan?.items?.find(item=>item.exercise===app.selectedExercise&&item.enabled);
+    if(planItem)$("targetReps").value=planItem.target_reps;
     if(source==="upload"){
       const file=$("exerciseUpload").files[0];if(!file)throw new Error("请选择运动视频");
       const form=new FormData();form.append("file",file);
@@ -299,7 +320,9 @@ async function startExercise(ev){
     if(source==="camera"){
       $("exerciseCamera").hidden=false;$("exerciseCamera").src=`/api/sessions/${app.sid}/camera/stream`;
     }else $("exerciseCamera").hidden=true;
-    renderExerciseState(result);await refresh();
+    renderExerciseState(result);
+    if(household)app.plan=await api("/api/plan").catch(()=>app.plan);
+    await refresh();
   });
 }
 async function controlExercise(action){
@@ -551,7 +574,7 @@ async function clearReportScope(){
   const button=$("clearReportScope");
   button.disabled=true;
   try{
-    const result=await api("/api/records/clear",{method:"POST",body:{mode:app.reportMode,days:app.reportDays,events:true,sessions:true}});
+    const result=await api("/api/records/clear",{method:"POST",body:{mode:app.reportMode,days:app.reportDays,events:true,sessions:true,confirm:"DELETE"}});
     await askConfirm("清空完成",`已清空：${recordSummary(result)}。`,"知道了",null);
     await loadReport();await refresh();
   }catch(e){
@@ -565,6 +588,150 @@ function fillSettings(s){app.settings=s;$("residentName").value=s.resident.name;
 async function saveSettings(ev){ev.preventDefault();await busy($("saveSettings"),async()=>{const contacts=Array.from(document.querySelectorAll(".contact-editor")).map(el=>({name:el.querySelector(".contact-name").value.trim(),relation:el.querySelector(".contact-relation").value.trim(),phone:el.querySelector(".contact-phone").value.trim()}));const value={resident:{name:$("residentName").value.trim(),room:$("residentRoom").value.trim(),notes:$("residentNotes").value.trim()},contacts,audio_consent:$("audioConsent").checked,exercise_target:Number($("defaultTarget").value),escalation_seconds:Number($("escalationSeconds").value),webhook_url:$("webhookUrl").value.trim()};if(!value.audio_consent)await stopAudioLive();const result=await api("/api/settings",{method:"PUT",body:value});fillSettings(result);toast("设置已保存");await refresh();});}
 function renderModules(){$("moduleList").innerHTML=app.status.modules.map(m=>`<div class="module-row"><div><h3>${moduleNames[m.id]}</h3><small>${modelNames[m.id]}</small>${m.error?`<small style="color:var(--red)">${esc(m.error)}</small>`:""}</div><span class="badge ${m.state==="ready"?"green":m.state==="unavailable"?"red":"amber"}">${stateNames[m.state]||m.state}</span><button class="icon-button" type="button" data-init="${m.id}" title="重新初始化模块" aria-label="重新初始化${moduleNames[m.id]}" ${m.state==="loading"?"disabled":""}>${icon("rotate-cw")}</button></div>`).join("");icons();}
 async function loadDiagnostics(){try{const d=await api("/api/diagnostics");$("diagnosticsList").innerHTML=d.logs.length?d.logs.slice(0,30).map(x=>`<div class="diagnostic-item"><time>${dateTime(x.at)}</time><span>${esc(x.module)} · ${esc(x.action)}${x.payload.error?`<br>${esc(x.payload.error)}`:""}</span></div>`).join(""):empty("暂无运行记录","list", "",true);}catch(e){toast(e.message,true);}}
+
+/* ---------------------------------------------------------------------------
+   后台算法开关。开关只决定「原算法要不要跑」，模型、阈值与判定保持原样：
+   - 后台常驻：服务在跑就一直跑，不依赖任何页面是否打开；
+   - 视频跌倒检测：与家庭守护同一件事，两个入口同步；
+   - 加速度跌倒检测：数据来自手机端 /sensor，后台只做接收与调度；
+   - 四种运动：分别开关，关掉后既不再自动开始，也不再接受新的训练请求。
+--------------------------------------------------------------------------- */
+const algorithmCopy = {
+  resident:{title:"后台常驻",note:"服务运行期间，开着的算法自动启动；关闭页面、锁屏都不影响"},
+  vision:{title:"视频跌倒检测",note:"本机摄像头持续推理，与「家庭守护」是同一个开关"},
+  accel:{title:"加速度跌倒检测",note:"接收手机端三轴加速度流，数据只在本机处理"}
+};
+const residentStates={off:"未开启",starting:"正在启动",running:"常驻中",exited:"已退出"};
+function algorithmToggles(){
+  return [["resident",$("algorithmResident")],["vision",$("algorithmVision")],["accel",$("algorithmAccel")]]
+    .concat(Object.keys(names).map(key=>[key,document.querySelector(`[data-algorithm="${key}"]`)]))
+    .filter(([,input])=>input);
+}
+/* 三个安全开关在模板里是静态节点，不像四种动作那样由 renderExerciseSwitches 现造，
+   所以事件只在这里绑一次；重复绑定会让一次点击发两次请求。 */
+function bindAlgorithmToggles(){
+  for(const [key,input] of algorithmToggles()){
+    if(input.dataset.bound)continue;
+    input.dataset.bound="1";
+    input.onchange=()=>setAlgorithm(key,input.checked);
+  }
+}
+/* 「后台算法」页里四种动作的开关。单独成函数，初始化时先渲染一次，
+   之后 refresh() 只改勾选状态，不会重复生成 DOM。 */
+function renderExerciseSwitches(){
+  const box=$("exerciseSwitches");
+  if(!box||box.children.length)return;
+  box.innerHTML=Object.keys(names).map(key=>{
+    const guide=exerciseGuides[key]||{};
+    return `<label class="toggle-row switch-card" data-switch="${key}"><span><strong>${esc(names[key])}</strong><small>${esc(guide.count||"")}</small></span><input type="checkbox" class="switch" role="switch" data-algorithm="${key}" aria-label="${esc(names[key])}检测开关"></label>`;
+  }).join("");
+  box.querySelectorAll("[data-algorithm]").forEach(input=>{
+    input.onchange=()=>setAlgorithm(input.dataset.algorithm,input.checked);
+  });
+}
+async function loadAlgorithms(){
+  try{
+    const [state,plan]=await Promise.all([api("/api/algorithms"),api("/api/plan")]);
+    app.algorithms=state;app.plan=plan;renderAlgorithms();renderPlan(plan);renderPlanProgress(plan.progress);
+  }catch(e){toast(e.message,true);}
+}
+function renderAlgorithms(){
+  const state=app.algorithms;if(!state||!$("algorithmResident"))return;
+  const effective=!!state.switches.resident;
+  for(const [key,input] of algorithmToggles())input.checked=!!state.switches[key];
+  document.querySelectorAll("#page-algorithms [data-switch]").forEach(card=>{
+    const key=card.dataset.switch;
+    card.classList.toggle("is-off",!state.switches[key]);
+    card.classList.toggle("is-muted",!effective&&key!=="resident");
+  });
+  $("algorithmResident").disabled=!state.resident_ready;
+  const channels=state.channels||[];
+  const running=channels.filter(c=>c.active).length;
+  $("algorithmsSummary").textContent=effective?`常驻中 · ${running} 路运行`:"未开启";
+  $("algorithmsSummary").className=`badge ${effective?running?"green":"amber":"neutral"}`;
+  $("algorithmsBannerTitle").textContent=effective?"后台常驻已开启":"后台常驻未开启";
+  $("algorithmsBannerText").textContent=effective
+    ? (state.blockers[0]||`${running} 路算法正在后台运行，不依赖页面是否打开`)
+    : "开启后视频、加速度与运动检测由后台调度自动运行";
+  $("algorithmsBanner").classList.toggle("is-active",effective&&!state.blockers.length);
+  $("algorithmChannels").innerHTML=channels.map(row=>{
+    const on=!!row.active;
+    return `<div class="channel-status-row"><span class="dot ${on?"green":"amber"}"></span><div><strong>${esc(names[row.key]||algorithmCopy[row.key]?.title||row.key)}</strong><small>${esc(row.detail||"")}</small></div><span class="badge ${on?"green":"neutral"}">${on?"运行中":"未运行"}</span></div>`;
+  }).join("");
+  $("algorithmBlockers").innerHTML=(state.blockers||[]).map(text=>`<p><i data-lucide="circle-alert"></i><span>${esc(text)}</span></p>`).join("");
+  icons();
+}
+let algorithmBusy=false;
+async function setAlgorithm(key,value){
+  if(algorithmBusy)return;
+  algorithmBusy=true;
+  const input=document.querySelector(`[data-algorithm="${key}"]`);
+  if(input)input.disabled=true;
+  try{
+    app.algorithms=await api("/api/algorithms",{method:"PUT",body:{[key]:value}});
+    renderAlgorithms();
+    toast(`${algorithmCopy[key]?.title||names[key]}已${value?"开启":"关闭"}`);
+    await refresh();
+    if(app.page==="algorithms")renderAlgorithms();
+  }catch(e){
+    if(input)input.checked=!value;
+    toast(e.message,true);
+  }finally{
+    if(input)input.disabled=false;
+    algorithmBusy=false;
+  }
+}
+
+/* 运动计划：照护者设定，长者端展示并逐项完成。 */
+let planDraft=null;
+function planItemRow(item,index){
+  const key=item.exercise,guide=exerciseGuides[key];
+  return `<div class="plan-item" data-plan-item="${key}">
+    <span class="plan-order">${index+1}</span>
+    <img src="/static/media/${key}-guide.png" alt="${esc(guide.title)}动作示意">
+    <div class="plan-item-copy"><strong>${esc(names[key])}</strong><small>${esc(guide.count)}</small></div>
+    <label class="plan-count">次数<input type="number" min="1" max="10000" value="${item.target_reps}" data-plan-reps="${key}"></label>
+    <label class="plan-include"><input type="checkbox" data-plan-enabled="${key}" ${item.enabled?"checked":""}><span>纳入计划</span></label>
+  </div>`;
+}
+function renderPlan(plan){
+  if(!plan||!$("planEnabled"))return;
+  const draft=planDraft||plan;
+  $("planEnabled").checked=!!draft.enabled;
+  $("planTitle").value=draft.title||"";
+  $("planNote").value=draft.note||"";
+  $("planTarget").value=draft.target_reps||10;
+  const byKey=Object.fromEntries((draft.items||[]).map(item=>[item.exercise,item]));
+  const items=Object.keys(names).map((key,index)=>byKey[key]||{exercise:key,target_reps:draft.target_reps||10,enabled:true});
+  $("planItems").innerHTML=items.map(planItemRow).join("");
+  icons();
+}
+function draftPlan(){
+  const items=Array.from(document.querySelectorAll("[data-plan-item]")).map(row=>{
+    const key=row.dataset.planItem;
+    const reps=row.querySelector("[data-plan-reps]");
+    return {exercise:key,target_reps:Math.min(10000,Math.max(1,Number(reps.value)||1)),enabled:row.querySelector("[data-plan-enabled]").checked};
+  });
+  planDraft={enabled:$("planEnabled").checked,title:$("planTitle").value.trim()||"今天的运动计划",note:$("planNote").value.trim(),target_reps:Math.min(10000,Math.max(1,Number($("planTarget").value)||10)),items};
+  return planDraft;
+}
+function renderPlanProgress(progress){
+  if(!progress||!$("planProgress"))return;
+  $("planProgressDate").textContent=progress.date||"—";
+  const rows=(progress.items||[]).filter(item=>item.enabled);
+  $("planProgress").innerHTML=rows.length?rows.map(item=>{
+    const percent=Math.min(100,Math.round(100*(item.reps||0)/Math.max(1,item.target_reps)));
+    return `<div class="plan-progress-row ${item.done?"is-done":""}"><div><strong>${esc(names[item.exercise])}</strong><small>${item.done?"今天已完成":`${item.reps||0} / ${item.target_reps} 次 · ${item.sessions||0} 次训练`}${item.disabled?" · 该动作检测已关闭":""}</small></div><div class="plan-progress-bar"><span style="width:${percent}%"></span></div><span class="badge ${item.done?"green":"neutral"}">${item.done?"已完成":"待完成"}</span></div>`;
+  }).join(""):empty("计划里还没有项目","clipboard-list","在「训练项目」中勾选要安排的动作",true);
+}
+async function savePlan(){
+  const value=draftPlan();
+  await busy($("savePlan"),async()=>{
+    const result=await api("/api/plan",{method:"PUT",body:value});
+    planDraft=null;app.plan=result;renderPlan(result);renderPlanProgress(result.progress);
+    toast("运动计划已保存，长者端会立即看到");
+  });
+}
 
 function canvasContext(canvas){if(!canvas)return null;const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return null;const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr);const ctx=canvas.getContext("2d");ctx.scale(dpr,dpr);return {ctx,w:rect.width,h:rect.height};}
 function chartBase(canvas,max,labels=[]){const setup=canvasContext(canvas);if(!setup)return null;const {ctx,w,h}=setup;const area={l:35,r:w-10,t:13,b:h-29};ctx.clearRect(0,0,w,h);ctx.font='10px "Segoe UI","Microsoft YaHei",sans-serif';ctx.textBaseline="middle";for(let i=0;i<4;i++){const y=area.t+(area.b-area.t)*i/3;ctx.strokeStyle="#e4ebe6";ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(area.l,y);ctx.lineTo(area.r,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#9ba99f";ctx.textAlign="right";const val=max*(1-i/3);ctx.fillText(max<=1?val.toFixed(1):String(Math.round(val)),area.l-9,y);}ctx.textAlign="center";if(labels.length){const step=Math.max(1,Math.ceil(labels.length/7));labels.forEach((label,i)=>{if(i%step===0||i===labels.length-1){const x=area.l+(area.r-area.l)*(i+.5)/labels.length;ctx.fillStyle="#98a89c";ctx.fillText(label,x,h-11);}});}return {...setup,area};}
@@ -581,13 +748,23 @@ document.addEventListener("DOMContentLoaded",async()=>{
   $("videoSource").onchange=()=>{$("cameraIndexField").hidden=$("videoSource").value!=="camera";$("videoUploadField").hidden=$("videoSource").value!=="upload";};$("videoForm").onsubmit=ev=>{ev.preventDefault();busy($("startVideo"),async()=>{let upload_id=null;if($("videoSource").value==="upload"){const file=$("videoUpload").files[0];if(!file)throw new Error("请选择视频文件");const form=new FormData();form.append("file",file);$("videoUploadStatus").textContent="正在上传视频…";try{const result=await api("/api/uploads/video",{method:"POST",body:form});upload_id=result.upload_id;$("videoUploadStatus").textContent=result.filename;}catch(e){$("videoUploadStatus").textContent="上传失败";throw e;}}app.videoHistory=[];await api("/api/video/start",{method:"POST",body:{source:$("videoSource").value,camera_index:Number($("videoForm").elements.camera_index.value),upload_id}});await refresh();toast("检测已启动");});};$("stopVideo").onclick=()=>busy($("stopVideo"),async()=>{await api("/api/video/stop",{method:"POST"});await refresh();});
   restoreOverlay();$("toggleBoxes").onclick=()=>setOverlay("box",!app.overlay.box);$("toggleSkeleton").onclick=()=>setOverlay("skeleton",!app.overlay.skeleton);setOverlay("box",app.overlay.box);setOverlay("skeleton",app.overlay.skeleton);
   $("signalSource").onchange=()=>$("signalUploadField").hidden=$("signalSource").value!=="upload";$("analyzeSignal").onclick=()=>busy($("analyzeSignal"),async()=>{let result;if($("signalSource").value==="sample")result=await api("/api/signal/sample",{method:"POST"});else{const file=$("signalFile").files[0];if(!file)throw new Error("请选择 CSV 文件");const form=new FormData();form.append("file",file);result=await api("/api/signal/analyze",{method:"POST",body:form});}drawLines($("signalChart"),[{values:result.waveform.ax,color:"#547bb4"},{values:result.waveform.ay,color:"#5a9877"},{values:result.waveform.az,color:"#bf9459"}],{labels:result.waveform.t.map(t=>`${t.toFixed(1)}s`)});drawLines($("signalProbabilityChart"),[{values:result.info.probs,color:"#52886d"}],{min:0,max:1,threshold:.5,labels:result.info.t_end.map(t=>`${t.toFixed(1)}s`)});$("signalState").textContent="回放分析完成";$("signalResult").innerHTML=`${result.info.n_windows} 个窗口 · ${result.records.length} 个疑似跌倒事件 ${result.records.map(e=>`<button class="text-action" data-event="${e.id}">查看 #${e.id.slice(0,6)} ${icon("arrow-right")}</button>`).join(" ")}`;await refresh();icons();});
-  $("exerciseOptions").innerHTML=Object.entries(names).map(([key,name],index)=>`<button type="button" class="exercise-option ${index===0?"selected":""}" data-exercise="${key}" aria-pressed="${index===0}"><img src="/static/media/${key}-pose.png" alt="${name}骨架动作"><span class="selection-mark">${icon("check")}</span><div><strong>${esc(exerciseGuides[key].title)}</strong><small>${["坐姿 / 站立完整周期","下蹲 / 起立完整周期","抬腿 / 回落完整周期","跨步 / 复位完整周期"][index]}</small></div></button>`).join("");document.querySelectorAll("[data-exercise]").forEach(b=>b.onclick=()=>chooseExercise(b.dataset.exercise));$("exerciseSource").onchange=()=>{$("exerciseUploadField").hidden=$("exerciseSource").value!=="upload";$("exerciseCameraField").hidden=$("exerciseSource").value!=="camera";};$("exerciseForm").onsubmit=startExercise;
-  chooseExercise(app.selectedExercise);
+  $("exerciseOptions").innerHTML=Object.entries(names).map(([key,name],index)=>`<button type="button" class="exercise-option ${index===0?"selected":""}" data-exercise="${key}" aria-pressed="${index===0}" data-switch-card="${key}"><img src="/static/media/${key}-pose.png" alt="${name}骨架动作"><span class="selection-mark">${icon("check")}</span><span class="exercise-off-badge" hidden>检测已关闭</span><div><strong>${esc(exerciseGuides[key].title)}</strong><small>${["坐姿 / 站立完整周期","下蹲 / 起立完整周期","抬腿 / 回落完整周期","跨步 / 复位完整周期"][index]}</small></div></button>`).join("");document.querySelectorAll("[data-exercise]").forEach(b=>b.onclick=()=>chooseExercise(b.dataset.exercise));$("exerciseSource").onchange=()=>{$("exerciseUploadField").hidden=$("exerciseSource").value!=="upload";$("exerciseCameraField").hidden=$("exerciseSource").value!=="camera";};$("exerciseForm").onsubmit=startExercise;
+  // 长者端点计划里某一项进来时，直接选中那个动作，目标次数在开始训练时套用计划值。
+  const fromPlan=household?sessionStorage.getItem("homeease.plan"):null;
+  if(fromPlan&&names[fromPlan])sessionStorage.removeItem("homeease.plan");
+  chooseExercise(names[fromPlan]?fromPlan:app.selectedExercise);
+  if(household&&!app.plan)api("/api/plan").then(plan=>{app.plan=plan;window.HomeMonitoring?.render();}).catch(()=>{});
   $("pauseExercise").onclick=async()=>{await busy($("pauseExercise"),()=>controlExercise(app.exercise?.status==="paused"?"resume":"pause"));syncExerciseControls();};$("endExercise").onclick=async()=>{await busy($("endExercise"),()=>controlExercise("end"));syncExerciseControls();};$("newExercise").onclick=()=>{app.sid=null;app.exercise=null;$("exerciseActive").hidden=true;$("exerciseChooser").hidden=false;};
   $("audioSource").onchange=()=>{const source=$("audioSource").value;$("audioSampleField").hidden=source!=="sample";$("audioFileField").hidden=source!=="upload";$("audioRecordField").hidden=source!=="record";$("audioPreview").removeAttribute("src");if(source==="sample")$("audioPreview").src=`/api/audio/samples/${$("audioSampleSelect").value}`;};$("audioSampleSelect").onchange=()=>$("audioPreview").src=`/api/audio/samples/${$("audioSampleSelect").value}`;$("audioFile").onchange=()=>{const file=$("audioFile").files[0];if(file)$("audioPreview").src=URL.createObjectURL(file);};$("audioForm").onsubmit=analyzeAudio;$("recordAudio").onclick=recordAudio;$("startAudioLive").onclick=startAudioLive;$("stopAudioLive").onclick=stopAudioLive;
   $("eventStateFilter").querySelectorAll("button").forEach(b=>b.onclick=()=>{app.eventFilter=b.dataset.value;$("eventStateFilter").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));renderEvents();});$("eventModeFilter").onchange=()=>{app.eventMode=$("eventModeFilter").value;renderEvents();};$("eventSearch").oninput=renderEvents;$("reportDays").querySelectorAll("button").forEach(b=>b.onclick=()=>{app.reportDays=Number(b.dataset.value);$("reportDays").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));loadReport();});$("reportMode").onchange=()=>{app.reportMode=$("reportMode").value;loadReport();};
   $("selectAllRecords").onchange=()=>{const checked=$("selectAllRecords").checked;reportRows().forEach(row=>{row.checked=checked;});syncReportPicker();};$("reportRecords").addEventListener("change",event=>{const box=event.target.closest(".pick-all");if(box){const all=reportRows();(box.dataset.scope==="all"?all:all.filter(row=>row.dataset.kind===box.dataset.scope)).forEach(row=>{row.checked=box.checked;});}if(box||event.target.closest(".row-pick"))syncReportPicker();});$("deleteSelectedRecords").onclick=deleteSelectedRecords;$("clearReportScope").onclick=clearReportScope;
   $("settingsForm").onsubmit=saveSettings;$("addContact").onclick=()=>{if(document.querySelectorAll(".contact-editor").length>=10){toast("最多添加 10 位联系人",true);return;}contactEditor();};$("audioConsent").onchange=()=>$("consentStatusText").textContent=$("audioConsent").checked?"待保存授权":"待保存撤回";$("testNotification").onclick=()=>busy($("testNotification"),async()=>{await api("/api/notifications/test",{method:"POST"});if("Notification" in window&&Notification.permission==="default")await Notification.requestPermission();toast("测试通知已加入通知中心");app.settings=await api("/api/settings");$("notificationTestStatus").textContent=`最近测试 ${dateTime(app.settings.notification_test_at)}`;await refresh();});
+  if($("planForm"))$("planForm").onsubmit=ev=>{ev.preventDefault();savePlan();};
+  if($("savePlan"))$("savePlan").onclick=ev=>{ev.preventDefault();savePlan();};
+  renderExerciseSwitches();
+  bindAlgorithmToggles();
+  if($("planTargetFromDefault"))$("planTargetFromDefault").onclick=()=>{const value=Math.min(10000,Math.max(1,Number($("planTarget").value)||10));document.querySelectorAll("[data-plan-reps]").forEach(input=>{input.value=value;});toast(`已统一为 ${value} 次`);};
+  $("page-plan")?.addEventListener("change",()=>{if($("planForm"))draftPlan();});
   try{fillSettings(await api("/api/settings"));const samples=await api("/api/audio/samples");$("audioSampleSelect").innerHTML=[...(samples.scenes||[]),...(samples.replies||[])].map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join("");$("audioPreview").src=`/api/audio/samples/${$("audioSampleSelect").value}`;}catch(e){toast(e.message,true);}navigate();await refresh();icons();setInterval(refresh,2500);setInterval(pollExercise,600);setInterval(loadPose,500);window.addEventListener("resize",()=>{if(app.page==="overview"&&app.report)drawBars($("overviewChart"),app.report.series,"reps","#579579");if(app.page==="monitor")renderMonitor();if(app.page==="reports")renderReport();if(app.exercise)drawPose($("poseCanvas"),app.exercise.keypoints,app.exercise.mode!=="live");});
   window.addEventListener("pagehide",()=>{app.camera?.getTracks().forEach(t=>t.stop());app.audioStream?.getTracks().forEach(t=>t.stop());app.recordingStream?.getTracks().forEach(t=>t.stop());if(app.sid&&["running","paused"].includes(app.exercise?.status)&&app.exerciseSource==="camera")fetch(`/api/sessions/${app.sid}/control`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"end"}),keepalive:true});});
 });
