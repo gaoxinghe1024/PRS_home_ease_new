@@ -35,7 +35,7 @@
       <div class="topbar-right"><span id="headerDate" class="muted desktop-date"></span><button class="icon-button notification-button" id="notificationButton" title="通知" aria-label="查看通知"><i data-lucide="bell"></i><span id="noticeDot" hidden></span></button><span class="avatar" title="照护者">护</span></div>
     </header>
     <main>
-      {% if household %}{% include "home.html" %}{% endif %}
+      {% if household %}{% include "home-alerts.html" %}{% include "home.html" %}{% endif %}
       <section id="page-overview" class="page"{% if household %} hidden{% endif %}>
         <div class="page-title"><div><div class="eyebrow" id="overviewRoom">HOME CARE</div><h1>照护总览</h1><p id="overviewSubtitle">今天的安全与活动记录</p></div><a class="button secondary" href="/home" target="_blank"><i data-lucide="accessibility"></i>家庭使用入口<i data-lucide="arrow-up-right"></i></a></div>
         <div class="setup-banner" id="setupBanner" hidden><i data-lucide="clipboard-list"></i><span>照护档案待完善</span><a href="#settings">完善档案<i data-lucide="arrow-right"></i></a></div>
@@ -133,7 +133,6 @@
         <section class="settings-section"><div><h2>训练与通知</h2><p class="muted">默认目标与通知通道</p></div><div class="form-grid"><label>默认训练目标<div class="number-input"><input id="defaultTarget" type="number" min="1" max="10000" value="10"><span>次</span></div></label><label class="full-span">Webhook 地址（选填）<input id="webhookUrl" type="url" placeholder="https://" maxlength="2000"></label><div class="full-span button-row"><button class="button secondary" type="button" id="testNotification"><i data-lucide="bell-ring"></i>发送测试通知</button><span class="muted small" id="notificationTestStatus">尚未测试</span></div></div></section></form>
         <section class="settings-section"><div><h2>算法运行状态</h2><p class="muted">原始最佳版本</p></div><div id="moduleList"></div></section><section class="settings-section"><div><h2>运行记录</h2><p class="muted">最近调用与状态变化</p></div><div id="diagnosticsList" class="diagnostics-list"></div></section>
       </section>
-      {% if household %}{% include "home-alerts.html" %}{% endif %}
     </main>
     <footer class="workspace-footer"><span>HomeEase <span class="muted">/</span> Group 10</span><span id="connectionState"><span class="dot green"></span>系统连接中</span></footer>
   </div>
