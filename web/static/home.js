@@ -57,7 +57,6 @@
     $("homeAudioNotice").hidden = !desired || (audio && !audioError);
     $("homeAudioReason").textContent = audioError || (!app.settings?.audio_consent ? "麦克风尚未授权" : "麦克风等待连接");
     $("homeAllowAudio").querySelector("span").textContent = app.settings?.audio_consent ? "连接麦克风" : "允许麦克风";
-    $("homePause").querySelector("span").textContent = desired ? "暂停守护" : "恢复守护";
     $("homeRoom").textContent = app.settings?.resident.room || "客厅";
     if (document.activeElement !== $("homeCameraIndex")) $("homeCameraIndex").value = app.status.home_monitoring?.camera_index ?? 0;
     $("exerciseCameraIndex").value = app.status.home_monitoring?.camera_index ?? 0;
@@ -156,8 +155,6 @@
     stream() { return app.audioStream; }
   };
   document.addEventListener("DOMContentLoaded", () => {
-    $("homePause").onclick = () => setGuard(!desired);
-    $("homeRetry").onclick = async () => { audioError = ""; permissionBlocked = false; await setGuard(true); await connectAudio(); };
     $("homeCameraApply").onclick = () => {
       if (!$("homeCameraIndex").reportValidity()) return;
       return setGuard(true, Number($("homeCameraIndex").value));

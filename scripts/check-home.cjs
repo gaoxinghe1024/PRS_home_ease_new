@@ -60,7 +60,8 @@ async function layout(page, label) {
     results.layouts.push(await layout(page,'home-zh-desktop'));
     assert(!(await status()).home_monitoring.enabled,'Home chooser unexpectedly started monitoring');
     assert.deepStrictEqual((await json(await page.request.get(`${base}/api/sessions`))).filter(s=>s.status==='running'),[]);
-    await page.locator('.home-choices a[href="#safety"]').click();
+    assert.strictEqual(await page.locator('.home-choices, .home-choice').count(),0,'Home page still shows self-service guard/exercise cards');
+    await page.click('.home-header a[href="#safety"]');
     let running=await until(status,s=>s.home_monitoring.enabled&&s.video.state==='running');
     await page.locator('#homeAudioNotice').waitFor({state:'visible'});
     assert(!await page.evaluate(()=>!!app.audioStream),'Audio started without consent');
@@ -93,10 +94,13 @@ async function layout(page, label) {
     assert.strictEqual((await status()).video.state,'running');
     results.workflows.sharedCameraAndIndependentStop=true;
     await page.click('.home-header a[href="#safety"]');
-    await page.click('#homePause');
+    assert.strictEqual(await page.locator('#homePause, #homeRetry, .home-safety-actions').count(),0,'Older adult can still pause or restart the guard');
+    // 守护的暂停与恢复由家属在后台完成，这里直接调用同一个接口。
+    const guard=enabled=>page.request.put(`${base}/api/home/monitoring`,{data:{enabled,camera_index:running.home_monitoring.camera_index}}).then(json);
+    await guard(false);
     await until(status,s=>!s.home_monitoring.enabled&&s.video.state!=='running');
     await page.waitForFunction(()=>!app.audioStream&&!app.audioStopping);
-    await page.click('#homePause');
+    await guard(true);
     running=await until(status,s=>s.home_monitoring.enabled&&s.video.state==='running');
     await page.waitForFunction(()=>app.audioSocket?.readyState===1,null,{timeout:60000});
     await page.reload();

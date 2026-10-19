@@ -5,10 +5,6 @@
     <ol id="homePlanItems" class="home-plan-items"></ol>
     <div class="home-plan-foot"><span id="homePlanHint" class="muted">按顺序开始，做完一项会自动打勾</span><div class="button-row"><label class="home-plan-days"><span>休息</span><select id="homePlanDeferDays" aria-label="不做训练的天数"><option value="1">今天</option><option value="2">今明两天</option><option value="3">三天</option></select></label><button type="button" class="button secondary" id="homePlanDefer"><i data-lucide="calendar-clock"></i>先不做</button><a href="#exercise" class="button primary" id="homePlanStart"><i data-lucide="play"></i>开始训练</a></div></div>
   </section>
-  <div class="home-choices">
-    <a href="#safety" class="home-choice safety-choice"><div class="home-choice-visual"><img src="/static/media/room-preview.jpg" alt="居家监测画面"></div><div class="home-choice-title"><i data-lucide="shield-check"></i><h2>安心守护</h2><i data-lucide="arrow-right"></i></div><span class="home-choice-note">日常居家</span></a>
-    <a href="#exercise" class="home-choice exercise-choice"><div class="home-choice-visual"><img src="/static/media/chair_sit_to_stand-guide.png" alt="椅子坐站动作"></div><div class="home-choice-title"><i data-lucide="activity"></i><h2>运动训练</h2><i data-lucide="arrow-right"></i></div><span class="home-choice-note">今天动一动</span></a>
-  </div>
   <div class="home-family"><span id="elderExerciseCount">0 次训练</span><a href="/#reports" target="_blank" rel="noopener"><i data-lucide="chart-no-axes-combined"></i>家属查看报告<i data-lucide="arrow-up-right"></i></a></div>
   <div id="elderContacts" class="elder-contacts"></div>
 </section>
@@ -24,7 +20,6 @@
     </div>
   </div>
   <div id="homeAudioNotice" class="home-permission" hidden><i data-lucide="mic-off"></i><div><strong id="homeAudioReason">麦克风尚未授权</strong><p id="homeAudioPrivacy">允许本地音频处理，原始音频与语音文字不保存。</p></div><button id="homeAllowAudio" class="button primary"><i data-lucide="mic"></i><span>允许麦克风</span></button></div>
-  <div class="home-safety-actions"><button id="homeRetry" class="button secondary"><i data-lucide="rotate-cw"></i>重新连接</button><button id="homePause" class="button secondary"><i data-lucide="pause"></i><span>暂停守护</span></button><a href="#exercise" class="button primary"><i data-lucide="activity"></i>去运动</a></div>
   <p class="home-runtime-note">视频守护在本机服务运行时持续工作。声音与语音问询需要此页面保持打开、麦克风可用；电脑休眠或关机时无法监测。</p>
   <details class="home-devices"><summary>摄像头设置</summary><label>摄像头序号<input id="homeCameraIndex" type="number" value="0" min="0" max="10"></label><button id="homeCameraApply" class="button secondary"><i data-lucide="check"></i>应用</button></details>
 </section>
