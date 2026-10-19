@@ -621,6 +621,7 @@ async def live_audio(ws: WebSocket):
             key = sound["event_id"]
             if seen_events.get(key) != sound.get("n_windows"):
                 system.store.save_sound({"task": "sounds", "result": {"events": [sound], "raw_audio_stored": False}}, "live")
+                system.events.attach_sound(sound)
                 seen_events[key] = sound.get("n_windows")
         if len(seen_events) > 250:
             for key in list(seen_events)[:-100]:
