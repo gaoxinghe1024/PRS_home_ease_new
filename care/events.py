@@ -17,6 +17,31 @@ from algorithm3.policy import alarm_tag, inquiry_outcome
 WITHDRAW_WINDOW_S = 30
 SELF_TRIGGERED = ("manual", "audio")
 
+# One fall seen by several channels is one event: algorithm3's alarm tag counts the channels of one event (single / dual / triple).
+# An alarm of another channel close to an open live alarm therefore joins that event instead of opening a second one, so a camera
+# fall followed by a spoken call for help is one emergency that is asked about once. A spoken call always raises the event to
+# EMERGENCY, as it would on its own. Sound labels (impact, abnormal, help-like) heard around an alarm are only noted on it: they
+# never raise, close or downgrade an event (algorithm3's sound monitor rule).
+LINK_WINDOW_S = 30
+LINKED_CHANNELS = ("accel", "vision", "audio")
+CHANNEL_NAMES = {"accel": "加速度跌倒检测", "vision": "视频跌倒检测", "audio": "语音求助"}
+SOUND_HINTS = {"HELP": "求助相关声音", "IMPACT": "撞击声", "ABNORMAL": "异常声音"}
+
+
+def _time(stamp):
+    try:
+        moment = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return moment if moment.tzinfo else moment.replace(tzinfo=timezone.utc)
+
+
+def _gap(event, when):
+    """Seconds between ``when`` and the nearest alarm marker of the event (None without a counted channel)."""
+    gaps = [abs((when - t).total_seconds()) for m in event.get("markers", [])
+            if m["channel"] in LINKED_CHANNELS and (t := _time(m["at"])) is not None]
+    return min(gaps) if gaps else None
+
 
 def is_withdrawn(event):
     w = event.get("withdrawal")
@@ -62,6 +87,14 @@ class Events:
     def create(self, channel, evidence, mode="live", source="", dedup_key=None, at=None):
         settings = self.store.settings()
         timestamp = at or now()
+        if mode == "live" and channel in LINKED_CHANNELS:
+            if dedup_key and (known := self.store.event_by_key(dedup_key)):
+                return known
+            incident, joined = self._incident(channel, timestamp, dedup_key)
+            if joined:
+                return incident
+            if incident:
+                return self._link(incident["id"], channel, evidence, source, timestamp, dedup_key)
         emergency = channel in {"manual", "audio"}
         markers = [{"channel": channel, "at": timestamp, "kind": "spoken_help" if channel == "audio" else channel}]
         tag = alarm_tag(markers)
@@ -81,6 +114,75 @@ class Events:
         event, created = self.store.add_event(event, dedup_key)
         if created:
             self.notify(event)
+            if mode == "live" and channel in LINKED_CHANNELS:
+                event = self._recent_sounds(event)
+        return event
+
+    def _incident(self, channel, timestamp, dedup_key=None):
+        """(event, already_joined): the open live alarm of another channel that this alarm belongs to, or (None, False)."""
+        when = _time(timestamp)
+        best = None
+        for event in self.store.events(mode="live", state="open", limit=200):
+            if dedup_key and any(link.get("dedup_key") == dedup_key for link in event.get("linked", [])):
+                return event, True
+            # A withdrawn alarm stays apart; a second alarm of the same channel is a new alarm, as before.
+            if when is None or is_withdrawn(event) or channel in {m["channel"] for m in event.get("markers", [])}:
+                continue
+            gap = _gap(event, when)
+            if gap is not None and gap <= LINK_WINDOW_S and (best is None or gap < best[0]):
+                best = (gap, event)
+        return (best[1] if best else None), False
+
+    def _link(self, event_id, channel, evidence, source, timestamp, dedup_key):
+        raised = []
+
+        def mutate(event):
+            kind = "spoken_help" if channel == "audio" else channel
+            tag = alarm_tag([*event["markers"], {"channel": channel, "at": timestamp, "kind": kind}])
+            event.update(markers=tag["markers"], channels=tag["channels"], tag=tag["tag"])
+            event.setdefault("linked", []).append({"channel": channel, "at": timestamp, "detected_at": now(), "source": source,
+                                                   "evidence": evidence, "dedup_key": dedup_key})
+            if channel == "audio" and event["level"] != "EMERGENCY":
+                event.update(level="EMERGENCY", escalated_at=now(),
+                             next_escalation_at=time.time() + self.store.settings()["escalation_seconds"])
+                raised.append(True)
+            self.timeline(event, "linked", f"{CHANNEL_NAMES[channel]}在同一时段报警，已并入本事件" + ("并升级为紧急求助" if raised else ""))
+
+        event = self.store.update_event(event_id, mutate)
+        if raised:
+            self.notify(event, "跌倒后语音求助", event["contact_index"])
+        return event
+
+    def attach_sound(self, sound, mode="live", candidates=None):
+        """Note a sound label heard around an open live alarm on that event. Assistive only: level, state and inquiry stay as they are."""
+        when = _time(sound.get("t_start_utc"))
+        if mode != "live" or sound.get("category") not in SOUND_HINTS or when is None:
+            return None
+        target = None
+        for event in candidates or self.store.events(mode="live", state="open", limit=200):
+            gap = _gap(event, when)
+            if gap is not None and gap <= LINK_WINDOW_S and (target is None or gap < target[0]):
+                target = (gap, event)
+        if not target or any(h["sound_id"] == sound.get("event_id") for h in target[1].get("sound_hints", [])):
+            return None
+
+        def mutate(event):
+            if any(h["sound_id"] == sound.get("event_id") for h in event.get("sound_hints", [])):
+                return
+            event.setdefault("sound_hints", []).append({"sound_id": sound.get("event_id"), "category": sound["category"],
+                                                        "confidence": sound.get("confidence"), "at": sound.get("t_start_utc")})
+            confidence = sound.get("confidence")
+            score = f"（置信度 {confidence:.0%}）" if isinstance(confidence, (int, float)) else ""
+            self.timeline(event, "sound_hint", f"同一时段听到{SOUND_HINTS[sound['category']]}{score}，仅作辅助参考，不改变事件级别")
+        return self.store.update_event(target[1]["id"], mutate)
+
+    def _recent_sounds(self, event):
+        """Sounds labelled shortly before a new alarm (a fall is heard before the camera or sensor decides) are noted on it too."""
+        for row in self.store.sounds(limit=50):
+            if row.get("mode") != "live":
+                continue
+            for sound in (row.get("result") or {}).get("events", []):
+                event = self.attach_sound(sound, candidates=[event]) or event
         return event
 
     def action(self, event_id, action, outcome=None, note="", actor="照护者", revision=None):

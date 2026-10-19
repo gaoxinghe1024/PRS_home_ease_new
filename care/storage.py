@@ -180,6 +180,11 @@ class Store:
             self._audit(conn, "events", "created", {"id": event["id"], "channel": event["channel"], "mode": event["mode"]})
         return event, True
 
+    def event_by_key(self, dedup_key):
+        with self.connection() as conn:
+            row = conn.execute("SELECT payload FROM events WHERE dedup_key=?", (dedup_key,)).fetchone()
+        return json.loads(row[0]) if row else None
+
     def event(self, event_id):
         with self.connection() as conn:
             row = conn.execute("SELECT payload FROM events WHERE id=?", (event_id,)).fetchone()

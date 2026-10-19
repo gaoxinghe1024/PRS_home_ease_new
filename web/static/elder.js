@@ -65,7 +65,10 @@ async function refresh(){
     }
     const query=new URLSearchParams(location.search).get("event");
     const live=events.filter(e=>e.mode==="live");
-    if(homeMode)live.sort((a,b)=>Number(b.level==="EMERGENCY")-Number(a.level==="EMERGENCY"));
+    // 先看正在问询的事件，再看还没问过的最新事件，最后才按紧急程度。否则一条未关闭的旧求助会一直排在前面，
+    // 新的跌倒事件永远轮不到语音问询。
+    const rank=e=>["listening","processing"].includes(e.inquiry.status)?0:e.inquiry.status==="not_started"?1:e.level==="EMERGENCY"?2:3;
+    live.sort((a,b)=>rank(a)-rank(b));
     const e=query?events.find(e=>e.id===query):(live[0]||(!homeMode&&events[0]));
     if(!recording){
       currentEvent=e||null;$("elderEvent").hidden=!e;

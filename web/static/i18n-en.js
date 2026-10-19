@@ -1106,5 +1106,11 @@ window.HOMEEASE_EN = {
   "\u597d\u7684\uff0c\u4f11\u606f": "All right, resting for",
   "\u5929\uff0c\u4e4b\u540e\u7167\u5e38\u63d0\u9192": "day(s), then reminders resume as usual",
   "\u4eca\u5929\u5df2\u7ecf\u8df3\u8fc7\u4e86": "Today is already marked as a rest day",
-  "\u672c\u673a\u6444\u50cf\u5934\u4e0d\u53ef\u7528\uff0c\u63d2\u4e0a\u6216\u91ca\u653e\u5360\u7528\u540e\u4f1a\u81ea\u52a8\u6062\u590d": "The camera on this device is unavailable; it recovers once it is plugged in or freed"
+  "\u672c\u673a\u6444\u50cf\u5934\u4e0d\u53ef\u7528\uff0c\u63d2\u4e0a\u6216\u91ca\u653e\u5360\u7528\u540e\u4f1a\u81ea\u52a8\u6062\u590d": "The camera on this device is unavailable; it recovers once it is plugged in or freed",
+  "\u5728\u540c\u4e00\u65f6\u6bb5\u62a5\u8b66\uff0c\u5df2\u5e76\u5165\u672c\u4e8b\u4ef6": "raised an alarm at the same time and was merged into this event",
+  "\u5e76\u5347\u7ea7\u4e3a\u7d27\u6025\u6c42\u52a9": "and raised it to an emergency",
+  "\u8dcc\u5012\u540e\u8bed\u97f3\u6c42\u52a9": "Spoken call for help after a fall",
+  "\u540c\u4e00\u65f6\u6bb5\u542c\u5230": "Heard at the same time:",
+  "\uff08\u7f6e\u4fe1\u5ea6": "(confidence",
+  "\uff0c\u4ec5\u4f5c\u8f85\u52a9\u53c2\u8003\uff0c\u4e0d\u6539\u53d8\u4e8b\u4ef6\u7ea7\u522b": ", noted for reference only; the event level is unchanged"
 };
