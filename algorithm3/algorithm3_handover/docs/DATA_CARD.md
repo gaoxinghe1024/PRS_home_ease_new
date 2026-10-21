@@ -1,41 +1,41 @@
-# 数据卡:算法 3 用到的数据和划分
+# Data card: data and splits used by Algorithm 3
 
-包里**不带**训练和评估用的数据集(只带 `samples/` 里 16 段短示例)。下面说明数据从哪来、怎么用、有什么边界。
+The package does not include the training and evaluation datasets, only the 16 short recordings in `samples/`. This card says where the data came from, how it was used and where its limits are.
 
-## 声音事件(训练和评估声音模型)
+## Sound events (training and evaluating the sound model)
 
-| 数据 | 内容 | 用途 | 许可 |
+| Data | Content | Use | Licence |
 |---|---|---|---|
-| ESC-50(Piczak 2015) | 2,000 段 5 秒、50 类、5 个官方折 | IMPACT(敲门,作为撞击的代理)、ABNORMAL(玻璃碎裂、婴儿哭、警笛、闹钟)、DAILY(19 类家居声) | CC BY-NC 3.0 |
-| VIVAE(Holz 等 2022) | 1,085 段表演的非语言发声,11 位说话人,6 种情绪、4 种强度 | HELP:恐惧和疼痛的中等、强、极强强度(277 段);低强度的 84 段不训练也不评分;愤怒归 ABNORMAL(174),成就感、愉悦、惊讶归 DAILY(550) | CC BY-NC 4.0 |
-| FSD50K 子集 | 265 段,171 位上传者,按文件下载并校验 | HELP:标签 Screaming(130 段);同库负样本:笑、咳嗽、喷嚏归 DAILY(65),重物落地、敲击归 IMPACT(45),破碎归 ABNORMAL(25) | 每段 CC0 / CC BY / CC BY-NC |
-| Mini LibriSpeech dev-clean-2 | 1,089 句,26 位说话人 | DAILY 的"说话"类(156 个窗口)、电视语音、语音门限和说话人验证评估 | CC BY 4.0 |
+| ESC-50 (Piczak 2015) | 2,000 clips of 5 s, 50 classes, 5 official folds | IMPACT (door knock, as a stand-in for an impact), ABNORMAL (glass breaking, crying baby, siren, alarm clock), DAILY (19 household classes) | CC BY-NC 3.0 |
+| VIVAE (Holz et al. 2022) | 1,085 acted non-speech vocalisations, 11 speakers, 6 emotions, 4 intensities | HELP: fear and pain at medium, strong and peak intensity (277 clips); the 84 low-intensity clips are neither trained nor scored; anger goes to ABNORMAL (174), achievement, pleasure and surprise to DAILY (550) | CC BY-NC 4.0 |
+| FSD50K subset | 265 clips, 171 uploaders, downloaded and checked file by file | HELP: label Screaming (130 clips); negatives from the same corpus: laughter, cough, sneeze as DAILY (65), heavy fall and knock as IMPACT (45), breaking as ABNORMAL (25) | CC0 / CC BY / CC BY-NC per clip |
+| Mini LibriSpeech dev-clean-2 | 1,089 sentences, 26 speakers | the DAILY "speech" class (156 windows), television speech, evaluation of the speech gate and of speaker verification | CC BY 4.0 |
 
-- 窗口 2 秒,RMS 归一化到 0.1;一个窗口对应一段来源片段,共 2,382 个窗口(HELP 407、IMPACT 85、ABNORMAL 359、DAILY 1,531)。
-- 划分按组:ESC-50 的原始录音、VIVAE 的说话人、FSD50K 的上传者、LibriSpeech 的说话人;5 折。随包模型用折 1 到 4 训练,折 5 做测试(466 个窗口、212 个组)。
-- 标签映射在训练前固定。同库负样本和"留一个语料库"检验用来测"模型是不是学到了语料库而不是声音"。
-- 短于 2 秒的片段在窗口里主要是填充,"安静帧比例"本身就能区分 HELP 和长片段(AUC 0.785)。这是已知的未控制线索。
-- 14 段 Freesound 录音同时出现在 ESC-50 和 FSD50K(都不是 HELP),有 11 段落在不同的折里。去掉它们 macro-F1 变化 0.001。
+- Windows are 2 s long, RMS-normalised to 0.1; each window comes from one source clip. There are 2,382 windows (HELP 407, IMPACT 85, ABNORMAL 359, DAILY 1,531).
+- Splits are by group: the original recording for ESC-50, the speaker for VIVAE, the uploader for FSD50K, the speaker for LibriSpeech; 5 folds. The shipped model is trained on folds 1 to 4 and tested on fold 5 (466 windows, 212 groups).
+- The label mapping was fixed before training. Negatives from the same corpus and a leave-one-corpus-out check test whether the model learned the corpus instead of the sound.
+- Clips shorter than 2 s are mostly padding inside a window, and the share of silent frames alone separates HELP from the longer clips (AUC 0.785). This is a known uncontrolled cue.
+- 14 Freesound recordings appear in both ESC-50 and FSD50K (none is HELP); 11 of them fall into different folds. Removing them changes macro-F1 by 0.001.
 
-## 回复识别
+## Reply recognition
 
-- 自写的短语库:312 句中英文,每条标了意图(求救、安慰、其他)、说话角色(本人、访客、电视)、同义改写族和划分。按族划分:开发 78 族、测试 78 族。
-- 用系统语音合成(Zira、David、Huihui;普通话的访客和电视声音由 Huihui 重采样模拟),部分混入 5 dB 的家用噪声;真实的 LibriSpeech 句子作为电视类;每个划分 208 条,196 条评分,12 条家电噪声用来测识别器的幻觉。
-- 另外 20 句求救话和 15 句安慰话由一位评审者在规则写完后写成,只当文字探针,不用于调整词表。
-- 词表是在看过两个划分的情况下写的:测试集上有 13 个线索只在测试措辞里触发,所以 0.894 是上界。
+- A phrase bank written for the project: 312 Chinese and English sentences, each labelled with the intent (help, reassurance, other), the speaker role (the person, a visitor, television), a paraphrase family and the split. Split by family: 78 families for development and 78 for test.
+- Rendered with system speech synthesis (Zira, David, Huihui; the Mandarin visitor and television voices are Huihui resampled), partly mixed with 5 dB household noise. Real LibriSpeech sentences serve as television. Each split has 208 items, 196 scored and 12 appliance-noise items that test the recogniser for hallucination.
+- 20 more calls for help and 15 reassurances were written by one reviewer after the rules were done and serve only as a text probe, not for tuning the lexicon.
+- The lexicon was written after both splits had been seen: 13 cues fire only in test wording, so 0.894 is an upper bound.
 
-## 说话人验证和误取消(A4、A6)
+## Speaker verification and false cancels (A4, A6)
 
-- A4:LibriSpeech 说话人按人分开发/评估两半;评估 13 位说话人、268 条真实匹配、3,216 条冒认试验。3,216 条冒认试验不足以估计 0.1% 的误接受率(至少需要 10,000)。
-- A6:Piper libritts_r 的 904 个合成说话人中随机抽 150 个做开发、150 个做评估(不相交),每人用同样三句中性话登记,再说短语库里的话;加上 5 dB 家用噪声、扬声器和房间模拟(电视、回放)、家用声音和静音,共 2,370 条评估片段。阈值只用开发说话人确定。
-- 全部是合成英文,干净,来自同一个合成引擎家族。
+- A4: LibriSpeech speakers are split by person into a development and an evaluation half; the evaluation has 13 speakers, 268 genuine trials and 3,216 impostor trials. 3,216 impostor trials are not enough to estimate a false-accept rate of 0.1% (at least 10,000 are needed).
+- A6: 150 development and 150 evaluation speakers (disjoint) drawn at random from the 904 synthetic speakers of Piper libritts_r. Each enrols with the same three neutral sentences and then says the phrases of the phrase bank; with 5 dB household noise, loudspeaker and room simulation (television, replay), household sounds and silence, this gives 2,370 evaluation items. The threshold is set on the development speakers only.
+- Everything is synthetic English, clean, and from one family of synthesis engines.
 
-## 示例(`samples/`)
+## Samples (`samples/`)
 
-- 6 个场景(20 到 24 秒):洗衣机背景(-48 dBFS,ESC-50)加撞击、尖叫、玻璃碎裂、电视语音和回复。每个来源片段都取自折 5(随包模型没见过的那一折),`scene_*.json` 记录了每个片段的来源、折、许可和哈希。
-- 10 段短回复:用系统语音合成,用来演示"求救、安慰、无关、感谢、电视长句、静音"。
-- 场景由 CC BY-NC、CC BY 的片段混合而成,按这些许可,仅用于非商业的课程研究演示。
+- 6 scenes (20 to 24 s): washing-machine background (-48 dBFS, ESC-50) with an impact, a scream, breaking glass, television speech and replies. Every source clip comes from fold 5 (the fold the shipped model has not seen); `scene_*.json` records the source, fold, licence and hash of each clip.
+- 10 short replies made with system speech synthesis, to show a call for help, reassurance, an unrelated remark, thanks, a long television sentence and silence.
+- The scenes mix CC BY-NC and CC BY clips and are therefore for non-commercial course research demonstrations only.
 
-## 不能从这些数据得出的结论
+## What these data cannot show
 
-没有老年人、方言口音、真实电视和访客、真实房间声学、麦克风距离、连续家庭录音(因此没有每小时误报数)。所有数字都是方法在这些数据上的性质,不是产品在家里的表现。
+There are no older adults, dialects and accents, real television and visitors, real room acoustics, microphone distances or continuous home recordings (so no false alarms per hour). All numbers describe the methods on these data, not the product in a home.

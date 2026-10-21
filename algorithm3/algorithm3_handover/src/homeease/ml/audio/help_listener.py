@@ -45,15 +45,13 @@ STOP_JOIN_S = 5.0  # stop() waits this long for a worker that is inside a recogn
 OVERFLOW_MEMORY_S = 60.0  # a dropped segment keeps the status degraded for this long
 MAX_UNITS = 14  # words (English) and characters (Chinese) of a call: "I fell and I can't get up, please help me" is 10
 
-# Cues of the reply-intent lexicon (ml/audio/intent_v2.py) that are a call, not a remark. The lexicon was built to read the answer to
-# a question that has just been asked; a listener hears every conversation and programme, where "oh no", "ouch" and the Chinese
-# equivalents of "oh dear" and "not good" are everyday exclamations. Descriptions of a state (stuck, on the floor, not well) stay
-# with the sensors and the inquiry.
+# Cues of the reply lexicon (intent_v2.py) that count as a call. The lexicon reads an answer to a question; a listener hears every
+# conversation and programme, where "oh no" or "ouch" are everyday exclamations, so those and descriptions of a state (stuck, on the
+# floor) are left out.
 CALL_CUES = frozenset({"help", "need_help", "ambulance", "get_doctor", "cant_do", "zh_help", "zh_cant", "zh_ambulance"})
 
-# A cue that needs a request around it. "ambulance", "doctor" and the Chinese word for ambulance are as much words of a news item or a
-# passing remark as of a call; they count only as the object of a verb of asking ("call an ambulance", or "call an ambulance quickly"
-# in Chinese) or when they are the whole utterance.
+# Cues that need a request around them: "ambulance" and "doctor" also occur in news and small talk, so they count only after a verb of
+# asking ("call an ambulance") or as the whole utterance.
 WEAK_CUES = frozenset({"ambulance", "get_doctor", "zh_ambulance"})
 _REQUEST = re.compile(
     r"(?:\u53eb|\u8bf7|\u627e|\u558a|\u6253|\u62e8|\u5feb|\u8d76\u7d27|\u8d76\u5feb|\u9a6c\u4e0a|\u7acb\u523b|\u9ebb\u70e6|\u9001\u6211|\u9001\u4ed6|\u9001\u5979|\u5e26\u6211|\u7ed9\u6211|\u8981|\u9700\u8981)\S{0,3}(?:\u6551\u62a4|\u6025\u6551|\u6551\u63f4|\u533b\u751f|\u5927\u592b|\u533b\u9662)"
@@ -62,10 +60,9 @@ _REQUEST = re.compile(
     r"|^(?:an?\s+)?(?:ambulance|doctor|emergency|paramedics?|\u6551\u62a4\u8f66?|\u6025\u6551|\u6551\u63f4|\u533b\u751f|\u5927\u592b)$"
 )
 
-# Spans that mention help without calling for it: thanks, an offer or a question put to someone else, "help is on the way", a help desk,
-# an ambulance in the news. They are blanked out before the call cues are looked for, so a real call in the same utterance still counts.
-# Refusals ("don't call an ambulance", or "I do not need help" in Chinese) are read by the reply-intent lexicon itself (a reassurance, never a help cue). Only what is
-# listed here is removed: everything else stays a call, because a call that is missed costs more than a short false alarm.
+# Spans that mention help without calling for it (thanks, an offer, "help is on the way", a help desk, an ambulance in the news). They
+# are blanked out before the cues are looked for, so a real call in the same utterance still counts. Everything else stays a call: a
+# missed call costs more than a short false alarm.
 _NOT_A_CALL = re.compile("|".join([
     r"(?:\u8c22\u8c22|\u591a\u8c22|\u611f\u8c22|\u8c22\u4e86|\u8c22)(?:\u4f60\u4eec?|\u60a8|\u5927\u5bb6|\u4f60\u7684|\u60a8\u7684|\u5927\u5bb6\u7684|\u7684)?(?:\u5e2e\u52a9|\u5e2e\u5fd9|\u5e2e\u6211|\u5e2e\u4e86\u6211|\u5e2e|\u6551\u4e86\u6211|\u6551\u6211|\u76f8\u52a9|\u6551\u547d\u4e4b\u6069)",
     r"(?:\u4f60\u4eec?|\u60a8)(?:\u662f\u5426|\u6709\u6ca1\u6709|\u8fd8)?(?:\u9700\u8981|\u8981|\u60f3\u8981|\u60f3)(?:\u4ec0\u4e48|\u4efb\u4f55|\u70b9|\u4e00\u70b9)?(?:\u5e2e\u52a9|\u5e2e\u5fd9|\u5e2e|\u6551\u62a4\u8f66?|\u533b\u751f|\u5927\u592b)",
