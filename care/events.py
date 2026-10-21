@@ -9,11 +9,9 @@ from care.storage import now
 sys.path.append(str(AUDIO / "src"))
 from algorithm3.policy import alarm_tag, inquiry_outcome
 
-# An alarm that the older adult raised (help button, spoken call for help) can be withdrawn by the same person for a short time, for
-# example after a button press by mistake or a television that said "help". A withdrawal never closes or downgrades the event: it
-# stays open at its level, the contact escalation stops, the caregivers are told, and only a caregiver closes it. A fall alarm of a
-# sensor can be withdrawn too once the voice inquiry has raised it to an emergency (no answer, or a call for help), for the same
-# time counted from that moment: before that the older adult can answer the inquiry, and the caregiver decides on the rest.
+# The older adult can withdraw an alarm for a short time: one from the help button or a spoken call, or a sensor fall alarm once the
+# voice inquiry has raised it to an emergency (the time then counts from that moment). A withdrawal never closes or lowers the event;
+# it stops the contact escalation, tells the caregivers, and a caregiver still closes the event.
 WITHDRAW_WINDOW_S = 30
 SELF_TRIGGERED = ("manual", "audio")
 

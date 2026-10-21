@@ -81,19 +81,16 @@ _HELP_PATTERNS: list[tuple[str, re.Pattern[str]]] = [(n, re.compile(p)) for n, p
     ("zh_down", r"\u5012\u5728\u5730|\u8eba\u5728\u5730"),
     ("zh_cry", r"\u54ce\u54df|\u54ce\u5537|\u54ce\u5466|\u5509\u54df|\u554a\u54df|\u54ce\u5440"),
 ]]
-# The recogniser (Whisper tiny) writes a bare, half-second Mandarin call for help ("jiu ming") with a homophone of its first character,
-# or as "jiu you ming le"; "bang bang wo" (help me) comes out as "dang dang wo". Such a word is a call only when it is the whole utterance (alone or repeated, with an optional particle),
-# so nothing inside a longer sentence changes.
+# Whisper tiny often writes a bare, half-second "jiu ming" with a homophone ("jiu you ming le"), and "bang bang wo" as "dang dang wo".
+# Only the whole utterance counts, alone or repeated, with an optional particle.
 _ZH_BARE_CALL = re.compile(r"(?:(?:[\u6551\u5c31\u65e7\u8205\u4e5d\u4e45]\u547d|\u5c31\u6709\u547d[\u4e86\u5566\u554a\u5440\u54c7]|(?:\u5f53\u5f53|\u65b9\u65b9|\u90a6\u90a6)\u6211)[\u554a\u5440\u54c7\u5566\u5416]?){1,4}")
 
-# A refusal of help is reassurance and never a help cue. English: "I don't need help", "no need to call an ambulance". Chinese: the
-# equivalents of "I do not need help", "no need to help", "no need to call an ambulance" and "do not call the doctor" (a negator that is
-# directly followed by the help word, an optional person and an optional call).
-# A reply that is nothing but a short, standard Mandarin "I am fine" (two or three syllables: "mei shi", "mei wen ti", "mei guan xi") is
-# recognised with a low confidence, because the log-probability is averaged over a handful of tokens: a clean "mei shi" scores about
-# -1.0 to -1.2. Only that whole-utterance form gets a little slack in the cancel test (see algorithm3.policy), nothing inside a sentence.
+# A short, standard Mandarin "I am fine" ("mei shi", "mei wen ti", "mei guan xi") is recognised with a low confidence, because the
+# log-probability is averaged over a few tokens. Only this whole-utterance form gets extra room in the cancel test (algorithm3.policy).
 _ZH_BARE_REASSURANCE = re.compile(r"(?:(?:\u6211|\u90fd)?(?:\u6ca1\u4e8b|\u6ca1\u95ee\u9898|\u6ca1\u5173\u7cfb|\u4e0d\u8981\u7d27|\u4e0d\u788d\u4e8b)(?:[\u513f\u4e86\u5566\u7684\u554a\u5440\u54e6]{1,2})?){1,3}")
 
+# A refusal of help is reassurance and never a help cue: "I don't need help", "no need to call an ambulance" and the Chinese equivalents
+# (a negator directly followed by the help word, an optional person and an optional call).
 _NO_HELP_EN = (
     r"(?:(?:don't|do not|doesn't|no|not|never|didn't) (?:need|want|require|ask for)(?: any| a| your| some)? (?:help|assistance)|no (?:help|assistance) (?:is )?(?:needed|necessary|required)"
     r"|(?:don't|do not|doesn't|no need to|no need for|need not|never|not|please don't|won't|stop) (?:(?:you|him|her|them|anyone|anybody|someone|somebody) )?"
