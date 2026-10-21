@@ -23,7 +23,7 @@ def a3() -> Algorithm3:
 
 def test_text_replies_need_no_model(a3):
     assert a3.classify_reply(text="I'm fine, don't worry")["intent"] == "REASSURANCE"
-    assert a3.classify_reply(text="救命")["intent"] == "HELP"          # Chinese "help!"
+    assert a3.classify_reply(text="\u6551\u547d")["intent"] == "HELP"          # Chinese "help!"
     assert a3.classify_reply(text="I'm fine but I can't get up")["intent"] == "HELP"  # a help cue wins over a reassurance cue
     assert a3.classify_reply(text="")["intent"] == "UNCERTAIN"
     r = a3.classify_reply(text="I'm fine, don't worry")

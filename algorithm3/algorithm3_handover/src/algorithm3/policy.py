@@ -1,18 +1,13 @@
-"""Decision rules around the voice check and the alarm tag, as pure functions (no database, no clock, no HTTP).
+"""What a voice inquiry means for an event, and the alarm tag, as pure functions (no database, no clock, no HTTP).
 
-In the HomeEase node these rules live in ``backend/services/events.py`` (``_voice_cancel_verdict`` and ``_voice_outcome``) next to the
-event store. A new system has no ``EventService``, so the same rules are given here as functions of plain values. The functions below
-mirror the node's code line by line; the scenarios in ``tests/test_policy.py`` are the node's scenario tests written as plain
-values. ``alarm_tag`` and ``add_marker`` are the node's own module (``backend/services/alarm_tags.py``), unchanged.
+A reply never closes or lowers an event.
 
-Rules, in one place (a reply never closes or downgrades an event):
-
-* a valid cancel is a trusted spoken "I'm fine" (intent REASSURANCE, acceptable ASR confidence and, when a voiceprint enrolment
-  exists, a matching voice) or the older adult's "I'm OK" button pressed after the question was asked. It only stops the escalation.
-* anything else that was judged (silence, unclear or unrelated speech, a call for help, an untrusted "I'm fine") is no cancel: an
-  audio alarm marker, and a PENDING event is raised to EMERGENCY.
-* a check that could not be made (audio off, no consent, microphone or recogniser failure, a question that reached nobody) is neither:
-  no marker, no escalation, shown as degraded. A spoken call for help is always an alarm.
+* A valid cancel is a trusted spoken "I'm fine" (intent REASSURANCE, enough recogniser confidence and, when a voiceprint is enrolled,
+  a matching voice) or the older adult's "I'm OK" button pressed after the question was asked. It only stops the escalation.
+* Anything else that was judged (silence, unclear or unrelated speech, a call for help, an untrusted "I'm fine") is no cancel: an
+  audio marker is recorded and a PENDING event is raised to EMERGENCY.
+* A check that could not be made (audio off, no consent, microphone or recogniser failure, a question that reached nobody) gives no
+  marker and no escalation and is shown as degraded. A spoken call for help is always an alarm.
 """
 
 from __future__ import annotations
@@ -24,18 +19,17 @@ from homeease.backend.services import alarm_tags
 
 INQUIRY_JUDGED = ("RESPONDED", "NO_RESPONSE", "UNCERTAIN")  # records that say how the person answered
 DEFAULT_MIN_ASR_LOGPROB = -1.0  # audio.voiceprint.min_asr_logprob
-# A reply that is only a short, standard Mandarin "I am fine" (record flag ``bare_reassurance``, set by ``classify_reply``) is averaged
-# over a handful of tokens and lands 0.0 to 0.25 below the gate although it was understood; it may be that much lower (relative to the
-# configured gate). Everything else, including every other language and every longer sentence, keeps the gate as it is.
+# A bare Mandarin "I am fine" (``bare_reassurance`` in the record) scores a little below the gate even when it was understood, so it gets
+# this much extra room. Everything else keeps the gate.
 BARE_REASSURANCE_SLACK = 0.3
 
 
 def voice_cancel_verdict(rec: dict[str, Any], min_asr_logprob: float = DEFAULT_MIN_ASR_LOGPROB) -> bool:
-    """Is this spoken reply a trusted "I'm fine"? Mirror of ``EventService._voice_cancel_verdict``.
+    """Is this spoken reply a trusted "I'm fine"?
 
-    Needs the REASSURANCE intent, an acceptable ASR confidence when there is one and, when the household has a voiceprint enrolment, a
-    matching voice (``speaker_verified`` True). A verdict of False is a mismatch. No verdict passes only without an enrolment;
-    ``voiceprint_enrolled`` says there is one even when the voices could not be compared (reply too short)."""
+    Needs the REASSURANCE intent, an acceptable ASR confidence when there is one and, when a voiceprint is enrolled, a matching voice
+    (``speaker_verified`` True). No verdict passes only without an enrolment; ``voiceprint_enrolled`` marks an enrolment even when the
+    voices could not be compared (reply too short)."""
     if rec.get("intent") != "REASSURANCE":
         return False
     conf = rec.get("asr_avg_logprob")
@@ -61,8 +55,7 @@ def inquiry_outcome(
     escalate_on_no_cancel: bool = True,
     min_asr_logprob: float = DEFAULT_MIN_ASR_LOGPROB,
 ) -> dict[str, Any]:
-    """What a voice-inquiry result means for the event. Mirror of ``EventService._voice_outcome`` with the database lookup replaced by
-    ``button_ok`` (the older adult pressed "I'm OK" after the question was asked).
+    """What a voice-inquiry result means for the event. ``button_ok``: the older adult pressed "I'm OK" after the question was asked.
 
     ``rec`` is a reply record (``classify_reply`` returns one) plus ``prompt_played`` (False: the question never reached anybody).
     Returns ``state`` (cancelled | no_cancel | not_run | audio_unavailable), ``cancelled``, ``by`` (voice | button), ``marker`` (kind of

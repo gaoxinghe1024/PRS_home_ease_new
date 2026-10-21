@@ -3,110 +3,126 @@
   {
    "id": "scene_glass_break",
    "file": "scene_glass_break.wav",
-   "title": "玻璃碎裂",
-   "note": "20 秒:安静的家里,第 8 到 13 秒有玻璃碎裂声(标注 ABNORMAL)。模型对 ABNORMAL 的召回不高(约 0.41),所以多半标成 DAILY 或 UNKNOWN,这是评估里写明的局限。"
+   "title": "\u73bb\u7483\u788e\u88c2",
+   "note": "20 s: a quiet home; breaking glass between 8 and 13 s (labelled ABNORMAL). The model recalls ABNORMAL poorly (about 0.41), so this is mostly labelled DAILY or UNKNOWN: a known limit.",
+   "title_en": "Glass breaking"
   },
   {
    "id": "scene_tv_and_knock",
    "file": "scene_tv_and_knock.wav",
-   "title": "电视和敲门声",
-   "note": "20 秒:第 3 到 6 秒电视里有人说话(不是本人回答),第 18 到 23 秒有敲门声(标注 IMPACT)。语音门限会切出电视的说话片段,喊救命检测不会因此报警。"
+   "title": "\u7535\u89c6\u548c\u6572\u95e8\u58f0",
+   "note": "20 s: someone speaks on the television from 3 to 6 s (not the person's reply) and a knock sounds from 18 to 23 s (labelled IMPACT). The washing machine runs in the background. Sound labels are only a hint and never raise an alarm.",
+   "title_en": "Television and a knock"
   },
   {
    "id": "scene_quiet_home",
    "file": "scene_quiet_home.wav",
-   "title": "安静的家",
-   "note": "20 秒:洗衣机背景声加一个日常声音(标注 DAILY)。不应出现 HELP、IMPACT、ABNORMAL。"
+   "title": "\u5b89\u9759\u7684\u5bb6",
+   "note": "20 s: washing-machine background and one everyday sound (labelled DAILY). It should not be labelled HELP, IMPACT or ABNORMAL.",
+   "title_en": "A quiet home"
   },
   {
    "id": "scene_fall_help_call",
    "file": "scene_fall_help_call.wav",
-   "title": "摔倒后喊救命",
-   "note": "24 秒:撞击声、一声尖叫,第 9 到 12 秒本人说\"Help me, I fell and I cannot get up.\"。喊救命检测应在 9 秒多报警。"
+   "title": "\u6454\u5012\u540e\u558a\u6551\u547d",
+   "note": "24 s: an impact and a scream; from 9 to 12 s the person says \"Help me, I fell and I cannot get up.\" The spoken-help detector should raise an alarm at about second 9.",
+   "title_en": "Calling for help after a fall"
   },
   {
    "id": "scene_fall_reassured",
    "file": "scene_fall_reassured.wav",
-   "title": "摔倒后说\"我没事\"",
-   "note": "24 秒:撞击声,随后本人说\"I'm fine, don't worry.\"。回复识别为 REASSURANCE,喊救命检测不报警。"
+   "title": "\u6454\u5012\u540e\u8bf4\"\u6211\u6ca1\u4e8b\"",
+   "note": "24 s: an impact, then the person says \"I'm fine, don't worry.\" The reply is read as REASSURANCE, and the spoken-help detector does not raise an alarm.",
+   "title_en": "Saying \"I'm fine\" after a fall"
   },
   {
    "id": "scene_fall_visitor_reply",
    "file": "scene_fall_visitor_reply.wav",
-   "title": "访客替老人回答",
-   "note": "24 秒:撞击声,随后另一个声音(访客)说\"Don't worry, she is fine.\"。文字上是安慰,没有声纹时无法区分说话人。"
+   "title": "\u8bbf\u5ba2\u66ff\u8001\u4eba\u56de\u7b54",
+   "note": "24 s: an impact, then another voice (a visitor) says \"Don't worry, she is fine.\" The words are reassuring; without an enrolled voiceprint the system cannot tell who spoke.",
+   "title_en": "A visitor answers for the person"
   }
  ],
  "replies": [
   {
    "id": "reply_help_en",
    "file": "reply_help_en.wav",
-   "title": "喊救命(英文)",
+   "title": "\u558a\u6551\u547d(\u82f1\u6587)",
    "said": "Help me! I fell and I can't get up.",
-   "note": "回复识别判为 HELP;喊救命检测报警。语音门限可能把一句话切成两段,第二段落在冷却时间内,会显示 cooldown。"
+   "note": "The reply is read as HELP. The spoken-help detector raises an alarm too; the recording may split the sentence in two, and the second part then shows cooldown.",
+   "title_en": "Calling for help (English)"
   },
   {
    "id": "reply_help_zh",
    "file": "reply_help_zh.wav",
-   "title": "喊救命(中文)",
-   "said": "救命啊,我摔倒了,起不来了。",
-   "note": "应判为 HELP;喊救命检测应报警。"
+   "title": "\u558a\u6551\u547d(\u4e2d\u6587)",
+   "said": "\u6551\u547d\u554a,\u6211\u6454\u5012\u4e86,\u8d77\u4e0d\u6765\u4e86\u3002",
+   "note": "Should be read as HELP; the spoken-help detector should raise an alarm.",
+   "title_en": "Calling for help (Chinese)"
   },
   {
    "id": "reply_fine_en",
    "file": "reply_fine_en.wav",
-   "title": "我没事(英文)",
+   "title": "\u6211\u6ca1\u4e8b(\u82f1\u6587)",
    "said": "I'm fine, don't worry.",
-   "note": "应判为 REASSURANCE(没有登记声纹时,有效取消只靠文字和识别置信度)。"
+   "note": "Should be read as REASSURANCE. Without an enrolled voiceprint a valid cancel depends only on the words and the recogniser confidence.",
+   "title_en": "\"I'm fine\" (English)"
   },
   {
    "id": "reply_fine_zh",
    "file": "reply_fine_zh.wav",
-   "title": "我没事(中文)",
-   "said": "我没事,不用担心。",
-   "note": "应判为 REASSURANCE。"
+   "title": "\u6211\u6ca1\u4e8b(\u4e2d\u6587)",
+   "said": "\u6211\u6ca1\u4e8b,\u4e0d\u7528\u62c5\u5fc3\u3002",
+   "note": "Should be read as REASSURANCE.",
+   "title_en": "\"I'm fine\" (Chinese)"
   },
   {
    "id": "reply_visitor_fine",
    "file": "reply_visitor_fine.wav",
-   "title": "访客说\"她没事\"",
+   "title": "\u8bbf\u5ba2\u8bf4\"\u5979\u6ca1\u4e8b\"",
    "said": "Don't worry, she is fine.",
-   "note": "文字上是安慰,所以会判为 REASSURANCE:没有声纹时文字不能证明说话人是谁。"
+   "note": "The words are reassuring, so this is read as REASSURANCE; without an enrolled voiceprint nothing proves who said it.",
+   "title_en": "A visitor says \"she is fine\""
   },
   {
    "id": "reply_fine_but_stuck",
    "file": "reply_fine_but_stuck.wav",
-   "title": "\"没事,但是起不来\"",
+   "title": "\"\u6ca1\u4e8b,\u4f46\u662f\u8d77\u4e0d\u6765\"",
    "said": "I'm fine, but I can't get up.",
-   "note": "混合句:求救线索优先,应判为 HELP。"
+   "note": "A mixed sentence: the cue for help wins, so it should be read as HELP.",
+   "title_en": "\"I'm fine, but I can't get up\""
   },
   {
    "id": "reply_other_en",
    "file": "reply_other_en.wav",
-   "title": "无关的话",
+   "title": "\u65e0\u5173\u7684\u8bdd",
    "said": "Okay, I will make some tea later.",
-   "note": "应判为 OTHER:不是安慰也不是求救,所以不算有效取消。"
+   "note": "Should be read as OTHER: neither reassurance nor a call for help, so it is not a valid cancel.",
+   "title_en": "An unrelated remark"
   },
   {
    "id": "reply_thanks_en",
    "file": "reply_thanks_en.wav",
-   "title": "感谢的话",
+   "title": "\u611f\u8c22\u7684\u8bdd",
    "said": "Thank you for your help.",
-   "note": "回复识别只看到 help 这个词,会判为 HELP;喊救命监听有专门的过滤(感谢、提议不算求救),所以不报警(not_a_call)。两者规则不同。"
+   "note": "The reply rules only see the word help and read HELP. The spoken-help detector has its own filter for this (thanks, an offer, an ambulance in the news) and ignores it (not_a_call). The two paths differ on purpose.",
+   "title_en": "Thanks"
   },
   {
    "id": "reply_tv_long",
    "file": "reply_tv_long.wav",
-   "title": "电视里的长句",
+   "title": "\u7535\u89c6\u91cc\u7684\u957f\u53e5",
    "said": "And in tonight's news, the city council has asked residents who need help with heating costs to call the support line, and a spokesperson said that volunteers will be ready to help families across the whole district this winter.",
-   "note": "含 help 的长句(超过 6 秒):喊救命检测忽略(too_long),不会误报;回复识别仍会读到 help 这个词。"
+   "note": "A long sentence with the word help (over 6 s): the spoken-help detector ignores it (too_long); the reply rules still read HELP because of the word.",
+   "title_en": "A long sentence from television"
   },
   {
    "id": "reply_silence",
    "file": "reply_silence.wav",
-   "title": "没有回答(3 秒静音)",
+   "title": "\u6ca1\u6709\u56de\u7b54(3 \u79d2\u9759\u97f3)",
    "said": "",
-   "note": "应得到 NO_RESPONSE:没人回答,按规则不算取消,会升级。"
+   "note": "Should give NO_RESPONSE: nobody answered, which is not a cancel, so the event is raised.",
+   "title_en": "No answer (3 s of silence)"
   }
  ]
 }
