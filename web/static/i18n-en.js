@@ -1106,5 +1106,13 @@ window.HOMEEASE_EN = {
   "\u597d\u7684\uff0c\u4f11\u606f": "All right, resting for",
   "\u5929\uff0c\u4e4b\u540e\u7167\u5e38\u63d0\u9192": "day(s), then reminders resume as usual",
   "\u4eca\u5929\u5df2\u7ecf\u8df3\u8fc7\u4e86": "Today is already marked as a rest day",
-  "\u672c\u673a\u6444\u50cf\u5934\u4e0d\u53ef\u7528\uff0c\u63d2\u4e0a\u6216\u91ca\u653e\u5360\u7528\u540e\u4f1a\u81ea\u52a8\u6062\u590d": "The camera on this device is unavailable; it recovers once it is plugged in or freed"
+  "\u672c\u673a\u6444\u50cf\u5934\u4e0d\u53ef\u7528\uff0c\u63d2\u4e0a\u6216\u91ca\u653e\u5360\u7528\u540e\u4f1a\u81ea\u52a8\u6062\u590d": "The camera on this device is unavailable; it recovers once it is plugged in or freed",
+  "\u58f0\u97f3\u76d1\u6d4b": "Sound monitoring",
+  "\u58f0\u97f3\u76d1\u6d4b\u542c\u5230\u6c42\u52a9\u76f8\u5173\u7684\u58f0\u97f3\uff0c\u7b49\u5f85\u7167\u62a4\u8005\u6838\u5b9e": "Sound monitoring heard a sound that goes with a call for help; waiting for a caregiver to verify",
+  "\u58f0\u97f3\u76d1\u6d4b\u542c\u5230\u649e\u51fb\u58f0\uff0c\u7b49\u5f85\u7167\u62a4\u8005\u6838\u5b9e": "Sound monitoring heard an impact; waiting for a caregiver to verify",
+  "\u58f0\u97f3\u76d1\u6d4b\u542c\u5230\u5f02\u5e38\u58f0\u97f3\uff0c\u7b49\u5f85\u7167\u62a4\u8005\u6838\u5b9e": "Sound monitoring heard an abnormal sound; waiting for a caregiver to verify",
+  "\u58f0\u97f3\u76d1\u6d4b\u540c\u65f6\u542c\u5230\u6c42\u52a9\u76f8\u5173\u7684\u58f0\u97f3\uff0c\u4e0e\u8dcc\u5012\u68c0\u6d4b\u4e92\u76f8\u5370\u8bc1\uff0c\u5df2\u5347\u7ea7\u4e3a\u7d27\u6025": "Sound monitoring also heard a sound that goes with a call for help, which confirms the fall detection; raised to emergency",
+  "\u58f0\u97f3\u76d1\u6d4b\u540c\u65f6\u542c\u5230\u649e\u51fb\u58f0\uff0c\u4e0e\u8dcc\u5012\u68c0\u6d4b\u4e92\u76f8\u5370\u8bc1\uff0c\u5df2\u5347\u7ea7\u4e3a\u7d27\u6025": "Sound monitoring also heard an impact, which confirms the fall detection; raised to emergency",
+  "\u58f0\u97f3\u76d1\u6d4b\u540c\u65f6\u542c\u5230\u5f02\u5e38\u58f0\u97f3\uff0c\u4e0e\u8dcc\u5012\u68c0\u6d4b\u4e92\u76f8\u5370\u8bc1\uff0c\u5df2\u5347\u7ea7\u4e3a\u7d27\u6025": "Sound monitoring also heard an abnormal sound, which confirms the fall detection; raised to emergency",
+  "\u58f0\u97f3\u4e0e\u8dcc\u5012\u68c0\u6d4b\u540c\u65f6\u62a5\u8b66": "Sound and fall detection both raised an alarm"
 };

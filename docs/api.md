@@ -115,3 +115,12 @@
 ## Interface language
 
 Every page loads `static/i18n-en.js` (Chinese source text to English phrase table) and `static/i18n.js`. The language is kept in `localStorage["homeease.lang"]` and switched with the button in the page header. English mode translates the DOM text at load and as it changes; Chinese mode does nothing. `tests/test_i18n_coverage.py` fails when a Chinese string in the templates, scripts or server code has no English phrase, and `node scripts/test-i18n.cjs` checks the translator.
+
+## Sound events as an alarm channel
+
+Every new HELP, IMPACT or ABNORMAL sound event of the live listening (`/ws/audio`) is looked at three seconds after it starts, so that a spoken call or a fall detection of the same moment is in the database first.
+
+- If a live event is open and its first marker is within 10 s of the sound, an audio marker of kind `sound_event` is added. A fall candidate (`accel`, `vision`) becomes `dual_channel` and is raised to EMERGENCY (`escalated_at` is set, so it can be withdrawn for 30 s) and the caregivers are notified.
+- Otherwise a PENDING event with `channel: "audio"` and the source "sound monitoring" is opened for a caregiver to check.
+- DAILY and UNKNOWN sounds are no alarm. The sound model is weak on the three classes (HELP precision about 0.5), so a lone sound only asks for a check. `SOUND_ALARM_CATEGORIES` in `care/events.py` lists the categories; an empty tuple switches this off.
+

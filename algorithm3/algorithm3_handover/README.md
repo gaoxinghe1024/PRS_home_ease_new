@@ -4,7 +4,7 @@ Algorithm 3 does three things. Everything runs on the local machine, nothing goe
 
 | Function | Input | Output | Role in the system |
 |---|---|---|---|
-| Sound-event labelling | continuous audio | HELP / IMPACT / ABNORMAL / DAILY / UNKNOWN labels with time, confidence and level | a hint only; it never raises or cancels an alarm |
+| Sound-event labelling | continuous audio | HELP / IMPACT / ABNORMAL / DAILY / UNKNOWN labels with time, confidence and level | the labels HELP, IMPACT and ABNORMAL are evidence in the HomeEase system: next to a fall candidate they are the audio channel, alone they open a suspected event (see below); they never cancel an alarm |
 | Spoken call for help | speech segments cut from the audio | an alarm, or the reason the speech was ignored | a clear call in Chinese or English ("help me", "jiu ming") raises an emergency |
 | Voice inquiry | the reply to "What's wrong? Are you OK?" after a fall candidate | HELP / REASSURANCE / OTHER / UNCERTAIN, and whether the reply is a valid cancel | without a valid cancel a PENDING event is raised to EMERGENCY; a valid cancel only stops that escalation |
 
@@ -113,7 +113,7 @@ One rule above all: a reply never closes or lowers an event.
 
 A reply that is only a short, standard Mandarin "I am fine" ("mei shi", "mei wen ti", "mei guan xi") is recognised with a low confidence because the score is averaged over a few tokens, so the cancel test gives that whole-utterance form 0.3 of slack (`bare_reassurance`). Other replies keep the gate.
 
-Tag rules (`alarm_tags.py`, the 10 s window is fixed): the channels accel, vision and audio count; `manual` (the help button) is recorded but not counted; the window starts at the earliest counted marker; markers outside it are kept with `counted: false`; the audio marker is stamped when the question was asked; sound-event labels never become markers.
+Tag rules (`alarm_tags.py`, the 10 s window is fixed): the channels accel, vision and audio count; `manual` (the help button) is recorded but not counted; the window starts at the earliest counted marker; markers outside it are kept with `counted: false`; the audio marker is stamped when the question was asked; in the HomeEase system a HELP, IMPACT or ABNORMAL sound event that starts within 10 s of an open fall candidate adds an audio marker of kind `sound_event` (the event becomes `dual_channel` and EMERGENCY), and one without a candidate opens a PENDING event of its own; this lives in `care/events.py`, not in this package.
 
 ## Settings
 

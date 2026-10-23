@@ -9,6 +9,7 @@ import json
 import logging
 import math
 import os
+import threading
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -613,12 +614,21 @@ async def live_audio(ws: WebSocket):
     seen_events = {}
     last_time = None
 
+    def raise_sound_alarm(sound):
+        try:
+            system.events.sound_alarm(sound)
+        except Exception:
+            logging.exception("Sound alarm failed")
+
     def persist_result(result):
         for call in result.get("calls", []):
             system.events.create("audio", call.get("details", {}), "live", "连续求救监听",
                 f"audio:{call.get('idem', uuid.uuid4().hex)}", at=call.get("at"))
         for sound in result.get("events", []):
             key = sound["event_id"]
+            if key not in seen_events:
+                # wait a moment so that a spoken call for help or a fall detection of the same moment is in the database first
+                threading.Timer(3.0, raise_sound_alarm, args=(sound,)).start()
             if seen_events.get(key) != sound.get("n_windows"):
                 system.store.save_sound({"task": "sounds", "result": {"events": [sound], "raw_audio_stored": False}}, "live")
                 seen_events[key] = sound.get("n_windows")

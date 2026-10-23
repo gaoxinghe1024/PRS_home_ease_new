@@ -15,6 +15,26 @@ from algorithm3.policy import alarm_tag, inquiry_outcome
 WITHDRAW_WINDOW_S = 30
 SELF_TRIGGERED = ("manual", "audio")
 
+# A sound event of the sound monitor (Algorithm 3) of one of these categories counts as an alarm. Next to an open fall candidate of the
+# same 10 s window it is the second channel (dual_channel) and raises the event to EMERGENCY; without a candidate it opens a suspected
+# event for a caregiver to check. The model is weak on these classes, so a lone sound only asks for a check.
+SOUND_ALARM_CATEGORIES = ("HELP", "IMPACT", "ABNORMAL")
+SOUND_WINDOW_S = 10.0
+SOUND_SOURCE = "\u58f0\u97f3\u76d1\u6d4b"
+SOUND_REASON = "\u58f0\u97f3\u4e0e\u8dcc\u5012\u68c0\u6d4b\u540c\u65f6\u62a5\u8b66"
+SOUND_NOTES = {
+    "HELP": {"new": "\u58f0\u97f3\u76d1\u6d4b\u542c\u5230\u6c42\u52a9\u76f8\u5173\u7684\u58f0\u97f3\uff0c\u7b49\u5f85\u7167\u62a4\u8005\u6838\u5b9e",
+          "marker": "\u58f0\u97f3\u76d1\u6d4b\u540c\u65f6\u542c\u5230\u6c42\u52a9\u76f8\u5173\u7684\u58f0\u97f3\uff0c\u4e0e\u8dcc\u5012\u68c0\u6d4b\u4e92\u76f8\u5370\u8bc1\uff0c\u5df2\u5347\u7ea7\u4e3a\u7d27\u6025"},
+    "IMPACT": {"new": "\u58f0\u97f3\u76d1\u6d4b\u542c\u5230\u649e\u51fb\u58f0\uff0c\u7b49\u5f85\u7167\u62a4\u8005\u6838\u5b9e",
+          "marker": "\u58f0\u97f3\u76d1\u6d4b\u540c\u65f6\u542c\u5230\u649e\u51fb\u58f0\uff0c\u4e0e\u8dcc\u5012\u68c0\u6d4b\u4e92\u76f8\u5370\u8bc1\uff0c\u5df2\u5347\u7ea7\u4e3a\u7d27\u6025"},
+    "ABNORMAL": {"new": "\u58f0\u97f3\u76d1\u6d4b\u542c\u5230\u5f02\u5e38\u58f0\u97f3\uff0c\u7b49\u5f85\u7167\u62a4\u8005\u6838\u5b9e",
+          "marker": "\u58f0\u97f3\u76d1\u6d4b\u540c\u65f6\u542c\u5230\u5f02\u5e38\u58f0\u97f3\uff0c\u4e0e\u8dcc\u5012\u68c0\u6d4b\u4e92\u76f8\u5370\u8bc1\uff0c\u5df2\u5347\u7ea7\u4e3a\u7d27\u6025"},
+}
+
+
+def _utc(ts):
+    return datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone.utc)
+
 
 def is_withdrawn(event):
     w = event.get("withdrawal")
@@ -57,11 +77,11 @@ class Events:
         if self.store.settings().get("webhook_url") and event["mode"] == "live":
             self.store.notify(event["id"], payload, kind="webhook")
 
-    def create(self, channel, evidence, mode="live", source="", dedup_key=None, at=None):
+    def create(self, channel, evidence, mode="live", source="", dedup_key=None, at=None, level=None, kind=None):
         settings = self.store.settings()
         timestamp = at or now()
-        emergency = channel in {"manual", "audio"}
-        markers = [{"channel": channel, "at": timestamp, "kind": "spoken_help" if channel == "audio" else channel}]
+        emergency = channel in {"manual", "audio"} if level is None else level == "EMERGENCY"
+        markers = [{"channel": channel, "at": timestamp, "kind": kind or ("spoken_help" if channel == "audio" else channel)}]
         tag = alarm_tag(markers)
         event = {
             "occurred_at": timestamp, "detected_at": now(), "mode": mode,
@@ -75,10 +95,47 @@ class Events:
             "inquiry": {"status": "not_started"}, "notes": "", "response_s": None,
         }
         self.timeline(event, "detected", "主动求助" if emergency else "原算法检测到疑似跌倒，等待照护者核实", at=timestamp)
+        if kind == "sound_event":
+            event["timeline"][-1]["note"] = SOUND_NOTES[evidence["sound_category"]]["new"]
         self.timeline(event, "notification_queued", "站内通知已排队")
         event, created = self.store.add_event(event, dedup_key)
         if created:
             self.notify(event)
+        return event
+
+    def sound_alarm(self, sound):
+        """One sound event of the live sound monitor. Returns the event it was added to or opened, or None when it is no alarm."""
+        category = sound.get("category")
+        if category not in SOUND_ALARM_CATEGORIES:
+            return None
+        at = sound.get("t_start_utc") or now()
+        when = _utc(at)
+        for event in self.store.events(mode="live", state="open", limit=50):
+            first = min([_utc(m["at"]) for m in event.get("markers", [])] or [_utc(event["occurred_at"])])
+            if abs((first - when).total_seconds()) <= SOUND_WINDOW_S:
+                return self._add_sound_marker(event["id"], category, at)
+        evidence = {"sound_category": category, "confidence": sound.get("confidence")}
+        return self.create("audio", evidence, "live", SOUND_SOURCE, f"sound:{sound.get('event_id') or at}", at=at, level="PENDING", kind="sound_event")
+
+    def _add_sound_marker(self, event_id, category, at):
+        raised = []
+
+        def mutate(event):
+            if event["state"] != "open":
+                return
+            tag = alarm_tag([*event["markers"], {"channel": "audio", "kind": "sound_event", "at": at}])
+            if tag["markers"] == event["markers"]:
+                return  # the same sound again
+            event.update(markers=tag["markers"], channels=tag["channels"], tag=tag["tag"])
+            self.timeline(event, "sound_marker", SOUND_NOTES[category]["marker"], SOUND_SOURCE)
+            if event["level"] != "EMERGENCY" and event["channel"] in ("accel", "vision"):
+                event["level"] = "EMERGENCY"
+                event["escalated_at"] = now()
+                event["next_escalation_at"] = time.time() + self.store.settings()["escalation_seconds"]
+                raised.append(True)
+        event = self.store.update_event(event_id, mutate)
+        if raised:
+            self.notify(event, SOUND_REASON, event["contact_index"])
         return event
 
     def action(self, event_id, action, outcome=None, note="", actor="照护者", revision=None):
