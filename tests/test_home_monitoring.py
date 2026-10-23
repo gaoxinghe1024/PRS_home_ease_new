@@ -14,7 +14,11 @@ from care.storage import Store
 def home(tmp_path):
     service = System(Store(tmp_path / "home.sqlite3"))
     service.modules["video"] = SimpleNamespace(state="ready", close=Mock())
-    service.video_start = Mock(side_effect=lambda *args: service.video.update(state="running", processing=True))
+    def start_video(source, mode):
+        service.video_mode = mode
+        service.video.update(state="running", processing=True)
+
+    service.video_start = Mock(side_effect=start_video)
     service.video_stop = Mock(side_effect=lambda: service.video.update(state="idle", processing=False))
     yield service
     service.pool.shutdown(wait=True)

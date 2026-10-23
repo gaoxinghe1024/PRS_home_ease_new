@@ -109,3 +109,5 @@ python -m venv .venv
 详见 [架构与集成](docs/architecture.md)、[API 与数据格式](docs/api.md)、[验证记录](docs/verification.md) 和 [样例来源](samples/SOURCES.md)。目前完成了原算法一致性、API 工作流和浏览器测试；真实家庭设备、外部通知送达、七天持续运行与真实误报漏报率仍需现场验收。
 
 本次基于 GitHub 最新 `deaaf07` 版本的运动接入排查见 [运动接入排查](docs/exercise-integration.md)；四动作骨架回放通过，真人深蹲零计数仍在排查。历史的卡顿、零计数和实时声音接入排查见 [原交付排查记录](docs/audit-20261015.md)。停止服务后，可用 `python scripts/clear_records.py` 清除视频/加速度跌倒与训练记录及关联通知、录像；资料、联系人、声音历史不受影响。验证脚本应始终使用独立数据目录。
+
+2026-10-23 本机摄像头／上传的坐站训练启用 `counting_policy="pose_cycle_v2"`，站立直腿抬腿启用 `pose_cycle_v1`，用骨架端点确认完整周期，修复连续可见输入中阶段漏判导致的零计数。坐站新增站立准备提示，并容纳不超过 400 ms 的有效输入间隔；最新版本已由用户现场复测并反馈“效果不错”。这是新增部署计数策略，不能套用原阶段分类器的实验精度；模型概率保留，SDK/API 默认计数、深蹲和跨步保持原策略。详见 [部署记录](docs/exercise-integration.md#2026-10-23坐站和直腿前抬的摄像头周期确认)。

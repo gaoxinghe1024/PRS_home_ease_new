@@ -241,7 +241,9 @@ class ExerciseWorker:
     def create(self, exercise, target_reps, action_scope="open"):
         from care.exercise import ExerciseDiagnostics
         result = self._request("post", "/v1/sessions", {"exercise": exercise, "target_reps": target_reps,
-                                                       "action_scope": action_scope})
+            "action_scope": action_scope,
+            "counting_policy": ("pose_cycle_v2" if exercise == "chair_sit_to_stand" else "pose_cycle_v1")
+                if action_scope == "training" and exercise in {"chair_sit_to_stand", "standing_leg_raise"} else "original"})
         self.diagnostics[result["session_id"]] = ExerciseDiagnostics()
         return self.diagnostics[result["session_id"]].attach(result)
 

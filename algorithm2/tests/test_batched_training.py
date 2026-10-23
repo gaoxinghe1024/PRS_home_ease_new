@@ -72,3 +72,33 @@ def test_batch_uses_only_each_ticks_past_and_retains_continuation():
     continuation = stream.update(poses[0], 8 / 30)
     expected = sequential(model.stream(), model.stream(), observations + [(poses[0], 8 / 30)])[-1]
     np.testing.assert_allclose(continuation, expected, atol=1e-6, rtol=0)
+
+
+@pytest.mark.parametrize("kind", ["tcn", "gru"])
+def test_single_view_batch_preserves_sequential_windows_continuation_and_reset(kind):
+    model = predictor(kind)
+    batch, reference = model.stream(), model.stream()
+    rng = np.random.default_rng(53)
+    poses = rng.normal(size=(30, 12, 3)).astype(np.float32)
+    before = poses.copy()
+    offset = 0
+    for size in [1, 3, 8, 0, 6, 7, 5]:
+        if size == 0:
+            batch.reset()
+            reference.reset()
+        observations = [(pose, i / 30) for i, pose in enumerate(poses[offset:offset+size], offset)]
+        actual = batch.update_many(observations)
+        expected = [reference.update(pose, timestamp) for pose, timestamp in observations]
+        np.testing.assert_allclose(actual, expected, atol=1e-6, rtol=0)
+        offset += size
+    np.testing.assert_array_equal(poses, before)
+
+
+def test_single_view_batch_cannot_read_future_windows():
+    model = predictor("tcn")
+    rng = np.random.default_rng(54)
+    poses = rng.normal(size=(10, 12, 3)).astype(np.float32)
+    expected = model.stream().update_many([(pose, i / 30) for i, pose in enumerate(poses)])
+    poses[5:, :, :2] += 20
+    actual = model.stream().update_many([(pose, i / 30) for i, pose in enumerate(poses)])
+    np.testing.assert_array_equal(actual[:5], expected[:5])

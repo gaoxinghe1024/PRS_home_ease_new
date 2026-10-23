@@ -298,6 +298,9 @@ function renderExerciseCycle(s){
   else if(["ended","interrupted"].includes(s.status))cue=s.status==="ended"?"训练已结束。":"训练已中断。";
   else if(s.quality!=="good")cue="请让双肩、双髋、双膝和双踝完整入镜；恢复后从起始姿势重新开始。";
   else if(completed)cue="完整动作已计入，请稳住后开始下一次。";
+  else if(s.exercise==="chair_sit_to_stand"&&s.counting_policy?.startsWith("pose_cycle_")&&stage<0){
+    cue=s.setup_pose==="standing"?"已识别站立，请先坐到椅子上并坐稳。":"请坐稳片刻，确认起始坐姿后开始。";
+  }
   if($("exerciseCue").dataset.cue!==cue){$("exerciseCue").dataset.cue=cue;$("exerciseCue").textContent=cue;}
 }
 async function startExercise(ev){
@@ -349,13 +352,16 @@ function renderExerciseState(s){
   const diagnostic=s.capture_diagnostics;
   const jointNames={left_shoulder:"左肩",right_shoulder:"右肩",left_hip:"左髋",right_hip:"右髋",left_knee:"左膝",right_knee:"右膝",left_ankle:"左踝",right_ankle:"右踝"};
   let quality=qualityNames[q]||q;
-  const unrecognized=q==="good"&&s.phase==="other";
+  const chairSetup=q==="good"&&s.exercise==="chair_sit_to_stand"&&s.counting_policy?.startsWith("pose_cycle_")&&s.counter_stage<0;
+  const unrecognized=q==="good"&&s.phase==="other"&&!chairSetup;
   if(unrecognized)quality="骨架有效，尚未确认所选动作";
+  if(chairSetup)quality=s.setup_pose==="standing"?"已识别站立，请先坐稳":"骨架有效，正在确认起始坐姿";
   if(diagnostic?.missing_joints?.length&&q==="insufficient_pose")quality+=`：${diagnostic.missing_joints.map(n=>jointNames[n]||n).join("、")}`;
-  if(diagnostic?.gap_ms>250&&q==="good")quality="画面曾中断，当前动作重新观察";
+  const inputGapLimit=s.max_input_gap_ms??250;
+  if(diagnostic?.gap_ms>inputGapLimit&&q==="good")quality="画面曾中断，当前动作重新观察";
   $("exerciseQuality").textContent=quality;
   $("exerciseQuality").title=diagnostic?`有效采样 ${diagnostic.observation_fps||0} FPS · 最近间隔 ${diagnostic.gap_ms||0} ms`:"";
-  $("exerciseQuality").classList.toggle("bad",unrecognized||!["good","waiting_for_input"].includes(q)||diagnostic?.gap_ms>250);
+  $("exerciseQuality").classList.toggle("bad",unrecognized||!["good","waiting_for_input"].includes(q)||diagnostic?.gap_ms>inputGapLimit);
   const counts=s.counting_diagnostics,details=$("exerciseDiagnostics");
   details.hidden=!counts;
   if(counts){
