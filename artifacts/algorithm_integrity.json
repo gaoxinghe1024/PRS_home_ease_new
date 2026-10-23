@@ -45,9 +45,9 @@
   "algorithm2/artifacts/yolo11n-pose.pt": "869e83fcdffdc7371fa4e34cd8e51c838cc729571d1635e5141e3075e9319dc0",
   "algorithm2/artifacts/yolo11s-pose.pt": "1060bda4a27012060eca246f9b2adeea22eabb045a1e58f8d229be29b7ebc2ba",
   "algorithm2/homeease/__init__.py": "51c631cee6f94f9657425f5b474f2ce4c86926c51dafc739cce75840d3fec560",
-  "algorithm2/homeease/api.py": "11fc6bf6fe89b46bd8bb1f5115d781a528e706597842ffd1da12a648e8bb68cc",
+  "algorithm2/homeease/api.py": "95b355a83248f69da920ceaf2e204642cdd56c2bf43aac16c9fe236a6e91e0fb",
   "algorithm2/homeease/counter.py": "745c5d5c132b8c64a4ae07ad5aff280acc5a12fe8779f340eff017b4b0656383",
-  "algorithm2/homeease/engine.py": "4f12641102ce5dcc03887845a48b5ddb93cec15c0abcb3d7368c2ca794ef10d4",
+  "algorithm2/homeease/engine.py": "8844a782431deffcf2207beddb81bc9604ec2d5f8514047916066b0234427ed1",
   "algorithm2/homeease/exercises.py": "9eba58d16624bca69de9e6a6e8125a6ae7245dc279ba3d7e7d40d62162070e0f",
   "algorithm2/homeease/features.py": "c8d7e40f8edac1ad05d7715ce71d3bd7afa36b6a022e0b24ed8c2b092444cea3",
   "algorithm2/homeease/models.py": "0d502e4201fcd090c1d4a959e5a9e86ccaf1270bb525efe8ae9e02b2e7ec1698",
@@ -114,5 +114,7 @@
   "algorithm3/algorithm3_handover/tests/test_audio_intent_v2.py": "a6c516a393a5fa95368d771eedf9fd2e4cce1abacc1339ae937ca7fd0e7053f0",
   "algorithm3/algorithm3_handover/tests/test_cancel_gate.py": "0ef69393b19ccab37c0471ea5c21aa3fc31bb447abaecccde763b38e8d1d47e6",
   "algorithm3/algorithm3_handover/tests/test_facade.py": "644e3560a73bee8ba12ec75dee7009c22db0e478844f0cfc3c2ddf6a28d27874",
-  "algorithm3/algorithm3_handover/tests/test_policy.py": "8b537179cd8c2a6b2f182fe736452318f17594c574c5c0dc4d7fb09be7c8a9cc"
+  "algorithm3/algorithm3_handover/tests/test_policy.py": "8b537179cd8c2a6b2f182fe736452318f17594c574c5c0dc4d7fb09be7c8a9cc",
+  "algorithm2/homeease/pose_cycle.py": "370d33ead8122a4387cd148eeab20f8557f9fafce7acf5d39f37db4b9cf9dade",
+  "algorithm2/tests/test_pose_cycle.py": "072441c4cdb0cdf097a803d1e6e65c0ac08d1cdc9e8d471cc79cff11a3f4e246"
 }

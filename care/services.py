@@ -850,12 +850,13 @@ class System:
             if any(meta["active"] for meta in self.session_metadata.values()):
                 raise ValueError("请先结束当前运动训练")
             owner = "exercise-opening"
-            descriptor = None if handover else self.cameras.acquire(index, owner)
+            if not handover:
+                self.cameras.acquire(index, owner)
             try:
                 self.modules["exercise"].call("pose_initialize")
                 result = self.create_session(exercise, target, "live", action_scope="training")
                 sid = result["session_id"]
-                descriptor = descriptor or self.handover_camera(handover, sid, index)
+                descriptor = self.handover_camera(handover or owner, sid, index)
                 self.session_metadata[sid]["shared_camera"] = True
                 self.session_metadata[sid]["last_viewer"] = time.monotonic()
                 self.camera_shapes[sid] = descriptor["shape"]
@@ -871,13 +872,10 @@ class System:
         原来的 ``acquire/release`` 会拆机重开，画面要重新协商（约一秒黑屏），
         这里改为只替换占用者编号，像素管道保持不动。
         """
-        descriptor = self.cameras.descriptor(owner)
-        if descriptor is None:
-            return self.cameras.acquire(index, sid)
-        # 「exercise-opening」只是短暂的占位编号，交接后不应继续挂在设备上。
-        self.cameras.release_except({sid})
-        if sid not in self.cameras.users(sid):
-            return self.cameras.acquire(index, sid)
+        previous = self.cameras.descriptor(owner)
+        descriptor = self.cameras.acquire(previous["index"] if previous else index, sid)
+        # Register the training session before dropping the previous owner.
+        self.cameras.release(owner)
         return descriptor
 
     def camera_exercise(self, sid, descriptor):

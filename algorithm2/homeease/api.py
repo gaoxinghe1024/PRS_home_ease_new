@@ -22,6 +22,16 @@ class CreateSession(StrictModel):
     target_reps: int = Field(default=10, ge=1, le=10000)
     exercise: Literal["chair_sit_to_stand", "squat", "standing_leg_raise", "hurdle_step"] = "chair_sit_to_stand"
     action_scope: Literal["open", "training"] = "open"
+    counting_policy: Literal["original", "pose_cycle_v1", "pose_cycle_v2"] = "original"
+
+    @model_validator(mode="after")
+    def check_counting_policy(self):
+        if self.counting_policy != "original" and (self.action_scope != "training" or
+                self.exercise not in {"chair_sit_to_stand", "standing_leg_raise"}):
+            raise ValueError("pose_cycle_v1 requires selected sitting or straight-leg training")
+        if self.counting_policy == "pose_cycle_v2" and self.exercise != "chair_sit_to_stand":
+            raise ValueError("pose_cycle_v2 requires selected sitting training")
+        return self
 
 
 class Frame(StrictModel):
@@ -75,6 +85,10 @@ class SessionState(StrictModel):
     recognized_exercise: str
     inference_views: Literal["original", "mirror_average"] = "original"
     phase_policy: Literal["original", "action_gap_hold_v1"] = "original"
+    counting_policy: Literal["original", "pose_cycle_v1", "pose_cycle_v2"] = "original"
+    model_phase: str = "other"
+    setup_pose: Literal["waiting", "standing", "sitting", "transitioning"] | None = None
+    max_input_gap_ms: float = 250
     exercise_probabilities: dict[str, float]
     phase: str
     phase_confidence: float
@@ -151,7 +165,8 @@ def create_app(predictor=None):
             if len(sessions) >= 100:
                 raise HTTPException(429, "SESSION_LIMIT_REACHED")
             session_id = str(uuid.uuid4())
-            session = ExerciseSession(app.state.predictor, session_id, body.target_reps, body.exercise, body.action_scope)
+            session = ExerciseSession(app.state.predictor, session_id, body.target_reps, body.exercise, body.action_scope,
+                                      counting_policy=body.counting_policy)
             sessions[session_id], caches[session_id] = session, OrderedDict()
             return session.snapshot()
 

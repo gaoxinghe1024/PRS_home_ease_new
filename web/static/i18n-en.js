@@ -1,6 +1,10 @@
 /* Phrase table of the English interface (Chinese source text -> English). Generated; keys and values are ASCII with unicode
    escapes. A phrase that is not listed stays in Chinese. Used by i18n.js. */
 window.HOMEEASE_EN = {
+  "\u5df2\u8bc6\u522b\u7ad9\u7acb\uff0c\u8bf7\u5148\u5750\u5230\u6905\u5b50\u4e0a\u5e76\u5750\u7a33\u3002": "Standing recognized. Sit on the chair and settle before starting.",
+  "\u8bf7\u5750\u7a33\u7247\u523b\uff0c\u786e\u8ba4\u8d77\u59cb\u5750\u59ff\u540e\u5f00\u59cb\u3002": "Sit steady briefly to confirm the starting position.",
+  "\u5df2\u8bc6\u522b\u7ad9\u7acb\uff0c\u8bf7\u5148\u5750\u7a33": "Standing recognized - sit steady to start",
+  "\u9aa8\u67b6\u6709\u6548\uff0c\u6b63\u5728\u786e\u8ba4\u8d77\u59cb\u5750\u59ff": "Body visible - confirming seated start",
   "\u52a8\u4f5c\u9aa8\u67b6\u53c2\u8003": "Movement Reference",
   "\u53cc\u81c2\u5411\u4e24\u4fa7\u62ac\u81f3\u7ea6\u80a9\u9ad8\u5e76\u5c48\u8098\uff0c\u53cc\u624b\u5411\u4e0a\uff1b\u53cc\u817f\u4f38\u76f4\uff0c\u5148\u7ad9\u7a33\u7ea6 2 \u79d2\u3002": "Raise your upper arms out to shoulder height, bend your elbows, and point your hands upward. Keep both legs straight and stand steady for about 2 seconds.",
   "\u652f\u6491\u817f\u7ad9\u7a33\uff0c\u53e6\u4e00\u6761\u817f\u819d\u76d6\u5c3d\u91cf\u4f38\u76f4\uff0c\u5411\u8eab\u4f53\u6b63\u524d\u65b9\u62ac\u8d77\u540e\u7a0d\u505c\uff1b\u53c2\u8003\u52a8\u4f5c\u63a5\u8fd1\u6c34\u5e73\u3002": "Keep your supporting leg steady. Raise the other leg forward with its knee as straight as comfortable, then pause. The reference leg approaches horizontal.",

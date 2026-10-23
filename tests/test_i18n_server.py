@@ -48,7 +48,7 @@ def samples():
 @pytest.mark.skipif(NODE is None, reason="node is needed to run the page translator")
 def test_server_and_page_translators_agree():
     texts = samples()
-    run = subprocess.run([NODE, "-e", JS, str(ROOT)], input=json.dumps(texts), capture_output=True, text=True, check=True)
+    run = subprocess.run([NODE, "-e", JS, str(ROOT)], input=json.dumps(texts), capture_output=True, text=True, encoding="utf-8", check=True)
     page = json.loads(run.stdout)
     different = [(t, p, i18n.translate(t)) for t, p in zip(texts, page) if i18n.translate(t) != p]
     assert len(texts) > 1000 and not different, different[:10]
@@ -95,8 +95,8 @@ def test_webhooks_carry_english_text_and_the_record_keeps_the_original(tmp_path,
 
 def run_main(tmp_path, code):
     """Import the application in a child process with its own data directory (no algorithm process is started)."""
-    env = {**os.environ, "HOMEEASE_SYSTEM_DATA": str(tmp_path / "runtime")}
-    return subprocess.run([sys.executable, "-c", code], cwd=ROOT, env=env, capture_output=True, text=True, check=True).stdout
+    env = {**os.environ, "HOMEEASE_SYSTEM_DATA": str(tmp_path / "runtime"), "PYTHONIOENCODING": "utf-8"}
+    return subprocess.run([sys.executable, "-c", code], cwd=ROOT, env=env, capture_output=True, text=True, encoding="utf-8", check=True).stdout
 
 
 def test_the_api_document_is_english(tmp_path):
@@ -117,7 +117,8 @@ for item in (event, asked):
     item["voice"] = voice_inquiry(item)
 session = {"session_id": "s1", "created_at": "2026-10-23T09:00:00+00:00", "mode": "live", "exercise": "squat", "count": 8, "status": "ended"}
 main.system = types.SimpleNamespace(report=lambda days, mode: {"events": [event, asked], "sessions": [session]})
-print(main.export_csv(7, "live").body.decode("utf-8"))
+import sys
+sys.stdout.buffer.write(main.export_csv(7, "live").body)
 """
     text = run_main(tmp_path, code).lstrip("﻿")
     rows = list(csv.reader(io.StringIO(text)))
