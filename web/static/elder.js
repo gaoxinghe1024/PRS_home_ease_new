@@ -66,7 +66,9 @@ async function refresh(){
     const query=new URLSearchParams(location.search).get("event");
     const live=events.filter(e=>e.mode==="live");
     if(homeMode)live.sort((a,b)=>Number(b.level==="EMERGENCY")-Number(a.level==="EMERGENCY"));
-    const e=query?events.find(e=>e.id===query):(live[0]||(!homeMode&&events[0]));
+    // an event that nobody has asked yet comes first, so that an older emergency that was already asked cannot hide a new fall
+    const waiting=x=>voiceEnabled&&!recording&&x.inquiry.status==="not_started"&&!promptedEvents.has(x.id);
+    const e=query?events.find(e=>e.id===query):(live.find(waiting)||live[0]||(!homeMode&&events[0]));
     if(!recording){
       currentEvent=e||null;$("elderEvent").hidden=!e;
       if(e){$("elderEventMode").textContent=e.mode==="live"?"实时事件":"样例 / 回放";$("elderEventText").textContent=eventText(e);$("elderSafe").disabled=e.inquiry.status==="button_safe";$("elderInquiry").disabled=!profile.audio_consent||e.inquiry.status==="listening"||e.inquiry.status==="processing";}
