@@ -24,6 +24,7 @@ from fastapi.templating import Jinja2Templates
 from care import schemas
 from care.adapters.process import ModuleError
 from care.config import ROOT, RUNTIME, UPLOADS, LOGS, VIDEO, SIGNAL, AUDIO, EXERCISE, EXERCISES, prepare
+from care.i18n import translate
 from care.services import System, canonical_csv
 from care.storage import now
 
@@ -42,9 +43,27 @@ async def lifespan(app):
     await asyncio.to_thread(system.close)
 
 
-app = FastAPI(title="HomeEase 居家照护", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="HomeEase Home Care", version="1.0.0", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=ROOT / "web" / "static"), name="static")
 templates = Jinja2Templates(directory=ROOT / "web" / "templates")
+
+
+def english(value):
+    if isinstance(value, dict):
+        return {key: english(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [english(item) for item in value]
+    return translate(value)
+
+
+def english_openapi():
+    """The API document (/docs) in English, like the pages: Chinese data defaults are shown with their English text."""
+    if app.openapi_schema is None:
+        app.openapi_schema = english(FastAPI.openapi(app))
+    return app.openapi_schema
+
+
+app.openapi = english_openapi
 
 
 def check_access(headers, client_host):
@@ -128,7 +147,7 @@ def elder(request: Request):
 
 @app.get("/api/elder/context")
 def elder_context():
-    """长者端一次拿到需要的全部内容：称呼、房间、计划与今天的完成情况。"""
+    """Everything the older adult's page needs in one call: name, room, the plan and today's progress."""
     settings = system.store.settings()
     plan = system.store.exercise_plan()
     return {"resident": settings["resident"], "contacts": settings["contacts"],
@@ -137,7 +156,7 @@ def elder_context():
 
 @app.post("/api/elder/open")
 def elder_open():
-    """长者端打开即上报：只记录活动时间，用来解释「后台常驻」的自检状态。"""
+    """Reported when the older adult's page opens: only the time of activity is kept, to explain the self-check of background monitoring."""
     system.resident["last_open_at"] = now()
     return {"ok": True}
 
@@ -159,7 +178,7 @@ def status():
 
 @app.get("/api/algorithms")
 def algorithms():
-    """后台算法开关与此刻的实际运行状态。"""
+    """Background algorithm switches and what is actually running right now."""
     return system.algorithm_status()
 
 
@@ -187,7 +206,7 @@ def update_exercise_plan(body: schemas.ExercisePlan):
 
 @app.post("/api/plan/defer")
 def defer_exercise_plan(body: schemas.PlanDefer | None = None):
-    """长者端：今天先不做。只记下被跳过的日期，计划内容仍是照护者设定的样子。"""
+    """Older adult's page: "not today". Only the skipped dates are recorded; the plan stays as the caregiver set it."""
     return system.shift_plan((body.days if body else 1))
 
 
@@ -753,16 +772,16 @@ def export_csv(days: int = Query(default=7, ge=1, le=90), mode: str = Query(defa
     report = system.report(days, mode)
     data = io.StringIO(newline="")
     writer = csv.writer(data)
-    writer.writerow(["类型", "记录编号", "时间", "来源", "级别/动作", "处置/次数", "语音问询", "问询说明", "状态"])
+    writer.writerow(["Type", "Record ID", "Time", "Source", "Level / exercise", "Outcome / count", "Voice inquiry", "Inquiry note", "State"])
     safe = lambda value: "'" + str(value) if str(value).startswith(("=", "+", "-", "@", "\t", "\r")) else value
     for item in report["events"]:
         voice = item["voice"]
-        label = voice["label"] + (f" · {voice['detail']}" if voice["detail"] else "")
-        writer.writerow([safe(v) for v in ["事件", item["id"], item["created_at"], item["mode"], item["level"],
-                                           item["outcome"] or "", label, voice["reason"],
-                                           item["state"] + ("\uff08\u957f\u8005\u5df2\u64a4\u56de\uff09" if item.get("withdrawn") else "")]])
+        label = translate(voice["label"] + (f" · {voice['detail']}" if voice["detail"] else ""))
+        writer.writerow([safe(v) for v in ["Event", item["id"], item["created_at"], item["mode"], item["level"],
+                                           item["outcome"] or "", label, translate(voice["reason"]),
+                                           item["state"] + (" (withdrawn by the older adult)" if item.get("withdrawn") else "")]])
     for item in report["sessions"]:
-        writer.writerow([safe(v) for v in ["训练", item["session_id"], item["created_at"], item["mode"], item["exercise"],
+        writer.writerow([safe(v) for v in ["Training", item["session_id"], item["created_at"], item["mode"], item["exercise"],
                                            item.get("count", 0), "", "", item["status"]]])
     return Response("\ufeff" + data.getvalue(), media_type="text/csv; charset=utf-8", headers={"Content-Disposition": 'attachment; filename="homeease-report.csv"'})
 
