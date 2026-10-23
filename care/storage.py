@@ -19,9 +19,13 @@ ALGORITHM_DEFAULTS = {
     "hurdle_step": True,
 }
 DEFAULT_PLAN_ITEMS = ["chair_sit_to_stand", "squat", "standing_leg_raise", "hurdle_step"]
+# The interface is English, so are the defaults. A value an earlier version stored as its Chinese default (and nobody changed since)
+# reads as the English default; what a person typed is never touched.
+DEFAULT_ROOM, DEFAULT_RELATION, DEFAULT_PLAN_TITLE = "Living room", "Family", "Today's movement plan"
+LEGACY_DEFAULTS = {"客厅": DEFAULT_ROOM, "家属": DEFAULT_RELATION, "今天的运动计划": DEFAULT_PLAN_TITLE}
 PLAN_DEFAULTS = {
     "enabled": False,
-    "title": "今天的运动计划",
+    "title": DEFAULT_PLAN_TITLE,
     "note": "",
     "target_reps": 10,
     "items": [{"exercise": key, "target_reps": 10, "enabled": True} for key in DEFAULT_PLAN_ITEMS],
@@ -83,7 +87,7 @@ class Store:
                 );
             """)
             defaults = {
-                "resident": {"name": "", "room": "客厅", "notes": ""},
+                "resident": {"name": "", "room": DEFAULT_ROOM, "notes": ""},
                 "contacts": [], "audio_consent": False, "exercise_target": 10,
                 "escalation_seconds": 60, "webhook_url": "", "notification_test_at": None,
             }
@@ -114,7 +118,10 @@ class Store:
             row = conn.execute("SELECT payload FROM exercise_plans WHERE id=1").fetchone()
         if not row:
             return dict(PLAN_DEFAULTS)
-        return {**PLAN_DEFAULTS, **json.loads(row[0])}
+        plan = {**PLAN_DEFAULTS, **json.loads(row[0])}
+        if LEGACY_DEFAULTS.get(plan["title"]) == DEFAULT_PLAN_TITLE:
+            plan["title"] = DEFAULT_PLAN_TITLE
+        return plan
 
     def save_exercise_plan(self, value):
         with self.connection() as conn:
@@ -141,7 +148,14 @@ class Store:
 
     def settings(self):
         with self.connection() as conn:
-            return json.loads(conn.execute("SELECT value FROM settings WHERE id=1").fetchone()[0])
+            value = json.loads(conn.execute("SELECT value FROM settings WHERE id=1").fetchone()[0])
+        resident = value.get("resident") or {}
+        if LEGACY_DEFAULTS.get(resident.get("room")) == DEFAULT_ROOM:
+            resident["room"] = DEFAULT_ROOM
+        for contact in value.get("contacts") or []:
+            if LEGACY_DEFAULTS.get(contact.get("relation")) == DEFAULT_RELATION:
+                contact["relation"] = DEFAULT_RELATION
+        return value
 
     def home_monitoring(self):
         with self.connection() as conn:

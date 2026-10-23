@@ -8,7 +8,7 @@ class Model(BaseModel):
 
 
 class PlanDefer(Model):
-    """长者端「今天先不做」。``days`` 是往后顺延的天数（今天 1 天、今天加明天 2 天）。"""
+    """Older adult's page: "not today". ``days`` is how many days to skip (1: today, 2: today and tomorrow)."""
     days: int = Field(default=1, ge=1, le=7)
 
 
@@ -20,7 +20,7 @@ class Resident(Model):
 
 class Contact(Model):
     name: str = Field(min_length=1, max_length=60)
-    relation: str = Field(default="家属", max_length=30)
+    relation: str = Field(default="Family", max_length=30)
     phone: str = Field(min_length=3, max_length=40, pattern=r"^[+0-9 ()-]+$")
 
 
@@ -68,10 +68,10 @@ class SessionControl(Model):
 
 
 class AlgorithmSwitches(Model):
-    """后台算法总开关。键名与原算法编号一致，四种运动分别开关。
+    """Master switches of the background algorithms. Keys follow the original algorithm numbers; each of the four exercises has its own.
 
-    ``resident`` 为后台常驻：开启后，视频跌倒、加速度跌倒、运动检测都由后台
-    调度自动运行，不依赖任何页面是否打开。只决定是否启动原算法，不改变其判定。
+    ``resident`` is background monitoring: when on, video fall, acceleration fall and exercise detection are run by the background
+    scheduler, whether or not any page is open. It only decides whether the original algorithms start, never their decisions.
     """
     resident: bool = False
     vision: bool = True
@@ -83,7 +83,7 @@ class AlgorithmSwitches(Model):
 
 
 class AlgorithmUpdate(Model):
-    """部分更新：只提交被改动的那几个开关，其余保持不变。"""
+    """Partial update: send only the switches that changed; the others stay as they are."""
     resident: bool | None = None
     vision: bool | None = None
     accel: bool | None = None
@@ -100,9 +100,9 @@ class PlanItem(Model):
 
 
 class ExercisePlan(Model):
-    """照护者制定的每日运动计划，长者端按此逐项完成。"""
+    """The caregiver's daily exercise plan, which the older adult works through item by item."""
     enabled: bool = False
-    title: str = Field(default="今天的运动计划", max_length=60)
+    title: str = Field(default="Today's movement plan", max_length=60)
     note: str = Field(default="", max_length=300)
     target_reps: int = Field(default=10, ge=1, le=10000)
     items: list[PlanItem] = Field(default_factory=list, max_length=4)
@@ -137,17 +137,17 @@ class SampleAudio(Model):
 
 
 class RecordDelete(Model):
-    """删除勾选的记录；事件与训练各传各的编号，互不影响。"""
+    """Delete the selected records; events and training sessions are listed separately and do not affect each other."""
     event_ids: list[str] = Field(default_factory=list, max_length=5000)
     session_ids: list[str] = Field(default_factory=list, max_length=5000)
 
 
 class RecordClear(Model):
-    """清空当前报告范围；范围参数与 /api/reports 完全一致。
+    """Clear the current report scope; the scope parameters are exactly those of /api/reports.
 
-    ``confirm`` 必须是字面量 ``DELETE``：清空是整段范围内不可撤销的批量删除，
-    默认参数（近 7 天 live 全部事件与训练）一旦被误发就会把真实记录一起抹掉，
-    所以要求调用方明确写出确认词，而不是靠默认值。
+    ``confirm`` must be the literal ``DELETE``: clearing is an irreversible bulk delete of the whole scope, and the default parameters
+    (all live events and training of the last 7 days) sent by mistake would erase real records, so the caller has to write the
+    confirmation word instead of relying on a default.
     """
     mode: Literal["live", "replay"] = "live"
     days: int = Field(default=7, ge=1, le=90)
