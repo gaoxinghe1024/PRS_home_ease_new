@@ -28,6 +28,7 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 let currentEvent=null,settings=null,recording=false,stream=null,recorder=null,timer=null;
 let voiceEnabled=false;
 const promptedEvents=new Set();
+let shownEventId,pageChecked=false;
 document.addEventListener("DOMContentLoaded",()=>{
   if(homeMode){
     window.addEventListener("homeease:voice",event=>{voiceEnabled=event.detail.enabled;});
@@ -87,6 +88,12 @@ async function refresh(){
 const refreshStatus=refresh;
 refresh=async function(){
   await refreshStatus();
+  // a new event on the home page: bring its card into view, so that a call for help is not missed below the fold
+  if(homeMode&&currentEvent&&currentEvent.mode==="live"&&currentEvent.id!==shownEventId){
+    if(shownEventId!==undefined||pageChecked)$("elderEvent").scrollIntoView({behavior:"smooth",block:"start"});
+    shownEventId=currentEvent.id;
+  }
+  pageChecked=true;
   if(settings&&!settings.audio_consent){
     voiceEnabled=false;
     const toggle=$("enableVoiceInquiry");if(toggle)toggle.checked=false;
