@@ -19,6 +19,7 @@ from care.adapters.process import AlgorithmProcess, ModuleError
 from care.camera import CameraHub
 from care.config import EXERCISE, SIGNAL, VIDEO, RUNTIME, EXERCISES, ALGORITHM_KEYS
 from care.events import Events
+from care.i18n import translate
 from care.inquiry import NOT_ASKED, ANSWERED, HIGH_RISK, voice_inquiry
 from care.events import is_withdrawn, withdraw_status
 from care.records import Records
@@ -1033,9 +1034,12 @@ class System:
         with self.store.connection() as conn:
             rows = conn.execute("SELECT * FROM notifications WHERE kind='webhook' AND status IN ('queued','retry') AND next_at<=? ORDER BY created_at LIMIT 1", (time.time(),)).fetchall()
         for row in rows:
+            # The receiver gets the English interface text; the stored record keeps the original.
+            sent = json.loads(row["payload"])
+            sent.update({key: translate(sent[key]) for key in ("title", "message") if key in sent})
             try:
                 with httpx.Client(timeout=5, follow_redirects=False) as client:
-                    response = client.post(destination, json=json.loads(row["payload"]), headers={"Idempotency-Key": row["id"]})
+                    response = client.post(destination, json=sent, headers={"Idempotency-Key": row["id"]})
                     response.raise_for_status()
                 state = "delivered"
             except Exception:

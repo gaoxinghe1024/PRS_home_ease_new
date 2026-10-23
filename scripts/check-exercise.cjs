@@ -4,8 +4,7 @@ const path = require('path');
 const assert = require('assert');
 
 const base = process.env.HOMEEASE_TEST_URL || 'http://127.0.0.1:8012';
-const language = process.env.HOMEEASE_TEST_LANG || 'zh';
-const suffix = language === 'zh' ? '' : `-${language}`;
+const suffix = '';  // the interface is English only
 const out = path.resolve(__dirname, '../artifacts/browser');
 fs.mkdirSync(out, {recursive: true});
 
@@ -42,7 +41,6 @@ async function layout(page) {
 (async () => {
   const browser = await chromium.launch({headless: true});
   const page = await browser.newPage({viewport: {width: 1440, height: 1000}});
-  await page.addInitScript(lang => localStorage.setItem('homeease.lang', lang), language);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const results = {};
@@ -52,7 +50,7 @@ async function layout(page) {
     const angleNotice = page.locator('.exercise-angle-notice');
     assert((await angleNotice.innerText()).includes('45'));
     assert(Number(await angleNotice.locator('strong').evaluate(el => getComputedStyle(el).fontWeight)) >= 700);
-    if (language === 'en') assert(!/[\u4e00-\u9fff]/.test(await angleNotice.innerText()));
+    assert(!/[\u4e00-\u9fff]/.test(await angleNotice.innerText()));
     assert.strictEqual(await page.locator('#exerciseGuide').getAttribute('data-exercise-guide'), 'chair_sit_to_stand');
     for (const [exercise, count] of Object.entries({chair_sit_to_stand: 9, squat: 10, standing_leg_raise: 10, hurdle_step: 10})) {
       await page.locator('#exerciseSource').selectOption('replay');
@@ -61,10 +59,8 @@ async function layout(page) {
       assert.strictEqual(await page.locator('#exerciseGuide ol li').count(), 3);
       await page.waitForFunction(() => document.querySelector('#exerciseGuide img').naturalWidth === 780);
       assert((await page.locator('#exerciseGuide .exercise-camera-guide').textContent()).includes('45'));
-      if (language === 'en') {
-        await page.waitForTimeout(100);
-        assert(!/[\u4e00-\u9fff]/.test(await page.locator('#exerciseGuide').innerText()), 'untranslated exercise guide');
-      }
+      await page.waitForTimeout(100);
+      assert(!/[\u4e00-\u9fff]/.test(await page.locator('#exerciseGuide').innerText()), 'untranslated exercise guide');
       if (exercise === 'standing_leg_raise') {
         await page.evaluate(() => window.scrollTo(0, 0));
         await page.screenshot({path: path.join(out, `exercise-guide-desktop${suffix}.png`), fullPage: true});

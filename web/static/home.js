@@ -105,7 +105,7 @@
       return `<li class="home-plan-item ${item.done ? "is-done" : ""}">
         <button type="button" class="home-plan-button" data-plan-start="${item.exercise}" ${item.disabled ? "disabled" : ""} aria-label="${item.done ? "再做一次" : "开始"}${names[item.exercise]}">
           <span class="home-plan-order">${item.done ? icon("circle-check") : index + 1}</span>
-          <img src="/static/media/${item.exercise}-guide.png" alt="${names[item.exercise]}动作示意">
+          <img src="/static/media/${item.exercise}-guide.png" alt="${names[item.exercise]} 动作示意">
           <span class="home-plan-copy"><strong>${names[item.exercise]}</strong><small>${item.disabled ? "该动作检测已关闭，请联系家属" : `${state} · 目标 ${item.target_reps} 次`}</small>
             <span class="home-plan-bar"><span style="width:${percent}%"></span></span></span>
           <span class="home-plan-go">${item.done ? "再做一次" : item.reps ? "继续" : "开始"}${icon("arrow-right")}</span>

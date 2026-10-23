@@ -21,7 +21,7 @@ async function until(fn, predicate, timeout=90000) {
 }
 async function layout(page, label) {
   await page.waitForTimeout(350);
-  assert(await page.locator('.home-header .lang-toggle').isVisible(),`${label}: missing language control`);
+  assert.strictEqual(await page.locator('.lang-toggle').count(),0,`${label}: the interface is English only, no language control`);
   const result=await page.evaluate(()=>({
     overflow:document.documentElement.scrollWidth>innerWidth+1,
     images:Array.from(document.images).filter(el=>el.offsetWidth&&el.getAttribute('src')&&(!el.complete||!el.naturalWidth)).map(el=>el.src),
@@ -121,8 +121,7 @@ async function layout(page, label) {
     results.workflows.automaticInquiryAndWithdrawal=true;
     await page.waitForFunction(()=>app.audioSocket?.readyState===1,null,{timeout:45000});
     await page.request.post(`${base}/api/events/${event.id}/action`,{data:{action:'resolve',outcome:'safe'}});
-    for(const language of ['zh','en']) {
-      await page.evaluate(lang=>localStorage.setItem('homeease.lang',lang),language);
+    for(const language of ['en']) {
       await page.reload();await page.waitForFunction(()=>app.ready);
       for(const width of [1440,820,390,320]) {
         await page.setViewportSize({width,height:width===390?844:1000});
