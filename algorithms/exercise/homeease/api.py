@@ -1,6 +1,5 @@
-"""Versioned local HTTP contract. One worker owns in-memory session state."""
+"""Versioned local HTTP contract; one worker owns the in-memory session state."""
 import hashlib
-import json
 import threading
 import uuid
 from collections import OrderedDict
@@ -139,7 +138,7 @@ def create_app(predictor=None):
 
     @app.middleware("http")
     async def limit_body(request: Request, call_next):
-        # Buffer with an upper bound; protects chunked bodies as well as Content-Length.
+        # Bounded buffering also covers chunked bodies, which carry no Content-Length.
         payload = bytearray()
         async for chunk in request.stream():
             payload.extend(chunk)

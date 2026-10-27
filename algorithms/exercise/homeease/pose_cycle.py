@@ -1,8 +1,8 @@
-"""Visible endpoint evidence for explicitly selected camera training.
+"""Visible endpoint evidence for the two exercises counted from explicit camera training.
 
-The learned action/phase posteriors remain available unchanged. This policy
-supplies movement phases to the existing ordered counter for two exercises
-whose transitions are poorly represented by the camera-domain classifier.
+The learned action/phase posteriors stay untouched; this policy only supplies
+movement phases to the ordered counter, for exercises whose transitions the
+camera-domain classifier represents poorly.
 """
 import numpy as np
 
@@ -40,14 +40,14 @@ class PoseCyclePhases:
             if stage <= 0:
                 self.side = int(np.argmin(p[[10, 11], 1])) if ankle_delta >= .15 else None
             side = self.side
-            # A single leg stays selected until both feet return to the floor.
+            # One leg stays selected until both feet are back on the floor.
             level = float((p[11 - side, 1] - p[10 + side, 1]) / torso) if side is not None else 0.
             straight = side is not None and knees[side] >= 135 and knees[1 - side] >= 140
             peak = straight and level >= .3
             departure = straight and level >= .15
             returning = self.peak is not None and level <= self.peak - .12
             if side is not None and (level < -.15 or (level >= .2 and knees[side] < 120)):
-                # Bent-knee steps cannot finish a straight-leg repetition.
+                # A bent knee cannot finish a straight-leg repetition.
                 return "other"
 
         if stage < 0:
@@ -70,7 +70,6 @@ class PoseCyclePhases:
             return "outbound" if departure else "rest"
         if stage == 1:
             if rest:
-                # A half movement returned without reaching the endpoint.
                 self.reset()
                 return "other"
             if peak:

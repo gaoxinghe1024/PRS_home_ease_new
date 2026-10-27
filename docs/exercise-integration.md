@@ -63,7 +63,7 @@ The model's action and phase probabilities are still computed and stored: `model
 
 ## Integration fixes
 
-- **Uploaded video** used to go through BGR decode, JPEG encode and JPEG decode before pose estimation. The worker now decodes frames directly and submits raw BGR, like the original `scripts/run_video.py`, keeping the file's frame rate and timestamps (keypoint error 0 on spot checks).
+- **Uploaded video** used to go through BGR decode, JPEG encode and JPEG decode before pose estimation. The worker now decodes frames directly and submits raw BGR, like the original `video` stage (`pipeline/replay.py`), keeping the file's frame rate and timestamps (keypoint error 0 on spot checks).
 - **Shared camera.** One process opens each camera and passes raw BGR frames to both the video and exercise algorithms through shared memory (keypoint error 0 against the original pose model). Frames older than the session start are skipped, which removed duplicate 0 ms timestamps; camera hand-over between video monitoring and exercise sessions rebinds the owner without reopening the device.
 - **Diagnostics survive control actions.** Pause, resume, end and snapshots keep the latest input diagnostics (keypoint completeness, missing joints, sampling rate, largest gap, interruptions, continuous valid duration). Diagnostics never take part in inference or counting.
 - **UI.** The page shows the confidence of the eight required joints and a five-step progress indicator driven by the counter's read-only `counter_stage`; the count shown is always the API's `count`. "Body visible, selected exercise not yet recognized" is shown separately from input problems.

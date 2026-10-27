@@ -1,41 +1,28 @@
-"""Optimize three strong temporal architectures without changing labels/splits.
-
-Training reads only train/validation arrays. The locked validation winner is
-written before --finalize accesses test arrays. Baselines remain archived.
-"""
-import argparse
-import copy
+"""Second-round optimization: three candidates, locked validation winner, then one test pass."""
 import csv
 import hashlib
 import json
 import shutil
-import sys
 import time
-from pathlib import Path
 
 import numpy as np
 import torch
 from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader, Dataset
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-from homeease.features import extract_sequence, FEATURE_DIMS
+from homeease.features import extract_sequence
 from homeease.models import build_model
-from scripts.prepare_data import project
-from scripts.train_compare import seeds, windows, replay, count_metrics
-from scripts.evaluate_select import evaluate, action_predictions
 
-CONFIGS = [
-    {"name": "opt_tcn_b4_w48", "kind": "tcn", "width": 48, "blocks": 4, "context": 96},
-    {"name": "opt_tcn_b5_w48", "kind": "tcn", "width": 48, "blocks": 5, "context": 128},
-    {"name": "opt_gru_b2_w64", "kind": "gru", "width": 64, "blocks": 2, "context": 96},
-]
+from .common import ROOT, seeds
+from .config import LABEL_SOURCE, MOVEMENTS, OPTIMIZED_CONFIGS, PROJECTION_ANGLES
+from .data import project
+from .metrics import action_predictions, count_metrics, cpu_benchmark, evaluate, replay, windows
+
 OUT = ROOT / "reports/optimization"
 
 
 class CausalWindowDataset(Dataset):
-    """Keep source sequences once; materialize only the requested batch windows."""
+    """Store each source sequence once and slice the requested windows per batch."""
     def __init__(self, sequences, mean, std, context, stride=12):
         self.context = context
         self.sequences = [((x - mean) / std, y) for x, y in sequences]
@@ -55,6 +42,14 @@ class CausalWindowDataset(Dataset):
         if len(yy) < 8:
             yy = np.pad(yy, (8 - len(yy), 0), mode="edge")
         return torch.from_numpy(xx), torch.from_numpy(yy)
+
+
+def load():
+    torch.set_num_threads(4)
+    OUT.mkdir(parents=True, exist_ok=True)
+    records = json.loads((ROOT / "data/processed/records.json").read_text())
+    skeletons = np.load(ROOT / "data/processed/skeletons.npz")
+    return records, skeletons
 
 
 def predict(model, x, mean, std, context, device, stride=1):
@@ -84,23 +79,7 @@ def data_for(records, skeletons, split):
 
 
 def sessions_for(records, skeletons, split):
-    return sum([replay(skeletons, records, split, m) for m in ["m05", "m01", "m06", "m02", "m07"]], [])
-
-
-def cpu_benchmark(model, dimension, context):
-    model = copy.deepcopy(model).cpu().eval()
-    sample = torch.zeros(1, context, dimension)
-    elapsed = []
-    with torch.inference_mode():
-        for _ in range(40):
-            model(sample)
-        for _ in range(300):
-            start = time.perf_counter()
-            model(sample)
-            elapsed.append((time.perf_counter() - start) * 1000)
-    parameters = sum(p.numel() for p in model.parameters())
-    return {"cpu_p50_ms": float(np.median(elapsed)), "cpu_p95_ms": float(np.quantile(elapsed, .95)),
-            "parameters": parameters, "weight_kib": parameters * 4 / 1024}
+    return sum([replay(skeletons, records, split, m) for m in MOVEMENTS], [])
 
 
 def archive_baseline():
@@ -113,9 +92,9 @@ def archive_baseline():
     shutil.copy2(ROOT / "artifacts/selected.json", archive / "selected.json")
 
 
-def train(args, records, skeletons):
+def train(records, skeletons, epochs=80, seed=2026, only=None):
     archive_baseline()
-    seeds(args.seed)
+    seeds(seed)
     training = []
     for r in records:
         if r["split"] != "train":
@@ -130,9 +109,9 @@ def train(args, records, skeletons):
                 pose = pose[:, [1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]]
             training.append((extract_sequence(pose, mode="stable80"), labels))
     print(f"Prepared {len(training)} augmented clips", flush=True)
-    # Train on cross-repetition histories as well as original isolated clips.
+    # Repetitions that follow each other are part of the deployment input, so train on them too.
     for session in sessions_for(records, skeletons, "train"):
-        for angle in [25, 45, 65]:
+        for angle in PROJECTION_ANGLES:
             training.append((extract_sequence(project(session["skel"], angle), mode="stable80"), session["labels"]))
     print(f"Prepared training clips plus sessions: {len(training)} sequences", flush=True)
     values = np.concatenate([x for x, _ in training])
@@ -148,22 +127,22 @@ def train(args, records, skeletons):
     action_weights = torch.tensor((1 / np.bincount(all_labels // 4, minlength=5)) ** .35, device=device, dtype=torch.float32)
     action_weights /= action_weights.mean()
     existing = json.loads((OUT / "validation.json").read_text()) if (OUT / "validation.json").exists() else []
-    for cfg in CONFIGS:
-        if args.only and cfg["name"] not in args.only:
+    for cfg in OPTIMIZED_CONFIGS:
+        if only and cfg["name"] not in only:
             continue
-        config = {"features": "stable80", "hierarchical": True, "dropout": .15, "seed": args.seed, **cfg}
-        seeds(args.seed)
+        config = {"features": "stable80", "hierarchical": True, "dropout": .15, "seed": seed, **cfg}
+        seeds(seed)
         context = cfg["context"]
         dataset = CausalWindowDataset(training, mean, std, context)
         loader = DataLoader(dataset, batch_size=128, shuffle=True, num_workers=0)
         print(f"Training {cfg['name']}: {len(dataset)} lazy windows", flush=True)
         model = build_model(config, 80).to(device)
         optimizer = torch.optim.AdamW(model.parameters(), lr=.0015, weight_decay=.005)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs, eta_min=.00005)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, epochs, eta_min=.00005)
         best_key, best_state, best_decoder, best_epoch = None, None, None, None
         history, stale = [], 0
         started = time.perf_counter()
-        for epoch in range(1, args.epochs + 1):
+        for epoch in range(1, epochs + 1):
             model.train()
             total = 0.
             for x, y in loader:
@@ -182,7 +161,7 @@ def train(args, records, skeletons):
                 optimizer.step()
                 total += loss.item()
             scheduler.step()
-            if epoch % 5 == 0 or epoch == args.epochs:
+            if epoch % 5 == 0 or epoch == epochs:
                 model.eval()
                 probs = [predict(model, x, mean, std, context, device, stride=3) for x, _ in val]
                 truth = np.concatenate([y[::3] for _, y in val])
@@ -207,7 +186,7 @@ def train(args, records, skeletons):
         model.eval()
         package = {"config": config, "state_dict": best_state, "mean": mean.tolist(), "std": std.tolist(),
                    "context_frames": context, "fps": 30, "input_dim": 80, "num_classes": 17,
-                   "label_source": "weak_kinematic_offline_v2", "best_epoch": best_epoch}
+                   "label_source": LABEL_SOURCE, "best_epoch": best_epoch}
         torch.save(package, ROOT / "artifacts" / f"{cfg['name']}.pt")
         phase = np.concatenate([predict(model, x, mean, std, context, device) for x, _ in val])
         truth = np.concatenate([y for _, y in val])
@@ -222,7 +201,7 @@ def train(args, records, skeletons):
         (OUT / "validation.json").write_text(json.dumps(existing, indent=2), encoding="utf-8")
         np.savez_compressed(OUT / f"{cfg['name']}_validation_probabilities.npz", phase=phase, truth=truth, **{f"session_{i}": p for i, p in enumerate(sp)})
         print(f"FINISHED {cfg['name']} val_MAE={row['validation']['count_mae']:.2f} phase={row['validation']['phase_macro_f1']:.4f} CPU={row['cpu_p50_ms']:.3f}ms", flush=True)
-    lock_selection(existing, args.seed, "training_decoder_grid")
+    lock_selection(existing, seed, "training_decoder_grid")
 
 
 def lock_selection(rows, seed, stage):
@@ -337,27 +316,3 @@ def finalize(records, skeletons):
     selected["members"] = [f"{lock['model']}.pt"]
     selected["optimization_selection_lock"] = "reports/optimization/selection_lock.json"
     (ROOT / "artifacts/selected.json").write_text(json.dumps(selected, indent=2), encoding="utf-8")
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=80)
-    parser.add_argument("--seed", type=int, default=2026)
-    parser.add_argument("--only", nargs="*")
-    parser.add_argument("--finalize", action="store_true")
-    parser.add_argument("--calibrate", action="store_true")
-    args = parser.parse_args()
-    torch.set_num_threads(4)
-    OUT.mkdir(parents=True, exist_ok=True)
-    records = json.loads((ROOT / "data/processed/records.json").read_text())
-    skeletons = np.load(ROOT / "data/processed/skeletons.npz")
-    if args.finalize:
-        finalize(records, skeletons)
-    elif args.calibrate:
-        calibrate(records, skeletons)
-    else:
-        train(args, records, skeletons)
-
-
-if __name__ == "__main__":
-    main()
