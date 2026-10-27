@@ -1,0 +1,7 @@
+# Algorithm 1 (accelerometer branch): inference and training dependencies.
+# Inside HomeEase they are covered by the root requirements.txt.
+numpy
+scipy
+scikit-learn
+xgboost
+joblib

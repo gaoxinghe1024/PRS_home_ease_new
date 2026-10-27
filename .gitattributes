@@ -1,1 +1,17 @@
-* -text
+# Text files are stored with LF line endings.
+* text=auto eol=lf
+
+# Model weights, data and media
+*.pt binary
+*.pkl binary
+*.onnx binary
+*.bin binary
+*.npz binary
+*.joblib binary
+*.png binary
+*.gif binary
+*.jpg binary
+*.mp4 binary
+*.avi binary
+*.wav binary
+*.docx binary

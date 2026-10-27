@@ -1,0 +1,25 @@
+<section id="page-home" class="page">
+  <div class="home-greeting"><div><p id="elderDate" class="muted"></p><h1 id="elderGreeting">Hello</h1></div><i data-lucide="sun"></i></div>
+  <section id="homePlan" class="home-plan" hidden aria-labelledby="homePlanTitle">
+    <div class="home-plan-head"><div><span class="home-plan-eyebrow">Set by your caregiver</span><h2 id="homePlanTitle">Today's movement plan</h2><p id="homePlanNote" class="muted"></p></div><span class="badge green" id="homePlanCount">0 / 0 Completed</span></div>
+    <ol id="homePlanItems" class="home-plan-items"></ol>
+    <div class="home-plan-foot"><span id="homePlanHint" class="muted">Start in order; each item is ticked off automatically</span><div class="button-row"><label class="home-plan-days"><span>Rest</span><select id="homePlanDeferDays" aria-label="Days without training"><option value="1">today</option><option value="2">today and tomorrow</option><option value="3">three days</option></select></label><button type="button" class="button secondary" id="homePlanDefer"><i data-lucide="calendar-clock"></i>Skip</button><a href="#exercise" class="button primary" id="homePlanStart"><i data-lucide="play"></i>Start exercise</a></div></div>
+  </section>
+  <div class="home-family"><span id="elderExerciseCount">0 sessions</span><a href="/#reports" target="_blank" rel="noopener"><i data-lucide="chart-no-axes-combined"></i>Reports for family<i data-lucide="arrow-up-right"></i></a></div>
+  <div id="elderContacts" class="elder-contacts"></div>
+</section>
+<section id="page-safety" class="page" hidden>
+  <div class="page-title"><div><h1>Home Monitoring</h1><p id="homeSafetyStatus">Starting monitoring</p></div><span class="badge amber" id="homeGuardBadge">Connecting</span></div>
+  <div class="home-safety-layout">
+    <div class="home-camera"><img id="homeFrame" alt="Live home camera" hidden><div id="homeCameraEmpty"><i data-lucide="video"></i><span>Waiting for camera</span></div><span class="home-camera-label"><span class="dot green"></span><span id="homeRoom">Living room</span></span></div>
+    <div class="home-channels" aria-label="Monitoring status">
+      <div><i data-lucide="video"></i><span>Fall detection</span><strong id="homeVideoState">Waiting for connection</strong></div>
+      <div><i data-lucide="mic"></i><span>Sound and help</span><strong id="homeAudioState">Waiting for connection</strong></div>
+      <div><i data-lucide="speech"></i><span>Voice inquiry</span><strong id="homeInquiryState">Waiting for connection</strong></div>
+      <div><i data-lucide="activity"></i><span>Motion sensor</span><strong id="homeSensorState">Not connected</strong></div>
+    </div>
+  </div>
+  <div id="homeAudioNotice" class="home-permission" hidden><i data-lucide="mic-off"></i><div><strong id="homeAudioReason">Microphone permission needed</strong><p id="homeAudioPrivacy">Allow local audio processing, Raw audio and transcripts are not stored.</p></div><button id="homeAllowAudio" class="button primary"><i data-lucide="mic"></i><span>Allow microphone</span></button></div>
+  <p class="home-runtime-note">Video monitoring continues while the local service runs. Sound and voice inquiry require this page to stay open with an available microphone. Monitoring stops when the computer sleeps or shuts down.</p>
+  <details class="home-devices"><summary>Camera settings</summary><label>Camera number<input id="homeCameraIndex" type="number" value="0" min="0" max="10"></label><button id="homeCameraApply" class="button secondary"><i data-lucide="check"></i>Apply</button></details>
+</section>

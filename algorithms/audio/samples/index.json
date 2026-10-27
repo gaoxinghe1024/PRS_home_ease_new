@@ -1,0 +1,128 @@
+{
+ "scenes": [
+  {
+   "id": "scene_glass_break",
+   "file": "scene_glass_break.wav",
+   "title": "\u73bb\u7483\u788e\u88c2",
+   "note": "20 s: a quiet home; breaking glass between 8 and 13 s (labelled ABNORMAL). The model recalls ABNORMAL poorly (about 0.41), so this is mostly labelled DAILY or UNKNOWN: a known limit.",
+   "title_en": "Glass breaking"
+  },
+  {
+   "id": "scene_tv_and_knock",
+   "file": "scene_tv_and_knock.wav",
+   "title": "\u7535\u89c6\u548c\u6572\u95e8\u58f0",
+   "note": "20 s: someone speaks on the television from 3 to 6 s (not the person's reply) and a knock sounds from 18 to 23 s (labelled IMPACT). The washing machine runs in the background. Sound labels are only a hint and never raise an alarm.",
+   "title_en": "Television and a knock"
+  },
+  {
+   "id": "scene_quiet_home",
+   "file": "scene_quiet_home.wav",
+   "title": "\u5b89\u9759\u7684\u5bb6",
+   "note": "20 s: washing-machine background and one everyday sound (labelled DAILY). It should not be labelled HELP, IMPACT or ABNORMAL.",
+   "title_en": "A quiet home"
+  },
+  {
+   "id": "scene_fall_help_call",
+   "file": "scene_fall_help_call.wav",
+   "title": "\u6454\u5012\u540e\u558a\u6551\u547d",
+   "note": "24 s: an impact and a scream; from 9 to 12 s the person says \"Help me, I fell and I cannot get up.\" The spoken-help detector should raise an alarm at about second 9.",
+   "title_en": "Calling for help after a fall"
+  },
+  {
+   "id": "scene_fall_reassured",
+   "file": "scene_fall_reassured.wav",
+   "title": "\u6454\u5012\u540e\u8bf4\"\u6211\u6ca1\u4e8b\"",
+   "note": "24 s: an impact, then the person says \"I'm fine, don't worry.\" The reply is read as REASSURANCE, and the spoken-help detector does not raise an alarm.",
+   "title_en": "Saying \"I'm fine\" after a fall"
+  },
+  {
+   "id": "scene_fall_visitor_reply",
+   "file": "scene_fall_visitor_reply.wav",
+   "title": "\u8bbf\u5ba2\u66ff\u8001\u4eba\u56de\u7b54",
+   "note": "24 s: an impact, then another voice (a visitor) says \"Don't worry, she is fine.\" The words are reassuring; without an enrolled voiceprint the system cannot tell who spoke.",
+   "title_en": "A visitor answers for the person"
+  }
+ ],
+ "replies": [
+  {
+   "id": "reply_help_en",
+   "file": "reply_help_en.wav",
+   "title": "\u558a\u6551\u547d(\u82f1\u6587)",
+   "said": "Help me! I fell and I can't get up.",
+   "note": "The reply is read as HELP. The spoken-help detector raises an alarm too; the recording may split the sentence in two, and the second part then shows cooldown.",
+   "title_en": "Calling for help (English)"
+  },
+  {
+   "id": "reply_help_zh",
+   "file": "reply_help_zh.wav",
+   "title": "\u558a\u6551\u547d(\u4e2d\u6587)",
+   "said": "\u6551\u547d\u554a,\u6211\u6454\u5012\u4e86,\u8d77\u4e0d\u6765\u4e86\u3002",
+   "note": "Should be read as HELP; the spoken-help detector should raise an alarm.",
+   "title_en": "Calling for help (Chinese)"
+  },
+  {
+   "id": "reply_fine_en",
+   "file": "reply_fine_en.wav",
+   "title": "\u6211\u6ca1\u4e8b(\u82f1\u6587)",
+   "said": "I'm fine, don't worry.",
+   "note": "Should be read as REASSURANCE. Without an enrolled voiceprint a valid cancel depends only on the words and the recogniser confidence.",
+   "title_en": "\"I'm fine\" (English)"
+  },
+  {
+   "id": "reply_fine_zh",
+   "file": "reply_fine_zh.wav",
+   "title": "\u6211\u6ca1\u4e8b(\u4e2d\u6587)",
+   "said": "\u6211\u6ca1\u4e8b,\u4e0d\u7528\u62c5\u5fc3\u3002",
+   "note": "Should be read as REASSURANCE.",
+   "title_en": "\"I'm fine\" (Chinese)"
+  },
+  {
+   "id": "reply_visitor_fine",
+   "file": "reply_visitor_fine.wav",
+   "title": "\u8bbf\u5ba2\u8bf4\"\u5979\u6ca1\u4e8b\"",
+   "said": "Don't worry, she is fine.",
+   "note": "The words are reassuring, so this is read as REASSURANCE; without an enrolled voiceprint nothing proves who said it.",
+   "title_en": "A visitor says \"she is fine\""
+  },
+  {
+   "id": "reply_fine_but_stuck",
+   "file": "reply_fine_but_stuck.wav",
+   "title": "\"\u6ca1\u4e8b,\u4f46\u662f\u8d77\u4e0d\u6765\"",
+   "said": "I'm fine, but I can't get up.",
+   "note": "A mixed sentence: the cue for help wins, so it should be read as HELP.",
+   "title_en": "\"I'm fine, but I can't get up\""
+  },
+  {
+   "id": "reply_other_en",
+   "file": "reply_other_en.wav",
+   "title": "\u65e0\u5173\u7684\u8bdd",
+   "said": "Okay, I will make some tea later.",
+   "note": "Should be read as OTHER: neither reassurance nor a call for help, so it is not a valid cancel.",
+   "title_en": "An unrelated remark"
+  },
+  {
+   "id": "reply_thanks_en",
+   "file": "reply_thanks_en.wav",
+   "title": "\u611f\u8c22\u7684\u8bdd",
+   "said": "Thank you for your help.",
+   "note": "The reply rules only see the word help and read HELP. The spoken-help detector has its own filter for this (thanks, an offer, an ambulance in the news) and ignores it (not_a_call). The two paths differ on purpose.",
+   "title_en": "Thanks"
+  },
+  {
+   "id": "reply_tv_long",
+   "file": "reply_tv_long.wav",
+   "title": "\u7535\u89c6\u91cc\u7684\u957f\u53e5",
+   "said": "And in tonight's news, the city council has asked residents who need help with heating costs to call the support line, and a spokesperson said that volunteers will be ready to help families across the whole district this winter.",
+   "note": "A long sentence with the word help (over 6 s): the spoken-help detector ignores it (too_long); the reply rules still read HELP because of the word.",
+   "title_en": "A long sentence from television"
+  },
+  {
+   "id": "reply_silence",
+   "file": "reply_silence.wav",
+   "title": "\u6ca1\u6709\u56de\u7b54(3 \u79d2\u9759\u97f3)",
+   "said": "",
+   "note": "Should give NO_RESPONSE: nobody answered, which is not a cancel, so the event is raised.",
+   "title_en": "No answer (3 s of silence)"
+  }
+ ]
+}

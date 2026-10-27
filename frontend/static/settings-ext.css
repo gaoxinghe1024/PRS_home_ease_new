@@ -1,0 +1,117 @@
+/* Background algorithm switches, the movement-plan editor and the plan cards on the older adult's page.
+   Only the styles these new parts need; the palette and corner radii follow style.css / home.css. */
+
+/* ---------- Background algorithms: switch cards ---------- */
+.switch-list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.switch-card{padding:16px 0;border-bottom:1px solid var(--line);transition:opacity .15s}
+.switch-card small{line-height:1.7}
+.switch-card.is-off strong{color:var(--muted)}
+.switch-card.is-muted{opacity:.55}
+.switch-card:last-child{border-bottom:0}
+
+/* ---------- Background algorithms: current running state ---------- */
+.channel-status{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.channel-status-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line);background:#fff}
+.channel-status-row:last-child{border-bottom:0}
+.channel-status-row strong{display:block;font-size:13px;font-weight:600}
+.channel-status-row small{display:block;margin-top:4px;font-size:11px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}
+.blocker-list{margin-top:14px}
+.blocker-list:empty{display:none}
+.blocker-list p{display:flex;gap:9px;align-items:flex-start;font-size:12px;line-height:1.7;color:var(--amber);background:var(--amber-light);border-radius:4px;padding:10px 12px;margin-bottom:8px}
+.blocker-list svg{width:15px;height:15px;margin-top:2px}
+.resident-note{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:13px 14px;background:#f4f7f5;border-radius:5px;font-size:11px;line-height:1.8;color:var(--muted)}
+.resident-note svg{width:15px;height:15px;margin-top:3px;flex-shrink:0}
+
+/* ---------- Movement plan: caregiver editor ---------- */
+.plan-basics{margin-top:20px}
+.plan-editor{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.plan-item{display:grid;grid-template-columns:26px 92px minmax(0,1fr) 110px 96px;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.plan-order{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:11px;font-weight:600}
+.plan-item>img{width:92px;aspect-ratio:1.45;object-fit:contain;background:#eef3ef;border-radius:4px}
+.plan-item-copy strong{display:block;font-size:13px;font-weight:600}
+.plan-item-copy small{display:block;margin-top:5px;font-size:11px;color:var(--muted);line-height:1.7}
+.plan-count{display:flex;flex-direction:column;gap:5px;margin:0;font-size:11px;color:var(--muted)}
+.plan-count input{width:100%}
+.plan-include{display:flex;align-items:center;gap:7px;margin:0;font-size:11px;color:var(--muted)}
+.plan-include input{width:15px;height:15px;accent-color:var(--green)}
+.plan-actions{margin-top:18px}
+.plan-progress{display:flex;flex-direction:column;gap:10px}
+.plan-progress-row{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:5px;background:#fff}
+.plan-progress-row.is-done{background:var(--green-light);border-color:#cfe4d7}
+.plan-progress-row strong{display:block;font-size:13px;font-weight:600}
+.plan-progress-row small{display:block;margin-top:4px;font-size:11px;color:var(--muted)}
+.plan-progress-bar{height:5px;background:#e6ece8;border-radius:3px;overflow:hidden}
+.plan-progress-bar span{display:block;height:100%;background:var(--green);border-radius:3px;transition:width .3s}
+
+/* ---------- Workbench: marker for a switched-off movement ---------- */
+.exercise-option{position:relative}
+.exercise-option.is-disabled{opacity:.5}
+.exercise-option.is-disabled>img{filter:grayscale(1)}
+.exercise-off-badge{position:absolute;right:9px;top:9px;background:var(--amber-light);color:var(--amber);font-size:10px;line-height:1.4;padding:3px 7px;border-radius:4px}
+.exercise-guide.is-disabled{opacity:.55}
+
+/* ---------- Older adult page: plan cards on the home page ---------- */
+.home-plan{background:#fff;border:1px solid #dce6e0;border-radius:6px;padding:26px 28px 22px;margin-bottom:28px}
+.home-plan-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.home-plan-eyebrow{font-size:12px;letter-spacing:.05em;color:#8aa297}
+.home-plan-head h2{font-size:25px;margin-top:6px;color:#194c3e;line-height:1.35;overflow-wrap:anywhere}
+.home-plan-head p{font-size:15px;color:#6f7d78;margin-top:8px;line-height:1.7}
+.home-plan-items{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:12px}
+.home-plan-item{list-style:none}
+.home-plan-button{display:grid;grid-template-columns:34px 108px minmax(0,1fr) auto;align-items:center;gap:16px;width:100%;padding:12px;border:1px solid #e2e8e7;border-radius:6px;background:#fbfdfc;text-align:left;color:var(--ink)}
+.home-plan-button:hover{border-color:#88b7a3;background:#fff}
+.home-plan-button:disabled{opacity:.6;cursor:not-allowed}
+.home-plan-item.is-done .home-plan-button{background:#f0f7f3;border-color:#c9e3d0}
+.home-plan-order{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#e7f2ec;color:#167359;font-size:16px;font-weight:600}
+.home-plan-order svg{width:20px;height:20px}
+.home-plan-button>img{width:108px;aspect-ratio:1.45;object-fit:contain;background:#eef3ef;border-radius:5px}
+.home-plan-copy strong{display:block;font-size:19px;font-weight:600}
+.home-plan-copy small{display:block;margin-top:6px;font-size:14px;color:#728079}
+.home-plan-bar{display:block;height:6px;background:#e6ece8;border-radius:3px;overflow:hidden;margin-top:9px;max-width:320px}
+.home-plan-bar span{display:block;height:100%;background:#167359;border-radius:3px;transition:width .3s}
+.home-plan-go{display:flex;align-items:center;gap:6px;font-size:15px;color:#456bb4;white-space:nowrap}
+.home-plan-item.is-done .home-plan-go{color:#167359}
+.home-plan-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid #e7eeea}
+.home-plan-foot .muted{font-size:14px}
+.home-plan-foot>div.button-row{margin-left:auto}
+.home-plan-days{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:#6f7d78;width:auto;flex:0 0 auto;white-space:nowrap}
+.home-plan-days select{font:inherit;padding:0 6px;height:34px;border:1px solid #d7e2dc;border-radius:8px;background:#fff;color:#194c3e}
+/* On narrow screens the hint takes its own line; the day picker and both buttons share one line so no button wraps. */
+@media(max-width:760px){
+  .home-plan-foot{gap:10px}
+  .home-plan-foot>#homePlanHint{flex:1 0 100%}
+  .home-plan-foot>div.button-row{width:100%;margin-left:0;flex-wrap:nowrap !important;gap:8px}
+  .home-plan-days{flex:0 0 auto;font-size:13px;gap:4px}
+  .home-plan-days select{height:44px;padding:0 2px;width:78px}
+  .home-plan-foot>div.button-row>.button{flex:1 1 auto;min-width:0;padding:10px 8px;gap:4px;font-size:15px;white-space:nowrap}
+  .home-plan-foot>div.button-row>.button>span{white-space:nowrap}
+  .home-plan-foot>div.button-row>.button>svg{width:15px;height:15px}
+}
+.household .home-plan .button{min-height:50px;font-size:16px}
+.household .home-plan-head h2{font-size:27px}
+
+@media(max-width:900px){
+  .plan-item{grid-template-columns:24px 76px minmax(0,1fr) 96px;row-gap:10px}
+  .plan-include{grid-column:2/-1}
+}
+@media(max-width:760px){
+  .home-plan{padding:20px 18px 18px}
+  .home-plan-head h2{font-size:22px}
+  .home-plan-button{grid-template-columns:28px minmax(0,1fr) auto;gap:12px;padding:11px}
+  .home-plan-button>img{display:none}
+  .home-plan-copy strong{font-size:17px}
+  .home-plan-copy small{font-size:13px}
+  .home-plan-go{font-size:13px}
+  .plan-item{grid-template-columns:22px 60px minmax(0,1fr);gap:10px}
+  .plan-count,.plan-include{grid-column:2/-1}
+  .plan-progress-row{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}
+  .plan-progress-bar{grid-column:1/-1;order:3}
+}
+
+/* Very narrow screens (<=380px) drop the word "rest" and split the line evenly between both buttons, keeping all three controls on one line. */
+@media(max-width:380px){
+  .home-plan-days>span{display:none}
+  .home-plan-foot>div.button-row{gap:6px}
+  .home-plan-foot>div.button-row>.button{flex:1 1 0;padding:10px 4px;font-size:14px;gap:3px}
+  .home-plan-foot>div.button-row>.button>svg{width:14px;height:14px;flex:0 0 auto}
+}

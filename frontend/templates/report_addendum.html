@@ -1,0 +1,12 @@
+{% set channel_names = {'vision':'Video','accel':'Acceleration','audio':'Audio'} %}
+{% set delivery_names = {'queued':'Queued','retry':'Retrying','failed':'Send failed','delivered':'Delivered','seen':'Seen'} %}
+{% if event %}
+<h2>Monitoring coverage when the event occurred</h2>
+<table><thead><tr><th>Channel</th><th>Status</th><th>Reason</th><th>Start of this state</th></tr></thead><tbody>
+{% for c in event.channel_quality|default([]) %}<tr><td>{{ channel_names.get(c.channel,c.channel) }}</td><td>{{ {'active':'Valid','reduced':'Limited','unavailable':'Unavailable'}.get(c.state,c.state) }}</td><td>{{ c.reason }}</td><td><time>{{ c.started_at }}</time></td></tr>{% else %}<tr><td colspan="4">This historical record did not store the channel status</td></tr>{% endfor %}
+</tbody></table>
+{% endif %}
+<h2>Notification records</h2>
+<div class="table-wrap"><table><thead><tr><th>Channel / contact</th><th>Status / attempts</th><th>Queued at</th><th>Delivered at</th><th>Seen at</th></tr></thead><tbody>
+{% for n in notifications if n.event_id %}<tr><td>{{ 'In-app notification' if n.kind == 'inapp' else 'Webhook' }} / {{ n.contact.name if n.contact else 'Care workbench' }}</td><td>{{ delivery_names.get(n.status,n.status) }} / {{ n.attempts }}</td><td><time>{{ n.created_at }}</time></td><td>{% if n.delivered_at %}<time>{{ n.delivered_at }}</time>{% else %}--{% endif %}</td><td>{% if n.seen_at %}<time>{{ n.seen_at }}</time>{% else %}--{% endif %}</td></tr>{% else %}<tr><td colspan="5">No event notifications</td></tr>{% endfor %}
+</tbody></table></div>

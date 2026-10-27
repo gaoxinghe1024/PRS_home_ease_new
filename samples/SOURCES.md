@@ -14,5 +14,6 @@ original detectors are invoked independently; the system does not invent a
 fusion classifier. Follow the dataset authors' terms for redistribution and
 publication, and cite their work as listed on the source page.
 
-Exercise previews are rendered from the existing algorithm2 examples. Audio
-examples are read directly from algorithm3/algorithm3_handover/samples.
+Exercise previews are rendered from the existing Algorithm 2 examples
+(`algorithms/exercise/examples`). Audio examples are read directly from
+`algorithms/audio/samples`.

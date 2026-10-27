@@ -60,7 +60,7 @@ def main():
     (data_directory / "server-address.json").write_text(json.dumps({"url": f"http://{args.host}:{port}", "pid": os.getpid()}), encoding="utf-8")
     import uvicorn
     stop_file.unlink(missing_ok=True)
-    server = uvicorn.Server(uvicorn.Config("care.main:app", host=args.host, port=port, workers=1, log_level="info"))
+    server = uvicorn.Server(uvicorn.Config("backend.main:app", host=args.host, port=port, workers=1, log_level="info"))
     finished = threading.Event()
 
     def watch_stop():

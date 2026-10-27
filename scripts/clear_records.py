@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from care.config import RUNTIME
+from backend.config import RUNTIME
 
 
 def clear_history(root):

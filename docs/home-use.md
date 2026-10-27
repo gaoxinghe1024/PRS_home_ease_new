@@ -1,35 +1,31 @@
-# 家庭入口
+# Household Entry
 
-基于 GitHub main 的 ac728de 版本增加老人操作入口，保留该版本的算法1、算法2、算法3代码、模型和事件处置规则。
+The household entry (`/home`) is the simplified interface for the older adult. It reuses the code, models and event-handling rules of Algorithms 1, 2 and 3 unchanged.
 
-## 入口与操作
+## Pages
 
-| 地址 | 使用者与行为 |
+| Address | User and behaviour |
 | --- | --- |
-| `/home` | 老人首页，选择安心守护或运动训练 |
-| `/home#safety` | 自动开启视频跌倒守护，授权后自动连接声音监听和语音问询 |
-| `/home#exercise` | 原四种运动及动作说明，手动点击开始训练 |
-| `/#reports` | 家属原报告入口 |
-| `/` | 家属原照护工作台、事件处置、档案与设置 |
+| `/home` | older adult's home page: choose Home Monitoring or Exercise |
+| `/home#safety` | starts video fall monitoring automatically; once consent is given, sound listening and the voice inquiry connect automatically |
+| `/home#exercise` | the four exercises with movement guides; a session starts only when the older adult taps Start |
+| `/#reports` | family members' reports |
+| `/` | family members' care workbench: event handling, profile and settings |
 
-首次使用由家属填写资料和联系人，打开安心守护，确认摄像头能看到老人，再同意本地音频处理和浏览器麦克风权限。系统会区分视频已连接、未见人体、音频未授权、麦克风不可用和传感器未连接。允许音频不会改写已有联系人或档案。
+On first use a family member fills in the profile and contacts, opens Home Monitoring, checks that the camera can see the older adult, and then grants local audio processing and the browser's microphone permission. The system distinguishes video connected, no person in view, audio not authorized, microphone unavailable and sensor not connected. Granting audio never changes existing contacts or the profile.
 
-安心守护与运动在同一页面内切换，声音监听持续运行。开始运动时共享守护摄像头，暂停或结束运动只影响训练。家庭页面可主动求助、回答语音问询或按原规则撤回误触；告警仍由家属核实处理，不自动关闭。
+Home Monitoring and Exercise switch within the same page while sound listening keeps running. An exercise session shares the monitoring camera, and pausing or ending it only affects the session. From the household page the older adult can ask for help, answer the voice inquiry, or withdraw an accidental alarm under the original rules; alarms are still verified and handled by family members and never close by themselves.
 
-## 持续运行
+## Continuous operation
 
-- 视频守护意图与摄像头序号保存在 SQLite 的独立 `home_monitoring` 表。开启后由后台调度维持，不依赖画面预览或浏览器心跳。
-- 本机服务重启后等待原模型就绪，再恢复视频守护。输入中断后重试间隔为15秒，错误可在页面和状态接口查看。
-- 点击暂停会持久关闭自动恢复；再次选择安心守护或点击恢复会重新开启。原工作台的视频停止按钮同样关闭自动恢复。
-- 已开启家庭视频守护时，原工作台不能直接用回放替换实时摄像头，需要先暂停守护。
-- 声音与自动问询使用浏览器麦克风、原算法3联合监听及问询接口，页面需保持打开。取得权限后刷新可恢复；权限拒绝或找不到设备时展示原因，等待手动重连，避免循环请求权限。
-- 问询播放期间暂时静音连续监听输入，避免扬声器播出的问询被当成用户求助；回答录音使用麦克风克隆轨道，结束时不关闭连续监听。
-- 页面尽可能请求屏幕常亮，但电脑休眠、关机或服务停止均无法监测。加速度分支仍需原传感器入口或外部客户端持续输入。
+- The monitoring intent and the camera index are stored in a separate SQLite table, `home_monitoring`. Once on, the background scheduler keeps it running without depending on a preview or a browser heartbeat.
+- After a restart of the local service, video monitoring resumes once the original models are ready. After an input interruption it retries every 15 seconds, and errors are shown on the page and in the status API.
+- Pause turns automatic recovery off persistently; choosing Home Monitoring again or tapping Resume turns it back on. The video stop button of the workbench also turns automatic recovery off.
+- While household video monitoring is on, the workbench cannot replace the live camera with a replay; pause monitoring first.
+- Sound listening and the automatic inquiry use the browser microphone with the joint listening and inquiry interfaces of the original Algorithm 3, so the page must stay open. After permission is granted, reloading the page recovers it; when permission is denied or no device is found, the reason is shown and the page waits for a manual reconnect instead of asking for permission in a loop.
+- While the question is being played, continuous listening is muted so the question from the speaker is not taken as a call for help; the answer is recorded from a cloned microphone track, and continuous listening keeps running afterwards.
+- The page asks the screen to stay awake where possible, but nothing can be monitored while the computer sleeps, is shut down or the service is stopped. The accelerometer branch still needs continuous input from the sensor page or an external client.
 
-## 验证
+## Validation scope
 
-后端用 `tests/test_home_monitoring.py` 检查开关保存、重启恢复、限速重试、暂停、摄像头切换、训练独立、模型后台恢复和授权资料保留。`npm run test:home` 使用独立运行目录与真实服务，验证家庭入口、浏览器测试麦克风、真实摄像头共享、语音问询、暂停重连、权限拒绝，以及中英文桌面和手机布局。
-
-2026-10-17：系统58项测试通过，家庭浏览器9组流程通过，1440、820、390、320像素宽度的中英文页面及授权拒绝提示共28个布局检查通过。独立服务重启后恢复已保存的视频守护，临时终止视频模型进程后恢复摄像头处理。算法完整性检查116项无变化。机器可读记录见 `artifacts/home_monitoring_validation.json`，截图保留在本机忽略目录 `artifacts/browser/`。
-
-摄像头测试要求服务以能访问相机的 Windows 用户运行；浏览器使用测试麦克风音源，因此不代表真人语音识别准确率验收。长期家庭设备稳定性和实际告警送达仍需现场验证。
+During development the household entry was tested end to end with an isolated data folder and a real server: switch persistence, recovery after restart, rate-limited retries, pausing, camera switching, independent exercise sessions, background model recovery, shared camera use, the voice inquiry and denied permissions, at desktop and phone widths. Browser tests used a synthetic microphone source, so they are not an acceptance test of speech recognition with real voices. Long-term stability on household devices and real alarm delivery still need on-site validation.
