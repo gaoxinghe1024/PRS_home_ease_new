@@ -1,113 +1,219 @@
-# HomeEase 居家照护系统
+# HomeEase - Your Home Care Buddy
 
-FastAPI + 原生 HTML/CSS/JavaScript + SQLite 电脑端系统。面向照护者和长者，提供独立的视频、加速度跌倒检测，四种运动统计，环境声音标签、语音求救和跌倒问询，以及事件处置与照护报告。
+HomeEase is a local, privacy-first home-care system for older adults who live alone. It combines three pattern-recognition algorithms in one application:
 
-## 从 GitHub 获取
+- **Fall detection** from a home camera and from a phone accelerometer, as two independent branches;
+- **Exercise recognition and rep counting** for four fall-prevention exercises, from the same camera;
+- **Sound and voice understanding**: ambient sound labels, spoken calls for help, and a spoken "Are you OK?" inquiry after a suspected fall.
 
-仓库包含整体系统、`algorithm1/`、`algorithm2/`、`algorithm3/` 的原始代码、模型权重、样例及随附训练资料。本次交付将原有 35 个 LFS 文件作为实际二进制文件提交，当前版本的模型与数据不依赖 LFS 指针；历史提交仍保留原记录。
+Everything runs on one computer. A web interface serves the caregiver, who verifies and resolves events, and the older adult, who can call for help, answer the voice inquiry and follow a daily exercise plan.
 
-```powershell
+> Group project of **Group 10**, Pattern Recognition Systems: Gao Xinghe, Lin Kai, Sun Yancheng, Yu Yuchen. The original proposal is in [`docs/project-proposal.docx`](docs/project-proposal.docx).
+
+## Contents
+
+- [Features](#features)
+- [System architecture](#system-architecture)
+- [Algorithms](#algorithms)
+- [Repository layout](#repository-layout)
+- [Getting started](#getting-started)
+- [Configuration](#configuration)
+- [Data, privacy and notifications](#data-privacy-and-notifications)
+- [Documentation](#documentation)
+- [Limitations](#limitations)
+- [Data sources and licences](#data-sources-and-licences)
+
+## Features
+
+| Page | Address | For | What it does |
+| --- | --- | --- | --- |
+| Care workbench | `/` | caregiver | care overview, fall detection (video + accelerometer), exercise, sounds and inquiries, event center, care report, movement plan, background algorithms, profile and settings |
+| Household entry | `/home` | older adult | one-tap Home Monitoring (video fall detection, sound listening, voice inquiry) and Exercise with movement guides |
+| Older adult page | `/elder` | older adult | help button, "I'm OK", answering the voice inquiry, withdrawing an accidental alarm |
+| Sensor page | `/sensor` | phone | streams the phone's accelerometer to the server |
+| Reports | `/reports/print`, `/reports/events/{id}` | caregiver | printable care and event reports, CSV export |
+| API docs | `/docs` | developers | interactive OpenAPI documentation |
+
+How an event is handled:
+
+1. An original detector reports a suspected fall (video or accelerometer), creating a **PENDING** event; the help button or a spoken call for help creates an **EMERGENCY**.
+2. The older adult's page asks "What's wrong? Are you OK? Do you need help?" and listens for 10 seconds.
+3. No answer, an unclear answer or a call for help escalates the event to EMERGENCY; a trusted "I'm fine" or the "I'm OK" button only stops the escalation.
+4. Caregivers are notified (in-app, browser notifications, optional webhook) and escalate through the contact list.
+5. **Only a caregiver closes an event**, by recording a resolution: confirmed fall, false alarm, verified safe or undetermined.
+
+## System architecture
+
+```mermaid
+flowchart LR
+    subgraph Browser
+        W[Care workbench]
+        H[Household / older adult pages]
+        S[Phone sensor page]
+    end
+    subgraph Backend [backend - FastAPI]
+        API[HTTP + WebSocket API]
+        SVC[Scheduling, events, reports]
+        CAM[Shared camera capture]
+        DB[(SQLite)]
+    end
+    subgraph Workers [one process per algorithm]
+        V[Algorithm 1a: video fall detection]
+        A[Algorithm 1b: accelerometer fall detection]
+        E[Algorithm 2: exercise counting]
+        AU[Algorithm 3: sound and voice]
+    end
+    W & H & S --> API
+    API --> SVC --> DB
+    SVC --> V & A & E & AU
+    CAM -- raw BGR frames, shared memory --> V & E
+```
+
+- The **frontend** (`frontend/`) is plain HTML, CSS and JavaScript served by the backend; there is no build step.
+- The **backend** (`backend/`) is the integration layer: HTTP / WebSocket routes, scheduling, the event workflow, storage and notifications.
+- Each **algorithm** (`algorithms/`) runs in its own worker process and is called through a thin adapter (`backend/workers.py`) over JSON pipes. The original code, weights and decision rules are used as delivered; a failing algorithm cannot take down the others.
+- One camera capture is shared between video fall detection and exercise counting, so both can run at the same time.
+- The two fall branches decide independently. HomeEase adds event-level coordination (a 10 s window tags events as single / dual / triple channel) but no new fusion classifier.
+
+More detail: [docs/architecture.md](docs/architecture.md).
+
+## Algorithms
+
+| Module | Approach | Key result | Folder |
+| --- | --- | --- | --- |
+| **1a. Video fall detection** | YOLOv8n person detection -> our P1 pose U-Net (trained from scratch) -> A4 hybrid ensemble (7 base learners, OOF stacking + XGBoost) on 2 s skeleton windows | real-time on a laptop GPU (~20 fps at 640x480); P1 PCK@0.2 = 43.1% | [`algorithms/fall_video`](algorithms/fall_video) |
+| **1b. Accelerometer fall detection** | 60 Hz resampling, zero-phase 5 Hz Butterworth, 2 s / 0.25 s windows, 39 statistical features, RF(400) + XGB(400) probability average | sequence AUROC **0.9853 +/- 0.0010**, event accuracy 0.826 (URFD, 3 seeds x 5-fold CV); best of four compared approaches | [`algorithms/fall_signal`](algorithms/fall_signal) |
+| **2. Exercise recognition and counting** | YOLO11n-pose keypoints -> stable80 features -> hierarchical causal TCN (action head + per-exercise phase heads) -> ordered-transition decoder -> complete-cycle counter | test action Macro-F1 **0.9612**, count MAE **0.10** reps, MAPE **1.25%** (UI-PRMD reconstructed replays); 11 architectures compared | [`algorithms/exercise`](algorithms/exercise) |
+| **3. Sound and voice** | Silero VAD; YAMNet embedding + logistic regression for sound events; Whisper tiny + reply rules v2 for calls for help and inquiry replies; optional voiceprint gate | reply recognition Macro-F1 0.894 (rules v2); Silero speech-gate precision 0.995 | [`algorithms/audio`](algorithms/audio) |
+
+Each algorithm folder has its own README with the design, experiments and results. Algorithm 2 additionally documents its full development and optimization process in [`algorithms/exercise/docs`](algorithms/exercise/docs).
+
+## Repository layout
+
+```text
+HomeEase-Care-System/
+├── run.py                    # start / stop the server
+├── requirements.txt
+├── backend/                  # integration layer (FastAPI)
+│   ├── main.py               #   HTTP and WebSocket routes, access control
+│   ├── services.py           #   scheduling, background channels, sessions, reports
+│   ├── events.py             #   event workflow and notifications
+│   ├── inquiry.py            #   voice-inquiry conclusions
+│   ├── storage.py            #   SQLite persistence
+│   ├── records.py            #   deletion of records, clips and traces
+│   ├── camera.py             #   shared camera capture (shared memory)
+│   ├── workers.py            #   adapters to the original algorithm entry points
+│   ├── exercise.py, media.py, schemas.py, config.py
+│   └── adapters/             #   worker processes, ONNX Runtime acceleration
+├── frontend/
+│   ├── templates/            # Jinja2 pages: workbench, household, elder, sensor, reports
+│   └── static/               # JavaScript, CSS, icons, exercise guide images
+├── algorithms/
+│   ├── fall_video/           # Algorithm 1a: video fall detection
+│   ├── fall_signal/          # Algorithm 1b: accelerometer fall detection
+│   ├── exercise/             # Algorithm 2: exercise recognition and counting
+│   └── audio/                # Algorithm 3: sound events, calls for help, voice inquiry
+├── samples/                  # URFD fall-01 video and accelerometer samples
+├── scripts/
+│   └── clear_records.py      # clear fall / exercise history while the server is stopped
+└── docs/                     # architecture, API, household use, exercise integration, proposal
+```
+
+## Getting started
+
+### Requirements
+
+- Python **3.11** (64-bit)
+- Windows, macOS or Linux; a webcam for live monitoring and exercise
+- Optional: an NVIDIA GPU with CUDA for real-time video inference (the system also runs on the CPU, with a lower frame rate)
+- About 300 MB of disk space for the repository (model weights and samples included)
+
+### Install
+
+```bash
 git clone https://github.com/gaoxinghe1024/PRS_home_ease_new.git
 cd PRS_home_ease_new
-```
-
-虚拟环境、依赖缓存、运行数据库、历史告警录像和本机测试截图不上传；在新电脑按下方依赖说明创建环境。三个原始算法目录的文件保留原有字节内容，未做换行转换。
-
-## 本机启动
-
-本机的 Python 环境与模型已经配置好。双击 `start.bat`，打开终端打印的地址，通常为 <http://127.0.0.1:8000>。端口被占用时自动选择后续端口。
-
-```powershell
-cd E:\gc2_new
-.\.venv\Scripts\python.exe run.py
-```
-
-停止：双击 `stop.bat`，或执行 `.\.venv\Scripts\python.exe run.py --stop`。等待服务退出后再启动，可让视频、音频、模型和后台任务正常释放。启动时各模块独立加载；在设置页查看状态及重新初始化。
-
-电脑浏览器入口：家属照护工作台 `/`，老人家庭入口 `/home`，原简化长者操作台 `/elder`，外部加速度数据接入 `/sensor`，交互 API 文档 `/docs`。
-
-系统界面固定为英文，不再提供中英文切换：页面、弹窗、浏览器通知、语音问询播报、CSV 导出和 Webhook 通知均为英文。源码中的中文文案经 `web/static/i18n-en.js` 词组表翻译，新增界面文字需同时补充英文词组（`tests/test_i18n_coverage.py` 会检查）。说明见 [API 文档的界面语言部分](docs/api.md#interface-language)。
-
-### 家庭日常使用
-
-打开 `/home`，选择“安心守护”即可自动开启算法1视频跌倒检测，并在取得音频授权及浏览器麦克风权限后自动开启算法3声音、求助监听和语音问询。也可直接收藏 `/home#safety`。守护开关和摄像头序号会保存在本机，服务重启后自动恢复视频守护；摄像头掉线后每15秒尝试恢复。
-
-老人选择“运动训练”并手动点击开始，才会运行算法2训练。守护与运动共享同一台摄像头，结束训练不会关闭守护。查看报告、处理事件、修改档案仍在原家属工作台；家庭入口有直接链接。
-
-声音和自动语音问询需要家庭页面保持打开、麦克风可用。关闭页面后视频守护仍在本机后台运行，声音监听停止；电脑休眠、关机或服务退出时无法监测。加速度检测仍需外部传感器输入，不会模拟连接。详见 [家庭入口说明](docs/home-use.md)。
-
-## 首次使用
-
-1. 在设置页填写长者资料与紧急联系人，按优先顺序排列联系人，并测试通知。
-2. 取得长者同意后记录音频授权。默认关闭授权；授权不等于浏览器的麦克风权限，两者均需开启。
-3. 跌倒监测页同时展示视频与加速度通道。视频选择本机摄像头、上传视频或 URFD 样例；实时摄像头由系统统一采集，跌倒监测与运动训练可共用同一序号的设备。
-4. 加速度分支可上传 CSV，或通过外部传感器的数据接口输入。电脑自身无需内置加速度计；摄像头和传感器需要分别开启，模型就绪不代表已经监测。
-5. 运动页选择坐站、深蹲、站立抬腿或跨步，设置目标，启动、暂停、继续或结束训练。画面不可用、多人和目标变化按原算法停止有效计数，界面展示原因。
-6. 声音页开启联合监听后，同时进行全部环境声音分类和语音求助监听，无需选择声音类别。录音与样例回放也同时分析两者。长者页可主动求助、表示安全和回答语音问询，也可选择接收自动问询。
-7. 事件页接手处理、联系、升级响应，记录核实结论后关闭。报告页按时间范围分别查看实时与回放数据，导出 CSV，或打印为 PDF；训练可下载 JSON，事件有独立处置报告。
-
-声音标签为辅助信息。语音回答或“我没事”不会自行关闭、降级事件；需要照护者明确记录处置结论。未播放问询、未授权和识别不可用均有独立状态。
-
-## 原算法映射
-
-| 模块 | 唯一使用的已选方案 | 原实现入口 |
-| --- | --- | --- |
-| 算法一：视频 | YOLOv8n + P1 + A4，原默认参数 | `algorithm1/video/engine.py` 的 `DetectionEngine` |
-| 算法一：加速度 | A2 RF + XGB 平均模型 | `algorithm1/siganl/core/model.py`、`detector.py` |
-| 算法二：运动 | `opt_tcn_b4_w48`，原选定 `yolo11n-pose.pt` | `algorithm2/homeease/api.py`、`engine.py`、`pose.py` |
-| 算法三：声音与回复 | Silero VAD、YAMNet + LR v2、Whisper tiny、rule_v2、原 reply policy | `algorithm3/algorithm3_handover/src/algorithm3` 与原音频流水线 |
-
-算法一的两个分支独立运行，因此共有四个工作进程，仍然只有三个交付算法模块。系统不新增融合分类器、不重训模型，不修改权重、特征函数、阶段阈值或计数器。算法2增加可选的指定训练动作上下文，摄像头和上传训练使用该模式；直腿抬腿和跨步训练增加左右镜像预测取均值，深蹲和坐站保留单次推理。原 API 默认模式和原实验报告保留，详见 [部署说明](docs/exercise-integration.md)。Proposal 中与实际交付算法不同的技术方案未作为新算法实现。
-
-## 输入与设备
-
-- 原生 CSV：5 列 `t_ms, magnitude, ax, ay, az`，时间毫秒，加速度 g。兼容 4 列带表头 `t,ax,ay,az` 或 `t_ms,ax,ay,az`；前者以秒计。适配层仅补齐原读取器要求的格式。
-- 实时传感器：每批 `[t_seconds, ax_g, ay_g, az_g]`，严格递增时间戳。数据包含重力、单位 g。外部采集程序通过 `/ws/sensor` 提交数据；电脑端 `/sensor` 可连接并提交设备批次。原交付文件未包含具体 USB/串口设备驱动，接入硬件时由采集程序提供此格式，不要求手机。
-- 视频支持本机摄像头和可解码的 MP4/AVI/MOV/MKV/WebM，上传上限 512 MB。音频上限 20 MB / 120 秒。运动的骨架输入遵循原算法2接口。
-- 摄像头由服务所在电脑统一打开，原始 BGR 像素通过共享内存交给两种原算法，不重复打开设备、不用预览 JPEG 作推理输入。运动页与跌倒页需选择同一序号才能共享同一台相机。浏览器仅需麦克风权限；其他电脑通过局域网访问时需设置密码并使用 HTTPS。
-
-```powershell
-$env:HOMEEASE_PASSWORD = '自行设置的访问密码'
-.\.venv\Scripts\python.exe run.py --host 0.0.0.0 --port 8000
-```
-
-登录用户名 `caregiver`。局域网电脑通过可信 HTTPS 反向代理访问；代理须支持 WebSocket，并保留 Host 与 Origin 的一致性。本地回环地址默认无需密码。
-
-## 数据、通知与配置
-
-SQLite 默认 `runtime/homeease.sqlite3`，日志在 `runtime/logs/`，上传视频、事件片段和播放派生文件在 `runtime/`。原始音频与识别文字不写入数据库；音频临时数组在工作进程中清零。视频事件片段和上传视频会保留，应按家庭隐私约定管理磁盘与备份。
-
-站内通知、浏览器通知和联系人拨号链接已实现。站内送达表示工作台取得了通知，查看、接手、处置时间分别记录。配置 Webhook 后实时事件可发送到接收端，附幂等键，失败最多尝试 5 次；回放不会发送外部告警。系统没有预置短信、自动拨号或急救服务。
-
-| 配置 | 用途 |
-| --- | --- |
-| `HOMEEASE_SYSTEM_DATA` | 独立数据、日志和桥接目录，默认项目下的 `runtime` |
-| `HOMEEASE_PASSWORD` | HTTP Basic 访问密码，绑定非回环地址时必填 |
-| `HOMEEASE_VIDEO_CV_THREADS` | 视频工作进程 OpenCV 线程数，默认 4；不改变模型与检测参数 |
-| `HOMEEASE_VIDEO_DNN` | 默认 `auto`，优先用 CUDA FP32 执行原 ONNX；不可用时保留原 OpenCV 执行器。`opencv` 可显式使用原执行器 |
-| `HOMEEASE_EXERCISE_DEVICE` | 默认 `auto`，与原摄像头脚本一致自动选择 CUDA / CPU；可显式设为 `cpu` 或 `cuda` |
-| `run.py --host / --port` | 监听地址与首选端口 |
-| 设置页 | 资料、联系人、音频授权、通知、训练目标、联系人升级间隔 |
-
-仅运行一个 FastAPI worker；同一数据目录重复启动时返回已运行的地址，避免重复占用数据库与设备。多个实例必须使用不同的数据目录和端口。停止命令需使用与启动时相同的 `HOMEEASE_SYSTEM_DATA`。
-
-## 依赖与验证
-
-本机 `.venv` 基于 `E:\conda_envs\dl` 的 Python 3.11.15，并复用该环境已安装的 PyTorch。迁移到新电脑时创建独立 Python 3.11 环境并安装 `requirements.txt`，保留三个算法文件夹、权重和样例。`artifacts/environment.json` 与 `requirements-lock.txt` 记录原交付实测环境；复现该锁定环境时，CUDA 12.8 版 PyTorch 需要对应 wheel 源。
-
-```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe scripts\snapshot_algorithms.py
-.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=runtime\pytest-check
-.\.venv\Scripts\python.exe scripts\verify_integrations.py
-.\.venv\Scripts\python.exe scripts\acceptance.py
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-浏览器测试：`npm ci`、`npx playwright install chromium`，启动独立测试数据目录的服务器后设置 `HOMEEASE_TEST_URL`，执行 `npm run test:browser`。家庭入口联合测试执行 `npm run test:home`，需要服务能访问摄像头0；浏览器麦克风使用测试音源。测试会创建事件与训练记录，应使用隔离数据目录。
+For CUDA, install the matching PyTorch build from <https://pytorch.org> before `requirements.txt`. All model weights and samples are included in the repository; nothing is downloaded at startup.
 
-详见 [架构与集成](docs/architecture.md)、[API 与数据格式](docs/api.md)、[验证记录](docs/verification.md) 和 [样例来源](samples/SOURCES.md)。目前完成了原算法一致性、API 工作流和浏览器测试；真实家庭设备、外部通知送达、七天持续运行与真实误报漏报率仍需现场验收。
+### Run
 
-本次基于 GitHub 最新 `deaaf07` 版本的运动接入排查见 [运动接入排查](docs/exercise-integration.md)；四动作骨架回放通过，真人深蹲零计数仍在排查。历史的卡顿、零计数和实时声音接入排查见 [原交付排查记录](docs/audit-20261015.md)。停止服务后，可用 `python scripts/clear_records.py` 清除视频/加速度跌倒与训练记录及关联通知、录像；资料、联系人、声音历史不受影响。验证脚本应始终使用独立数据目录。
+```bash
+python run.py                      # http://127.0.0.1:8000 (the next free port if 8000 is taken)
+python run.py --stop               # stop gracefully; models, streams and the database are released
+```
 
-2026-10-23 本机摄像头／上传的坐站训练启用 `counting_policy="pose_cycle_v2"`，站立直腿抬腿启用 `pose_cycle_v1`，用骨架端点确认完整周期，修复连续可见输入中阶段漏判导致的零计数。坐站新增站立准备提示，并容纳不超过 400 ms 的有效输入间隔；最新版本已由用户现场复测并反馈“效果不错”。这是新增部署计数策略，不能套用原阶段分类器的实验精度；模型概率保留，SDK/API 默认计数、深蹲和跨步保持原策略。详见 [部署记录](docs/exercise-integration.md#2026-10-23坐站和直腿前抬的摄像头周期确认)。
+Open the address printed in the terminal. The four algorithm modules load in the background; their status is shown under **Profile and settings**, where a module can also be re-initialized.
+
+### First steps
+
+1. In **Profile and settings**, enter the older adult's profile and emergency contacts and send a test notification.
+2. With the older adult's agreement, record the audio consent (off by default). The browser's microphone permission is needed in addition.
+3. Try the detectors without any hardware: under **Fall detection**, choose the bundled video sample and the bundled acceleration sample; under **Sounds and inquiries**, run the bundled audio samples; under **Exercise**, choose the bundled skeleton sample.
+4. For live use, open `/home` and choose **Home Monitoring**, or start the camera from the workbench. To stream acceleration from a phone, open `/sensor` on the phone (LAN access requires a password and HTTPS, see below).
+5. Handle events in the **Event center** and review statistics under **Care report** (print to PDF or export CSV).
+
+## Configuration
+
+| Setting | Purpose |
+| --- | --- |
+| `HOMEEASE_SYSTEM_DATA` | data, log and runtime folder (default `runtime/` in the project) |
+| `HOMEEASE_PASSWORD` | HTTP Basic password (username `caregiver`); required when binding to a non-loopback address |
+| `HOMEEASE_VIDEO_CV_THREADS` | OpenCV threads of the video worker (default 4); does not change detection parameters |
+| `HOMEEASE_VIDEO_DNN` | `auto` (default) runs the original YOLO ONNX file on CUDA through ONNX Runtime when available; `opencv` forces the original OpenCV path |
+| `HOMEEASE_EXERCISE_DEVICE` | `auto` (default), `cpu` or `cuda` for Algorithm 2 |
+| `run.py --host / --port` | listening address and preferred port |
+| Settings page | profile, contacts, audio consent, notifications, exercise targets, contact escalation interval, background algorithm switches |
+
+Access from another device on the LAN:
+
+```bash
+export HOMEEASE_PASSWORD='choose-a-password'      # Windows PowerShell: $env:HOMEEASE_PASSWORD = '...'
+python run.py --host 0.0.0.0 --port 8000
+```
+
+Put a trusted HTTPS reverse proxy with WebSocket support in front of it; browsers only allow the camera, microphone and motion sensors on HTTPS or localhost.
+
+Only one server instance may use a data folder at a time; starting a second one prints the address of the running one. Run several instances with different data folders and ports, and stop each with the same `HOMEEASE_SYSTEM_DATA`.
+
+## Data, privacy and notifications
+
+- The SQLite database is `runtime/homeease.sqlite3`, logs are in `runtime/logs/`, and uploaded videos, event clips and playback copies are in `runtime/`.
+- Raw audio and transcripts are **never stored**; audio buffers are zeroed in the worker after use, and audio results are discarded when consent is withdrawn.
+- Video event clips and uploaded videos are kept; manage disk space and backups according to the household's privacy agreement. `python scripts/clear_records.py` (with the server stopped) clears fall and exercise history with their notifications and clips; profile, contacts and sound history are kept.
+- Notifications: in-app, browser notifications and tap-to-call contact links. With a webhook configured, live events are posted with an idempotency key and up to 5 attempts; replays never trigger external alerts. There is no built-in SMS, automatic dialling or emergency-service connection.
+
+## Documentation
+
+| Document | Content |
+| --- | --- |
+| [docs/architecture.md](docs/architecture.md) | call boundaries, how the original algorithm behaviour is preserved, state and recovery |
+| [docs/api.md](docs/api.md) | HTTP / WebSocket API and data formats |
+| [docs/home-use.md](docs/home-use.md) | the household entry and continuous monitoring |
+| [docs/exercise-integration.md](docs/exercise-integration.md) | deployment adaptations of Algorithm 2 for live cameras and how they were checked |
+| [samples/SOURCES.md](samples/SOURCES.md) | sources of the bundled samples |
+| Algorithm READMEs | [fall_video](algorithms/fall_video/README.md), [fall_signal](algorithms/fall_signal/README.md), [exercise](algorithms/exercise/README.md), [audio](algorithms/audio/README.md) |
+
+## Limitations
+
+- All reported accuracy comes from public or constructed datasets (URFD, UI-PRMD, COCO, synthetic and acted audio). Real-home accuracy, false-alarm rates with older adults, long-term (7-day) stability and real notification delivery have **not** been validated.
+- Exercise counting on live cameras uses deployment-only adaptations described in [docs/exercise-integration.md](docs/exercise-integration.md); they were checked on recorded skeletons and in user field tests, not with per-repetition ground truth.
+- Sound labels are hints only, and a voice reply never closes or downgrades an event.
+- The accelerometer branch needs a phone running `/sensor` (or another client sending samples); a computer has no accelerometer of its own.
+- Nothing is monitored while the computer sleeps or the server is stopped; sound listening and the voice inquiry need the household page to stay open.
+- The interface is English only. Speech recognition understands English and Mandarin calls for help and replies.
+
+## Data sources and licences
+
+- **URFD** (UR Fall Detection Dataset): bundled samples and accelerometer training data, <https://fenix.ur.edu.pl/~mkepski/ds/uf.html>.
+- **Le2i** and **Multiple Cameras Fall (MCF)**: training data of the video A4 ensemble.
+- **UI-PRMD**: exercise skeletons, <https://webpages.uidaho.edu/ui-prmd/>.
+- **COCO 2017** keypoints: pose-model comparison, <https://cocodataset.org>.
+- Pre-trained models: Ultralytics YOLOv8 / YOLO11 (AGPL-3.0), Google YAMNet (Apache-2.0), faster-whisper tiny (MIT), WeSpeaker ResNet34 (CC BY 4.0), Silero VAD (MIT). See [algorithms/audio/THIRD_PARTY_NOTICES.md](algorithms/audio/THIRD_PARTY_NOTICES.md) and each algorithm's data card.
+- Icons: Lucide ([frontend/static/vendor/NOTICE.txt](frontend/static/vendor/NOTICE.txt)).
+
+Follow each dataset's and model's terms for redistribution and publication.
