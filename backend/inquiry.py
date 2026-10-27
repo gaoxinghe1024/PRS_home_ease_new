@@ -19,10 +19,10 @@ NOT_ASKED = "not_asked"
 
 STATES = (ANSWERED, HIGH_RISK, NOT_ASKED)
 
-LABELS = {ANSWERED: "已应答", HIGH_RISK: "高风险", NOT_ASKED: "未问询"}
+LABELS = {ANSWERED: "Answered", HIGH_RISK: "High risk", NOT_ASKED: "Not asked"}
 
 # 已应答的三个细分档；未应答与未问询没有细分。
-ANSWER_KINDS = {"safe": "表示安全", "help": "求助", "unclear": "未能确认"}
+ANSWER_KINDS = {"safe": "Said they are safe", "help": "Called for help", "unclear": "Not confirmed"}
 
 CSS_CLASSES = {ANSWERED: "ok", HIGH_RISK: "risk", NOT_ASKED: "muted"}
 
@@ -46,28 +46,28 @@ def voice_inquiry(event):
         reply = record.get("status")
         if reply == "RESPONDED":
             if record.get("intent") == "HELP" or result.get("marker") == "spoken_help":
-                return _conclusion(ANSWERED, "help", "回答中明确呼救", inquiry.get("completed_at"))
+                return _conclusion(ANSWERED, "help", "The answer clearly called for help", inquiry.get("completed_at"))
             if result.get("cancelled"):
-                by = "按钮" if result.get("by") == "button" else "语音"
-                return _conclusion(ANSWERED, "safe", f"长者通过{by}确认表示安全", inquiry.get("completed_at"))
-            return _conclusion(ANSWERED, "unclear", "有回答，但未构成有效的安全确认", inquiry.get("completed_at"))
+                by = "button" if result.get("by") == "button" else "voice"
+                return _conclusion(ANSWERED, "safe", f"The older adult confirmed they are safe by {by}", inquiry.get("completed_at"))
+            return _conclusion(ANSWERED, "unclear", "There was an answer, but it was not a valid confirmation of safety", inquiry.get("completed_at"))
         if reply == "NO_RESPONSE":
-            return _conclusion(HIGH_RISK, None, "问询已播放，等待窗口内没有回答", inquiry.get("completed_at"))
+            return _conclusion(HIGH_RISK, None, "The question was played; there was no answer within the window", inquiry.get("completed_at"))
         if reply == "UNCERTAIN":
-            return _conclusion(HIGH_RISK, None, "有声音，但无法识别为有效回答", inquiry.get("completed_at"))
-        return _conclusion(NOT_ASKED, None, "音频或语音识别不可用，问询没有得到答案", inquiry.get("completed_at"))
+            return _conclusion(HIGH_RISK, None, "There was sound, but it could not be recognized as a valid answer", inquiry.get("completed_at"))
+        return _conclusion(NOT_ASKED, None, "Audio or speech recognition is unavailable; the inquiry got no answer", inquiry.get("completed_at"))
 
     # 长者按下「我没事」按钮：长者的主动确认，尚未进入录音问询也算已应答。
     if inquiry.get("button_ok") or status == "button_safe":
-        return _conclusion(ANSWERED, "safe", "长者按下「我没事」按钮")
+        return _conclusion(ANSWERED, "safe", "The older adult pressed the \"I'm OK\" button")
 
     if status == "listening":
-        return _conclusion(NOT_ASKED, None, "问询已播放，正在等待回答")
+        return _conclusion(NOT_ASKED, None, "The question was played; waiting for the answer")
     if status == "processing":
-        return _conclusion(NOT_ASKED, None, "正在识别长者的回答")
+        return _conclusion(NOT_ASKED, None, "Recognizing the older adult's answer")
     if status == "audio_unavailable":
-        return _conclusion(NOT_ASKED, None, inquiry.get("reason") or "问询语音未能播放")
-    return _conclusion(NOT_ASKED, None, inquiry.get("reason") or "尚未发起语音问询")
+        return _conclusion(NOT_ASKED, None, inquiry.get("reason") or "The question audio could not be played")
+    return _conclusion(NOT_ASKED, None, inquiry.get("reason") or "No voice inquiry has been started")
 
 
 def voice_counts(events):

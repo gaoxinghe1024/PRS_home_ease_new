@@ -23,7 +23,6 @@ from fastapi.templating import Jinja2Templates
 from backend import schemas
 from backend.adapters.process import ModuleError
 from backend.config import ROOT, RUNTIME, UPLOADS, LOGS, VIDEO, SIGNAL, AUDIO, EXERCISE, EXERCISES, prepare
-from backend.i18n import translate
 from backend.services import System, canonical_csv
 from backend.storage import now
 
@@ -47,24 +46,6 @@ app.mount("/static", StaticFiles(directory=ROOT / "frontend" / "static"), name="
 templates = Jinja2Templates(directory=ROOT / "frontend" / "templates")
 
 
-def english(value):
-    if isinstance(value, dict):
-        return {key: english(item) for key, item in value.items()}
-    if isinstance(value, list):
-        return [english(item) for item in value]
-    return translate(value)
-
-
-def english_openapi():
-    """The API document (/docs) in English, like the pages: Chinese data defaults are shown with their English text."""
-    if app.openapi_schema is None:
-        app.openapi_schema = english(FastAPI.openapi(app))
-    return app.openapi_schema
-
-
-app.openapi = english_openapi
-
-
 def check_access(headers, client_host):
     password = os.environ.get("HOMEEASE_PASSWORD")
     if password:
@@ -81,11 +62,11 @@ def check_access(headers, client_host):
 @app.middleware("http")
 async def guard(request, call_next):
     if not check_access(request.headers, request.client.host if request.client else ""):
-        return Response("需要身份验证", status_code=401, headers={"WWW-Authenticate": 'Basic realm="HomeEase", charset="UTF-8"'})
+        return Response("Authentication required", status_code=401, headers={"WWW-Authenticate": 'Basic realm="HomeEase", charset="UTF-8"'})
     if request.method not in {"GET", "HEAD", "OPTIONS"}:
         origin = request.headers.get("origin")
         if origin and urlparse(origin).netloc != request.headers.get("host"):
-            return JSONResponse({"error": "请求来源不匹配"}, status_code=403)
+            return JSONResponse({"error": "The request origin does not match"}, status_code=403)
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -107,13 +88,13 @@ async def value_error(request, exc):
 
 @app.exception_handler(KeyError)
 async def missing(request, exc):
-    return JSONResponse({"error": "记录不存在"}, status_code=404)
+    return JSONResponse({"error": "The record does not exist"}, status_code=404)
 
 
 @app.exception_handler(Exception)
 async def unexpected(request, exc):
     logging.getLogger(__name__).exception("Request failed: %s", request.url.path)
-    return JSONResponse({"error": "操作失败，详情已记录。请在设置页检查模块状态。"}, status_code=500)
+    return JSONResponse({"error": "The operation failed and the details were logged. Check the module status on the Settings page."}, status_code=500)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -233,17 +214,17 @@ def update_settings(body: schemas.Settings):
 @app.post("/api/modules/{name}/initialize", status_code=202)
 def initialize(name: str):
     if name not in system.modules:
-        raise HTTPException(404, "模块不存在")
+        raise HTTPException(404, "The module does not exist")
     if system.modules[name].state == "loading":
         return {"state": "loading"}
     if name == "video" and system.video.get("state") == "running":
-        raise ValueError("请先停止视频检测")
+        raise ValueError("Please stop video detection first")
     if name == "signal" and system.sensor["state"] == "connected":
-        raise ValueError("请先断开传感器")
+        raise ValueError("Please disconnect the sensor first")
     if name == "exercise" and any(meta["active"] for meta in system.session_metadata.values()):
-        raise ValueError("请先结束运动训练")
+        raise ValueError("Please end the exercise session first")
     if name == "audio" and system.audio_lock.locked():
-        raise ValueError("请先停止麦克风监听")
+        raise ValueError("Please stop microphone listening first")
     system.modules[name].close()
     system.modules[name].state = "loading"
     system.submit(system.initialize, name)
@@ -258,9 +239,9 @@ def diagnostics():
 @app.post("/api/notifications/test")
 def test_notice():
     settings = system.store.settings()
-    notice = system.store.notify(None, {"title": "照护通知测试", "message": "站内通知测试", "mode": "test", "contact": None})
+    notice = system.store.notify(None, {"title": "Care notification test", "message": "In-app notification test", "mode": "test", "contact": None})
     if settings.get("webhook_url"):
-        system.store.notify(None, {"title": "HomeEase 通知测试", "message": "通知通道测试", "mode": "test"}, kind="webhook")
+        system.store.notify(None, {"title": "HomeEase notification test", "message": "Notification channel test", "mode": "test"}, kind="webhook")
     settings["notification_test_at"] = now()
     system.store.save_settings(settings)
     return notice
@@ -283,9 +264,9 @@ async def read_upload(file, maximum):
         while chunk := await file.read(1024 * 1024):
             data.extend(chunk)
             if len(data) > maximum:
-                raise HTTPException(413, f"文件超过 {maximum // 1024 // 1024} MB")
+                raise HTTPException(413, f"The file exceeds {maximum // 1024 // 1024} MB")
         if not data:
-            raise HTTPException(422, "文件为空")
+            raise HTTPException(422, "The file is empty")
         return bytes(data)
     finally:
         await file.close()
@@ -295,7 +276,7 @@ async def read_upload(file, maximum):
 async def upload_video(file: UploadFile = File()):
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in {".mp4", ".avi", ".mov", ".mkv", ".webm"}:
-        raise HTTPException(422, "请选择 MP4、AVI、MOV、MKV 或 WebM 视频")
+        raise HTTPException(422, "Please choose an MP4, AVI, MOV, MKV or WebM video")
     upload_id = uuid.uuid4().hex + suffix
     path = UPLOADS / upload_id
     size = 0
@@ -304,14 +285,14 @@ async def upload_video(file: UploadFile = File()):
             while chunk := await file.read(1024 * 1024):
                 size += len(chunk)
                 if size > 512 * 1024 * 1024:
-                    raise HTTPException(413, "视频不能超过 512 MB")
+                    raise HTTPException(413, "The video must not exceed 512 MB")
                 output.write(chunk)
         import cv2
         cap = cv2.VideoCapture(str(path))
         try:
             ok, frame = cap.read()
             if not ok:
-                raise HTTPException(422, "视频没有可读取的画面")
+                raise HTTPException(422, "The video has no readable frames")
         finally:
             cap.release()
     except Exception:
@@ -324,10 +305,10 @@ async def upload_video(file: UploadFile = File()):
 
 def uploaded(name):
     if not name or Path(name).name != name:
-        raise ValueError("请先上传视频")
+        raise ValueError("Please upload a video first")
     path = UPLOADS / name
     if not path.is_file():
-        raise ValueError("上传文件不存在，请重新上传")
+        raise ValueError("The uploaded file does not exist. Please upload it again")
     return path
 
 
@@ -358,7 +339,7 @@ def video_pose():
 @app.get("/api/video/frame")
 def video_frame():
     if system.modules["video"].state != "ready":
-        raise HTTPException(503, "视频模块尚未就绪")
+        raise HTTPException(503, "The video module is not ready yet")
     data = base64.b64decode(system.modules["video"].call("frame", timeout=10))
     return Response(data, media_type="image/jpeg", headers={"Cache-Control": "no-store"})
 
@@ -366,7 +347,7 @@ def video_frame():
 @app.get("/api/video/stream")
 async def video_stream(request: Request):
     if system.modules["video"].state != "ready":
-        raise HTTPException(503, "视频模块尚未就绪")
+        raise HTTPException(503, "The video module is not ready yet")
 
     async def frames():
         last = None
@@ -389,17 +370,17 @@ def video_clip(event_id: str):
     event = system.store.event(event_id)
     clip = event["evidence"].get("clip")
     if not clip:
-        raise HTTPException(404, "该事件没有视频片段")
+        raise HTTPException(404, "This event has no video clip")
     path = RUNTIME / "video_bridge" / "systems" / "records" / "clips" / Path(clip).name
     if not path.is_file():
-        raise HTTPException(404, "视频片段尚未保存或已移除")
+        raise HTTPException(404, "The video clip has not been saved or was removed")
     from backend.media import browser_clip
     return FileResponse(browser_clip(path), media_type="video/mp4")
 
 
 @app.post("/api/signal/sample")
 def signal_sample():
-    return system.signal_offline(ROOT / "samples" / "fall-01-acc.csv", "URFD fall-01 加速度样例")
+    return system.signal_offline(ROOT / "samples" / "fall-01-acc.csv", "URFD fall-01 acceleration sample")
 
 
 @app.post("/api/signal/analyze")
@@ -409,7 +390,7 @@ async def signal_upload(file: UploadFile = File()):
     path = UPLOADS / (uuid.uuid4().hex + ".csv")
     try:
         path.write_bytes(canonical)
-        return await asyncio.to_thread(system.signal_offline, path, file.filename or "上传 CSV")
+        return await asyncio.to_thread(system.signal_offline, path, file.filename or "Uploaded CSV")
     finally:
         path.unlink(missing_ok=True)
 
@@ -426,7 +407,7 @@ async def sensor_stream(ws: WebSocket):
         return
     await ws.accept()
     if not system.sensor_lock.acquire(blocking=False):
-        await ws.send_json({"error": "已有传感器连接"})
+        await ws.send_json({"error": "A sensor is already connected"})
         await ws.close(1008)
         return
     stream_id = uuid.uuid4().hex
@@ -445,12 +426,12 @@ async def sensor_stream(ws: WebSocket):
                 break
             samples = message.get("samples")
             if not isinstance(samples, list) or not 1 <= len(samples) <= 200:
-                raise ValueError("每批需要 1 至 200 个 [t,ax,ay,az] 样本")
+                raise ValueError("A batch needs 1 to 200 [t, ax, ay, az] samples")
             for sample in samples:
                 if not isinstance(sample, list) or len(sample) != 4 or not all(isinstance(x, (int, float)) and math.isfinite(x) for x in sample):
-                    raise ValueError("样本必须包含 4 个有限数值")
+                    raise ValueError("A sample must contain 4 finite numbers")
                 if last_timestamp is not None and sample[0] <= last_timestamp:
-                    raise ValueError("传感器时间戳必须严格递增")
+                    raise ValueError("Sensor timestamps must strictly increase")
                 last_timestamp = sample[0]
             result = await asyncio.to_thread(system.modules["signal"].call, "samples", samples=samples)
             system.signal_results(result, stream_id)
@@ -491,7 +472,7 @@ def exercises():
 def create_session(body: schemas.SessionStart):
     # 设置页关掉的运动不再接收新的训练请求，避免计了数却没人看。
     if not system.exercise_enabled(body.exercise):
-        raise ValueError(f"{EXERCISES[body.exercise]}检测已在设置中关闭，请先开启")
+        raise ValueError(f"{EXERCISES[body.exercise]} detection is switched off in Settings; turn it on first")
     path = uploaded(body.upload_id) if body.source == "upload" else None
     if body.source == "camera" and body.capture == "shared":
         return system.start_camera_session(body.exercise, body.target_reps, body.camera_index)
@@ -528,7 +509,7 @@ def session(sid: str):
 @app.get("/api/sessions/{sid}/camera/stream")
 async def exercise_camera_stream(sid: str, request: Request):
     if not system.cameras.preview(sid):
-        raise HTTPException(409, "训练摄像头未连接")
+        raise HTTPException(409, "The exercise camera is not connected")
 
     async def frames():
         last = None
@@ -552,7 +533,7 @@ def control_session(sid: str, body: schemas.SessionControl):
 async def session_frames(sid: str, request: Request):
     data = await request.body()
     if len(data) > 2_000_000:
-        raise HTTPException(413, "骨架批次过大")
+        raise HTTPException(413, "The skeleton batch is too large")
     body = json.loads(data)
     return await asyncio.to_thread(system.session_frames, sid, body)
 
@@ -592,7 +573,7 @@ def audio_samples():
 def audio_sample_file(sample: str):
     path = AUDIO / "samples" / (sample + ".wav")
     if Path(sample).name != sample or not path.is_file():
-        raise HTTPException(404, "音频样例不存在")
+        raise HTTPException(404, "The audio sample does not exist")
     return FileResponse(path, media_type="audio/wav")
 
 
@@ -600,14 +581,14 @@ def audio_sample_file(sample: str):
 def analyze_audio_sample(body: schemas.SampleAudio):
     path = AUDIO / "samples" / (body.sample + ".wav")
     if not path.is_file():
-        raise HTTPException(404, "音频样例不存在")
+        raise HTTPException(404, "The audio sample does not exist")
     return system.audio_analyze(path.read_bytes(), body.task, "replay")
 
 
 @app.post("/api/audio/analyze")
 async def analyze_audio(task: str = Form(), mode: str = Form(default="replay"), event_id: str | None = Form(default=None), file: UploadFile = File()):
     if task not in {"monitor", "sounds", "help", "reply"} or mode not in {"live", "replay"}:
-        raise HTTPException(422, "音频任务或输入来源不合法")
+        raise HTTPException(422, "Invalid audio task or input source")
     data = await read_upload(file, 20 * 1024 * 1024)
     return await asyncio.to_thread(system.audio_analyze, data, task, mode, event_id)
 
@@ -624,7 +605,7 @@ async def live_audio(ws: WebSocket):
         return
     await ws.accept()
     if not system.audio_lock.acquire(blocking=False):
-        await ws.send_json({"error": "已有麦克风输入"})
+        await ws.send_json({"error": "A microphone input already exists"})
         await ws.close(1008)
         return
     started = False
@@ -634,7 +615,7 @@ async def live_audio(ws: WebSocket):
 
     def persist_result(result):
         for call in result.get("calls", []):
-            system.events.create("audio", call.get("details", {}), "live", "连续求救监听",
+            system.events.create("audio", call.get("details", {}), "live", "Continuous call-for-help listener",
                 f"audio:{call.get('idem', uuid.uuid4().hex)}", at=call.get("at"))
         for sound in result.get("events", []):
             key = sound["event_id"]
@@ -658,9 +639,9 @@ async def live_audio(ws: WebSocket):
                 break
             pcm, stamp = message.get("pcm"), message.get("timestamp_ms")
             if not isinstance(pcm, str) or len(pcm) > 175000 or not isinstance(stamp, (int, float)) or not math.isfinite(stamp):
-                raise ValueError("无效的音频块")
+                raise ValueError("Invalid audio block")
             if last_time is not None and stamp <= last_time:
-                raise ValueError("音频时间戳必须递增")
+                raise ValueError("Audio timestamps must increase")
             last_time = stamp
             listening = any(e["inquiry"].get("status") in {"listening", "processing"} for e in system.store.events(state="open"))
             result = await asyncio.to_thread(system.modules["audio"].call, "live_chunk", pcm=pcm, timestamp_ms=stamp, inquiry_active=listening)
@@ -668,7 +649,7 @@ async def live_audio(ws: WebSocket):
                 break
             system.audio_last_received = time.time()
             degraded = any(str(result.get(k, {}).get("status", "")).startswith("degraded") for k in ("pipeline", "listener"))
-            system.audio_quality = {"state": "reduced" if degraded else "active", "reason": "原音频流水线覆盖受限" if degraded else "连续麦克风输入有效"}
+            system.audio_quality = {"state": "reduced" if degraded else "active", "reason": "The original audio pipeline has limited coverage" if degraded else "Continuous microphone input is valid"}
             persist_result(result)
             await ws.send_json(result)
     except (WebSocketDisconnect, asyncio.TimeoutError):
@@ -715,7 +696,7 @@ def event_action(event_id: str, body: schemas.EventAction):
 @app.post("/api/events/{event_id}/inquiry")
 def inquiry_start(event_id: str, body: schemas.InquiryStart):
     if not system.store.settings()["audio_consent"]:
-        raise ValueError("未获得音频处理授权")
+        raise ValueError("Audio-processing consent has not been given")
     return system.events.inquiry_start(event_id, body.prompt_played, body.reason)
 
 
@@ -732,14 +713,14 @@ def inquiry_unavailable(event_id: str):
 @app.post("/api/records/delete")
 def delete_records(body: schemas.RecordDelete):
     if not body.event_ids and not body.session_ids:
-        raise ValueError("请先勾选要删除的记录")
+        raise ValueError("Please tick the records to delete first")
     return system.delete_records(body.event_ids, body.session_ids)
 
 
 @app.post("/api/records/clear")
 def clear_records(body: schemas.RecordClear):
     if not body.events and not body.sessions:
-        raise ValueError("请选择要清空的记录类型")
+        raise ValueError("Please choose the record types to clear")
     return system.clear_report_scope(body.mode, body.days, body.events, body.sessions)
 
 
@@ -749,7 +730,7 @@ def request_help():
     for old in existing:
         if old["channel"] == "manual" and not old.get("withdrawal") and time.time() - __import__("datetime").datetime.fromisoformat(old["created_at"]).timestamp() < 30:
             return old
-    return system.events.create("manual", {"action": "help_button"}, "live", "长者求助按钮")
+    return system.events.create("manual", {"action": "help_button"}, "live", "Older adult help button")
 
 
 @app.get("/api/reports")
@@ -766,9 +747,9 @@ def export_csv(days: int = Query(default=7, ge=1, le=90), mode: str = Query(defa
     safe = lambda value: "'" + str(value) if str(value).startswith(("=", "+", "-", "@", "\t", "\r")) else value
     for item in report["events"]:
         voice = item["voice"]
-        label = translate(voice["label"] + (f" · {voice['detail']}" if voice["detail"] else ""))
+        label = voice["label"] + (f" · {voice['detail']}" if voice["detail"] else "")
         writer.writerow([safe(v) for v in ["Event", item["id"], item["created_at"], item["mode"], item["level"],
-                                           item["outcome"] or "", label, translate(voice["reason"]),
+                                           item["outcome"] or "", label, voice["reason"],
                                            item["state"] + (" (withdrawn by the older adult)" if item.get("withdrawn") else "")]])
     for item in report["sessions"]:
         writer.writerow([safe(v) for v in ["Training", item["session_id"], item["created_at"], item["mode"], item["exercise"],

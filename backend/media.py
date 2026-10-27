@@ -20,7 +20,7 @@ def browser_clip(original):
         container = None
         try:
             if not cap.isOpened():
-                raise ValueError("原证据视频不可读取")
+                raise ValueError("The original evidence video cannot be read")
             fps = Fraction(float(cap.get(cv2.CAP_PROP_FPS) or 15)).limit_denominator(1000)
             w, h = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             container = av.open(str(temporary), "w", options={"movflags": "+faststart"})

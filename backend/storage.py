@@ -22,7 +22,7 @@ DEFAULT_PLAN_ITEMS = ["chair_sit_to_stand", "squat", "standing_leg_raise", "hurd
 # The interface is English, so are the defaults. A value an earlier version stored as its Chinese default (and nobody changed since)
 # reads as the English default; what a person typed is never touched.
 DEFAULT_ROOM, DEFAULT_RELATION, DEFAULT_PLAN_TITLE = "Living room", "Family", "Today's movement plan"
-LEGACY_DEFAULTS = {"客厅": DEFAULT_ROOM, "家属": DEFAULT_RELATION, "今天的运动计划": DEFAULT_PLAN_TITLE}
+LEGACY_DEFAULTS = {"\u5ba2\u5385": DEFAULT_ROOM, "\u5bb6\u5c5e": DEFAULT_RELATION, "\u4eca\u5929\u7684\u8fd0\u52a8\u8ba1\u5212": DEFAULT_PLAN_TITLE}
 PLAN_DEFAULTS = {
     "enabled": False,
     "title": DEFAULT_PLAN_TITLE,
@@ -208,7 +208,7 @@ class Store:
                 raise KeyError(event_id)
             event = json.loads(row[0])
             if revision is not None and event["revision"] != revision:
-                raise ValueError("记录已更新，请刷新后重试")
+                raise ValueError("The record was updated. Please refresh and try again")
             mutate(event)
             event["revision"] += 1
             conn.execute("UPDATE events SET level=?,state=?,payload=? WHERE id=?", (
@@ -282,7 +282,7 @@ class Store:
                 stamp = row[0]
                 conn.execute("UPDATE coverage SET ended_at=MAX(started_at,?) WHERE ended_at IS NULL", (stamp,))
                 for channel in ("vision", "accel", "audio"):
-                    conn.execute("INSERT INTO coverage(channel,started_at,ended_at,state,reason) VALUES (?,?,?,'unavailable','服务离线区间')", (channel, stamp, now()))
+                    conn.execute("INSERT INTO coverage(channel,started_at,ended_at,state,reason) VALUES (?,?,?,'unavailable','Service offline period')", (channel, stamp, now()))
 
     def heartbeat(self):
         with self.connection() as conn:

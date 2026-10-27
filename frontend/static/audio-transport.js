@@ -5,8 +5,8 @@ class AudioChunkQueue {
     this.send=send;this.maxPending=maxPending;this.pending=[];this.busy=false;this.waiters=[];this.closed=false;
   }
   push(message) {
-    if(this.closed)throw new Error("音频连接已停止");
-    if(this.pending.length>=this.maxPending)throw new Error("声音处理积压超过 4 秒，监听已停止，请检查设备负载后重新启动");
+    if(this.closed)throw new Error("The audio connection has stopped");
+    if(this.pending.length>=this.maxPending)throw new Error("Audio processing has been backed up for more than 4 seconds and listening has stopped. Check the device load and start again");
     this.pending.push(message);this.next();
   }
   next() {

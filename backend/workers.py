@@ -63,7 +63,7 @@ class VideoWorker:
                     from backend.camera import FrameReader
                     self.reader = FrameReader(spec["shared_camera"])
                     self.realtime = True
-                    self.label = f"摄像头 {spec.get('index', 0)}"
+                    self.label = f"Camera {spec.get('index', 0)}"
                 else:
                     super().__init__(spec)
 
@@ -159,7 +159,7 @@ class VideoWorker:
 
     def start(self, source):
         if self.engine.is_running():
-            raise ValueError("检测正在运行，请先停止")
+            raise ValueError("Detection is running. Please stop it first")
         return self.engine.start(source)
 
     def stop(self):
@@ -196,7 +196,7 @@ class SignalWorker:
     def offline(self, path):
         t, a = self.preprocess.read_acc_csv(path)
         if len(t) < 12:
-            raise ValueError("CSV 没有足够的有效数据。原文件读取器要求 5 列：毫秒、合加速度、ax、ay、az")
+            raise ValueError("The CSV does not have enough valid data. The original reader needs 5 columns: milliseconds, magnitude, ax, ay, az")
         events, info = self.detector.detect_offline(t, a, self.model)
         step = max(1, len(t) // 2000)
         return {"events": events, "info": info, "waveform": {"t": t[::step].tolist(), "ax": a[::step, 0].tolist(),
@@ -204,13 +204,13 @@ class SignalWorker:
 
     def stream_start(self):
         if self.stream is not None:
-            raise ValueError("传感器流正在运行")
+            raise ValueError("The sensor stream is running")
         self.stream = self.detector.StreamingDetector(self.model)
         return {"state": "listening"}
 
     def samples(self, samples):
         if self.stream is None:
-            raise ValueError("请先启动传感器流")
+            raise ValueError("Please start the sensor stream first")
         events = []
         for sample in samples:
             events.extend(self.stream.push(*sample))
@@ -304,7 +304,7 @@ class ExerciseWorker:
         fps = cap.get(cv2.CAP_PROP_FPS)
         if not cap.isOpened() or not math.isfinite(fps) or not 1 <= fps <= 240:
             cap.release()
-            raise ValueError("无法打开运动视频或确定视频帧率")
+            raise ValueError("Could not open the exercise video or determine its frame rate")
         self.video_readers[session_id] = {"capture": cap, "fps": fps, "index": 0}
         return {"fps": fps}
 
@@ -345,7 +345,7 @@ class ExerciseWorker:
         self.pose_initialize()
         frame = cv2.imdecode(np.frombuffer(base64.b64decode(image), np.uint8), cv2.IMREAD_COLOR)
         if frame is None:
-            raise ValueError("无法读取图像")
+            raise ValueError("Cannot read the image")
         return self._pose_frame(session_id, frame, timestamp_ms, request_id)
 
     def camera_frame(self, session_id, descriptor, base_stamp, last_sequence):
@@ -409,7 +409,7 @@ class AudioWorker:
         x = self.algorithm.decode(base64.b64decode(data))
         try:
             if len(x) > 16000 * 120:
-                raise ValueError("音频最长 120 秒")
+                raise ValueError("Audio can be at most 120 seconds")
             if task == "monitor":
                 sounds = self.algorithm.label_sounds(x)
                 help_result = self.algorithm.detect_spoken_help(x)
@@ -421,7 +421,7 @@ class AudioWorker:
                 return self.algorithm.detect_spoken_help(x)
             if task == "reply":
                 return self.algorithm.classify_reply(audio=x)
-            raise ValueError("未知音频任务")
+            raise ValueError("Unknown audio task")
         finally:
             x.fill(0)
 
@@ -438,7 +438,7 @@ class AudioWorker:
         from homeease.ml.audio.pipeline import Function3Pipeline
         from homeease.ml.audio.help_listener import HelpListener
         if self.pipe is not None:
-            raise ValueError("麦克风监听正在运行")
+            raise ValueError("Microphone listening is running")
         self.clock = SystemClock()
         self.calls = deque(maxlen=32)
         self.inquiry_since = None
@@ -460,7 +460,7 @@ class AudioWorker:
         import numpy as np
         from dataclasses import asdict
         if self.pipe is None:
-            raise ValueError("监听未启动")
+            raise ValueError("Listening has not started")
         if inquiry_active and self.inquiry_since is None:
             self.inquiry_since = self.clock.mono_ms()
         elif not inquiry_active:
@@ -468,7 +468,7 @@ class AudioWorker:
         x = np.frombuffer(base64.b64decode(pcm), dtype="<f4").copy()
         try:
             if not 1 <= len(x) <= 32000 or not np.isfinite(x).all():
-                raise ValueError("无效的音频数据块")
+                raise ValueError("Invalid audio data block")
             if not hasattr(self, "stream_base") or self.stream_base is None:
                 self.stream_base = self.clock.mono_ms() - float(timestamp_ms) - len(x) / 16
             self.pipe.process_chunk(x, self.stream_base + float(timestamp_ms))
@@ -519,7 +519,7 @@ def main():
                     instance = classes[sys.argv[1]]()
                 method = request["method"]
                 if method.startswith("_") or method == "close":
-                    raise ValueError("未知调用")
+                    raise ValueError("Unknown call")
                 result = getattr(instance, method)(**request.get("params", {}))
                 response = {"ok": True, "result": result, "worker_pid": os.getpid()}
                 encoded = json.dumps(response, ensure_ascii=True, allow_nan=False, default=protocol_default)

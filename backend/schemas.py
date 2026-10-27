@@ -39,7 +39,7 @@ class Settings(Model):
             from pydantic import TypeAdapter
             url = TypeAdapter(HttpUrl).validate_python(self.webhook_url)
             if url.username or url.password:
-                raise ValueError("Webhook URL 不得含账户密码")
+                raise ValueError("The webhook URL must not contain a username or password")
         return self
 
 
@@ -115,7 +115,7 @@ class ExercisePlan(Model):
     def no_duplicate_items(self):
         seen = [item.exercise for item in self.items]
         if len(seen) != len(set(seen)):
-            raise ValueError("同一动作在计划中只能出现一次")
+            raise ValueError("A movement can appear only once in the plan")
         return self
 
 

@@ -44,20 +44,20 @@
     const audioHealthy = audio && audioCoverage?.state === "active";
     const healthy = visible && audioHealthy;
     $("homeMonitorDot").className = `dot ${healthy ? "green" : "amber"}`;
-    $("homeMonitorSummary").textContent = healthy ? "居家守护中" : video ? "视频守护中" : desired ? "守护正在连接" : "守护已暂停";
-    $("homeMicSummary").textContent = audioHealthy ? "声音与语音已连接" : audio ? "声音监听准备中" : "麦克风未连接";
-    $("homeGuardBadge").textContent = healthy ? "守护中" : desired ? "等待输入" : "已暂停";
+    $("homeMonitorSummary").textContent = healthy ? "Home monitoring is active" : video ? "Video monitoring is active" : desired ? "Connecting monitoring" : "Monitoring paused";
+    $("homeMicSummary").textContent = audioHealthy ? "Sound and voice connected" : audio ? "Preparing sound monitoring" : "Microphone not connected";
+    $("homeGuardBadge").textContent = healthy ? "Monitoring" : desired ? "Waiting for input" : "Paused";
     $("homeGuardBadge").className = `badge ${healthy ? "green" : "amber"}`;
-    $("homeSafetyStatus").textContent = !desired ? "守护已暂停" : app.status.home_monitoring?.error || (healthy ? "视频与声音输入有效" : "正在检查摄像头与麦克风");
-    $("homeVideoState").textContent = !video ? "等待连接" : visible ? "监测中" : "已开启，未见人体";
-    $("homeAudioState").textContent = audioHealthy ? "监听中" : audio ? "检查输入中" : !app.settings?.audio_consent ? "尚未授权" : audioError || "等待连接";
-    $("homeInquiryState").textContent = audio ? "已就绪" : "等待麦克风";
-    $("homeSensorState").textContent = app.status.coverage.some(c => c.channel === "accel" && c.state === "active") ? "已连接" : "未连接";
+    $("homeSafetyStatus").textContent = !desired ? "Monitoring paused" : app.status.home_monitoring?.error || (healthy ? "Video and sound inputs are available" : "Checking camera and microphone");
+    $("homeVideoState").textContent = !video ? "Waiting for connection" : visible ? "Monitoring" : "On, no person visible";
+    $("homeAudioState").textContent = audioHealthy ? "Listening" : audio ? "Checking input" : !app.settings?.audio_consent ? "Not authorized" : audioError || "Waiting for connection";
+    $("homeInquiryState").textContent = audio ? "Ready" : "Waiting for microphone";
+    $("homeSensorState").textContent = app.status.coverage.some(c => c.channel === "accel" && c.state === "active") ? "Connected" : "Not connected";
     for (const [id, ready] of [["homeVideoState", visible], ["homeAudioState", audioHealthy], ["homeInquiryState", audio]]) $(id).className = ready ? "ready" : "warning";
     $("homeAudioNotice").hidden = !desired || (audio && !audioError);
-    $("homeAudioReason").textContent = audioError || (!app.settings?.audio_consent ? "麦克风尚未授权" : "麦克风等待连接");
-    $("homeAllowAudio").querySelector("span").textContent = app.settings?.audio_consent ? "连接麦克风" : "允许麦克风";
-    $("homeRoom").textContent = app.settings?.resident.room || "客厅";
+    $("homeAudioReason").textContent = audioError || (!app.settings?.audio_consent ? "Microphone permission needed" : "Microphone waiting to connect");
+    $("homeAllowAudio").querySelector("span").textContent = app.settings?.audio_consent ? "Connect microphone" : "Allow microphone";
+    $("homeRoom").textContent = app.settings?.resident.room || "Living room";
     if (document.activeElement !== $("homeCameraIndex")) $("homeCameraIndex").value = app.status.home_monitoring?.camera_index ?? 0;
     $("exerciseCameraIndex").value = app.status.home_monitoring?.camera_index ?? 0;
     const image = $("homeFrame"), preview = video && app.page === "safety";
@@ -92,28 +92,28 @@
     // 长者点过「今天先不做」，当天就不再显示这张卡片，明天照常出现。
     $("homePlan").hidden = !plan.enabled || !rows.length || !!progress.skipped;
     if ($("homePlan").hidden) return;
-    $("homePlanTitle").textContent = plan.title || "今天的运动计划";
+    $("homePlanTitle").textContent = plan.title || "Today's movement plan";
     $("homePlanNote").textContent = plan.note || "";
     $("homePlanNote").hidden = !plan.note;
     const done = rows.filter(item => item.done).length;
-    $("homePlanCount").textContent = `${done} / ${rows.length} 已完成`;
+    $("homePlanCount").textContent = `${done} / ${rows.length} completed`;
     $("homePlanCount").className = `badge ${done === rows.length ? "green" : "amber"}`;
     $("homePlanItems").innerHTML = rows.map((item, index) => {
       const guide = exerciseGuides[item.exercise];
       const percent = Math.min(100, Math.round(100 * (item.reps || 0) / Math.max(1, item.target_reps)));
-      const state = item.done ? "已完成" : item.reps ? `已做 ${item.reps} 次` : "还没开始";
+      const state = item.done ? "Completed" : item.reps ? `Done ${item.reps} reps` : "Not started";
       return `<li class="home-plan-item ${item.done ? "is-done" : ""}">
-        <button type="button" class="home-plan-button" data-plan-start="${item.exercise}" ${item.disabled ? "disabled" : ""} aria-label="${item.done ? "再做一次" : "开始"}${names[item.exercise]}">
+        <button type="button" class="home-plan-button" data-plan-start="${item.exercise}" ${item.disabled ? "disabled" : ""} aria-label="${item.done ? "Again" : "Start"}${names[item.exercise]}">
           <span class="home-plan-order">${item.done ? icon("circle-check") : index + 1}</span>
-          <img src="/static/media/${item.exercise}-guide.png" alt="${names[item.exercise]} 动作示意">
-          <span class="home-plan-copy"><strong>${names[item.exercise]}</strong><small>${item.disabled ? "该动作检测已关闭，请联系家属" : `${state} · 目标 ${item.target_reps} 次`}</small>
+          <img src="/static/media/${item.exercise}-guide.png" alt="${names[item.exercise]} movement guide">
+          <span class="home-plan-copy"><strong>${names[item.exercise]}</strong><small>${item.disabled ? "Detection for this movement is off; please contact your family" : `${state} · Target ${item.target_reps} reps`}</small>
             <span class="home-plan-bar"><span style="width:${percent}%"></span></span></span>
-          <span class="home-plan-go">${item.done ? "再做一次" : item.reps ? "继续" : "开始"}${icon("arrow-right")}</span>
+          <span class="home-plan-go">${item.done ? "Again" : item.reps ? "Resume" : "Start"}${icon("arrow-right")}</span>
         </button></li>`;
     }).join("");
     $("homePlanHint").textContent = done === rows.length
-      ? "今天的计划已经完成，辛苦了"
-      : done ? `还剩 ${rows.length - done} 项，慢慢来` : "按顺序开始，做完一项会自动打勾";
+      ? "Today's plan is complete, well done"
+      : done ? `Still ${rows.length - done} to go, take your time` : "Start in order; each item is ticked off automatically";
     $("homePlanStart").hidden = done === rows.length;
     icons();
     document.querySelectorAll("[data-plan-start]").forEach(button => {
@@ -132,14 +132,14 @@
       if (planBusy) return;
       // 顺延几天交给长者自己定，别替他猜「明天一定有空」。
       const days = Number($("homePlanDeferDays")?.value || 1);
-      if (days > 1 && !confirm("这几天都不做训练，确定吗？")) return;
+      if (days > 1 && !confirm("No training for these days. Are you sure?")) return;
       planBusy = true;
       try {
         await api("/api/plan/defer", {method: "POST", body: {days}});
         app.plan = await api("/api/plan");
         planPaint = "";
         render();
-        toast(days > 1 ? `好的，休息 ${days} 天，之后照常提醒` : "好的，今天先休息，计划改到明天");
+        toast(days > 1 ? `All right, resting for ${days} day(s), then reminders resume as usual` : "All right, rest today; the plan moves to tomorrow");
       } catch (error) { toast(error.message, true); }
       finally { planBusy = false; }
     };
@@ -172,9 +172,9 @@
     window.addEventListener("pagehide", () => { leaving = true; voiceState(); });
     setInterval(() => {
       if (!lastStatusAt || Date.now()-lastStatusAt < 12000) return;
-      $("homeMonitorSummary").textContent = "系统连接中断";
+      $("homeMonitorSummary").textContent = "System connection lost";
       $("homeMonitorDot").className = "dot amber";
-      $("homeGuardBadge").textContent = "系统连接中断";
+      $("homeGuardBadge").textContent = "System connection lost";
       $("homeGuardBadge").className = "badge amber";
       voiceState();
     }, 2000);
