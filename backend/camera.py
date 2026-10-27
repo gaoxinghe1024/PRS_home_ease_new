@@ -27,10 +27,10 @@ class FrameReader:
                 after = struct.unpack_from("<Q", self.memory.buf)[0]
                 if before == after:
                     if time.perf_counter() - stamp > 5:
-                        raise RuntimeError("摄像头画面中断，请检查连接后重新启动")
+                        raise RuntimeError("The camera image was interrupted. Check the connection and restart")
                     return np.frombuffer(pixels, np.uint8).reshape(self.shape).copy(), before // 2, stamp
             time.sleep(.001)
-        raise RuntimeError("摄像头画面暂不可用")
+        raise RuntimeError("Camera image is temporarily unavailable")
 
     def close(self):
         self.memory.close()
@@ -56,12 +56,12 @@ class CameraCapture:
                 self.cap.release()
                 self.cap = (factory or cv2.VideoCapture)(index)
             if not self.cap.isOpened():
-                raise ValueError(f"无法打开摄像头 {index}。请关闭相机、会议软件，并检查 Windows 相机隐私权限")
+                raise ValueError(f"Cannot open camera {index}. Close other camera or video-call apps and check the camera privacy permission")
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
             ok, frame = self.cap.read()
             if not ok or frame is None:
-                raise ValueError(f"摄像头 {index} 已连接但未返回画面，请检查设备占用或连接")
+                raise ValueError(f"Camera {index} is connected but returns no frames. Check whether it is in use by another app or disconnected")
             self.shape = frame.shape
             self.memory = shared_memory.SharedMemory(create=True, size=HEADER + frame.nbytes)
             self.memory.buf[:HEADER] = bytes(HEADER)
@@ -79,7 +79,7 @@ class CameraCapture:
     def _publish(self, frame):
         import cv2
         if frame.shape != self.shape:
-            raise RuntimeError("摄像头分辨率在采集中发生变化，请重新启动")
+            raise RuntimeError("The camera resolution changed during capture. Please restart")
         self.sequence += 2
         struct.pack_into("<Q", self.memory.buf, 0, self.sequence - 1)
         self.memory.buf[HEADER:] = frame.tobytes()
@@ -96,7 +96,7 @@ class CameraCapture:
             while not self.stop.is_set():
                 ok, frame = self.cap.read()
                 if not ok:
-                    raise RuntimeError("摄像头连接中断")
+                    raise RuntimeError("Camera connection lost")
                 self._publish(frame)
         except Exception as exc:
             self.error = str(exc)
@@ -115,7 +115,7 @@ class CameraCapture:
             self.cap.release()
             self.thread.join(timeout=2)
         if self.thread.is_alive():
-            raise RuntimeError("摄像头采集线程尚未退出，暂不能重新打开设备")
+            raise RuntimeError("The camera capture thread has not exited yet, so the device cannot be reopened")
         self.memory.close()
         self.memory.unlink()
         log.info("Camera %s released", self.index)
@@ -131,7 +131,7 @@ class CameraHub:
         with self.lock:
             capture = self.devices.get(index)
             if capture and capture.error:
-                raise ValueError(capture.error + "，请停止使用该摄像头的任务后重试")
+                raise ValueError(capture.error + ", please stop the tasks using this camera and try again")
             if capture is None:
                 capture = CameraCapture(index, self.factory)
                 self.devices[index] = capture

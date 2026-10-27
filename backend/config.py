@@ -11,17 +11,17 @@ SIGNAL = ROOT / "algorithms" / "fall_signal"
 EXERCISE = ROOT / "algorithms" / "exercise"
 AUDIO = ROOT / "algorithms" / "audio"
 EXERCISES = {
-    "chair_sit_to_stand": "坐站训练",
-    "squat": "深蹲训练",
-    "standing_leg_raise": "站立抬腿",
-    "hurdle_step": "跨步训练",
+    "chair_sit_to_stand": "Sit-to-stand",
+    "squat": "Squat",
+    "standing_leg_raise": "Standing leg raise",
+    "hurdle_step": "Hurdle step",
 }
 # 后台常驻时自动运行的算法通道。只决定「是否交给原算法运行」，不涉及任何
 # 模型、阈值或判定条件；未开启的通道算法完全不会收到输入。
 ALGORITHM_CHANNELS = {
-    "resident": "后台常驻",
-    "vision": "视频跌倒检测",
-    "accel": "加速度跌倒检测",
+    "resident": "Always on in background",
+    "vision": "Video fall detection",
+    "accel": "Accelerometer fall detection",
 }
 # 运动检测通道的键名沿用原算法2的动作编号，便于前端与 EXERCISES 对齐。
 ALGORITHM_KEYS = tuple(ALGORITHM_CHANNELS) + tuple(EXERCISES)

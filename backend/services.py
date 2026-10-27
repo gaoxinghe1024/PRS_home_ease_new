@@ -19,7 +19,6 @@ from backend.adapters.process import AlgorithmProcess, ModuleError
 from backend.camera import CameraHub
 from backend.config import EXERCISE, SIGNAL, VIDEO, RUNTIME, EXERCISES, ALGORITHM_KEYS
 from backend.events import Events
-from backend.i18n import translate
 from backend.inquiry import NOT_ASKED, ANSWERED, HIGH_RISK, voice_inquiry
 from backend.events import is_withdrawn, withdraw_status
 from backend.records import Records
@@ -29,7 +28,7 @@ log = logging.getLogger(__name__)
 
 EXERCISE_KEYS = tuple(EXERCISES)
 # 摄像头打不开（没插、被别的软件占用）时的统一标记，用来区分「设备问题」和「暂时失败」。
-FAILED = "摄像头不可用"
+FAILED = "Camera unavailable"
 
 
 def canonical_csv(data):
@@ -46,22 +45,22 @@ def canonical_csv(data):
             if header is None and not numeric:
                 header = [v.strip().lower() for v in row]
                 continue
-            raise ValueError("CSV 含有无法识别的数据行")
+            raise ValueError("The CSV contains unreadable rows")
         if len(values) not in {4, 5} or not all(math.isfinite(v) for v in values):
-            raise ValueError("CSV 需要 4 或 5 列有限数值")
+            raise ValueError("The CSV needs 4 or 5 columns of finite numbers")
         numeric.append(values)
     if len(numeric) < 12:
-        raise ValueError("至少需要 12 个有效加速度样本")
+        raise ValueError("At least 12 valid acceleration samples are needed")
     widths = {len(r) for r in numeric}
     if len(widths) != 1:
-        raise ValueError("CSV 列数不一致")
+        raise ValueError("The CSV rows have different numbers of columns")
     if len(numeric[0]) == 4:
         if not header or header[0] not in {"t", "t_s", "t_ms"}:
-            raise ValueError("4 列 CSV 需要表头 t,ax,ay,az（秒）或 t_ms,ax,ay,az（毫秒）；加速度单位 g")
+            raise ValueError("A 4-column CSV needs the header t,ax,ay,az (seconds) or t_ms,ax,ay,az (milliseconds); acceleration in g")
         factor = 1 if header[0] == "t_ms" else 1000
         numeric = [[r[0] * factor, math.sqrt(sum(v * v for v in r[1:])), *r[1:]] for r in numeric]
     if any(b[0] <= a[0] for a, b in zip(numeric, numeric[1:])):
-        raise ValueError("样本时间戳必须严格递增")
+        raise ValueError("Sample timestamps must strictly increase")
     output = io.StringIO(newline="")
     csv.writer(output).writerows(numeric)
     return output.getvalue().encode("utf-8")
@@ -115,7 +114,7 @@ class System:
         self.session_cancel = {}
         self.latest_poses = {}
         self.audio_last_received = None
-        self.audio_quality = {"state": "active", "reason": "麦克风输入有效"}
+        self.audio_quality = {"state": "active", "reason": "Microphone input is valid"}
         self.jobs = set()
         self.jobs_lock = threading.RLock()
         # 后台算法开关：只记录开关状态与调度结果，不参与原算法的判定。
@@ -134,7 +133,7 @@ class System:
         self.vision_retry_at = 0
         self.store.recover_coverage()
         for channel in ("vision", "accel", "audio"):
-            self.store.set_coverage(channel, "unavailable", "尚未连接实时输入")
+            self.store.set_coverage(channel, "unavailable", "No live input connected yet")
         for old in self.store.sessions():
             if old["status"] in {"running", "paused"}:
                 old.update(status="interrupted", quality="service_restarted", ended_at=now())
@@ -211,21 +210,21 @@ class System:
                 self.algorithms[key] = value
         try:
             if "vision" in changes and not changes["vision"]:
-                self.stop_vision("视频跌倒检测已关闭", switch=True)
+                self.stop_vision("Video fall detection off", switch=True)
             if "accel" in changes and not changes["accel"]:
-                self.stop_session_channel(self.sensor_session, "加速度跌倒检测已关闭")
+                self.stop_session_channel(self.sensor_session, "Accelerometer fall detection was switched off")
             for key, value in changes.items():
                 if key in EXERCISE_KEYS and not value:
-                    self.stop_session_channel(self.exercise_session, f"{EXERCISES[key]}检测已关闭")
+                    self.stop_session_channel(self.exercise_session, f"{EXERCISES[key]} detection off")
             if changes.get("resident"):
                 self.resident["state"] = "starting"
                 self.resident["error"] = None
                 self.store.audit("resident", "enabled", {"remote_access": self.remote_access})
             elif "resident" in changes and not changes["resident"]:
-                self.stop_vision("后台常驻已关闭", switch=True)
-                self.stop_session_channel(self.sensor_session, "后台常驻已关闭")
+                self.stop_vision("Always on in background off", switch=True)
+                self.stop_session_channel(self.sensor_session, "Always on in background off")
                 for key in EXERCISE_KEYS:
-                    self.stop_session_channel(self.exercise_session, "后台常驻已关闭")
+                    self.stop_session_channel(self.exercise_session, "Always on in background off")
                 self.resident.update(state="off", error=None)
                 self.store.audit("resident", "disabled", {})
             self.sync_home_monitoring()
@@ -353,13 +352,13 @@ class System:
         state = self.sensor_session
         wanted = bool(switches.get("resident") and switches.get("accel", True))
         if state.get("active") and not wanted:
-            self.stop_session_channel(state, "加速度跌倒检测已关闭")
+            self.stop_session_channel(state, "Accelerometer fall detection was switched off")
             return
         connected = self.sensor["state"] == "connected"
         with self.exercises_lock:
             state["active"] = bool(wanted and connected)
             state["sid"] = "sensor" if state["active"] else None
-            state["error"] = None if not wanted or connected else "本机没有三轴采集设备：请在手机上打开 /sensor 并保持页面在前台，数据会实时推送到这里"
+            state["error"] = None if not wanted or connected else "This computer has no three-axis sensor: open /sensor on the phone and keep that page in the foreground; samples stream here in real time"
         if state["active"]:
             state["stop"] = self._stop_sensor_channel
         else:
@@ -381,7 +380,7 @@ class System:
         if state.get("active"):
             if state.get("key") in wanted:
                 return
-            self.stop_session_channel(state, "该运动检测已关闭")
+            self.stop_session_channel(state, "Detection for this movement was switched off")
             return
         if wanted and state.get("error") and (state.get("retry_at") or 0) > time.monotonic():
             return
@@ -419,7 +418,7 @@ class System:
             # 画面已交给训练会话，视频通道腾出镜头；训练结束后下一轮调度再接管。
             # keep_camera: 采集线程此刻正被训练会话使用，不能拆机。
             with self.video_lock:
-                self.stop_vision("摄像头交由后台运动检测使用")
+                self.stop_vision("Camera handed over to background movement detection")
 
     def _next_exercise(self, wanted):
         """按计划顺序轮转；某动作本轮已完成，就让给下一个，让长者不用等。"""
@@ -474,18 +473,18 @@ class System:
         exercise = self.exercise_session
         channels = [
             {"key": "vision", "type": "algorithm", "active": vision_on,
-             "detail": self.video.get("error") or ("实时视频检测中" if vision_on else "未运行")},
+             "detail": self.video.get("error") or ("Live video detection running" if vision_on else "Not running")},
             {"key": "accel", "type": "algorithm",
              "active": bool(sensor.get("active")) or self.sensor["state"] == "connected",
-             "detail": sensor.get("error") or ("后台采集运行中" if sensor.get("active") else
-                                               "手机端已连接" if self.sensor["state"] == "connected" else "未运行")},
+             "detail": sensor.get("error") or ("Background capture running" if sensor.get("active") else
+                                               "Phone sensor connected" if self.sensor["state"] == "connected" else "Not running")},
         ]
         current = exercise.get("key") if exercise.get("active") else None
         for key in EXERCISE_KEYS:
             running = current == key
             channels.append({"key": key, "type": "exercise", "active": running,
-                             "detail": "随后台常驻识别动作" if running else
-                                       "待识别" if switches.get("resident") and switches.get(key) else "未运行"})
+                             "detail": "Recognising movements with always-on" if running else
+                                       "Ready to recognise" if switches.get("resident") and switches.get(key) else "Not running"})
         reasons = self.algorithm_blockers(switches)
         return {"switches": switches, "channels": channels, "resident": dict(self.resident),
                 "resident_ready": self.resident_available(), "blockers": reasons,
@@ -544,16 +543,16 @@ class System:
     def algorithm_blockers(self, switches):
         blockers = []
         if not switches.get("resident"):
-            blockers.append("「后台常驻」未开启，视频、加速度与运动检测不会自动运行")
+            blockers.append("Background mode is off, so video, accelerometer and movement detection do not start by themselves")
             return blockers
         if not self.resident_available():
-            blockers.append("找不到启动脚本，后台常驻无法自动恢复")
+            blockers.append("The start script is missing, so always-on cannot recover by itself")
         if self.resident.get("error") and self.resident["error"] != FAILED:
             blockers.append(self.resident["error"])
         if self.resident.get("error") and self.resident["error"] == FAILED:
-            blockers.append("本机摄像头不可用，插上或释放占用后会自动恢复")
+            blockers.append("The camera on this device is unavailable; it recovers once it is plugged in or freed")
         elif switches.get("vision") and self.modules["video"].state != "ready":
-            blockers.append("视频算法尚未就绪，启动后会自动接管")
+            blockers.append("The video algorithm is not ready yet; it takes over once available")
         if self.exercise_session.get("error"):
             blockers.append(self.exercise_session["error"])
         return blockers
@@ -574,17 +573,17 @@ class System:
         已经算好的结果，不参与判定，也无需向算法目录暴露任何检测参数。
         """
         if self.modules["video"].state != "ready":
-            raise ModuleError("视频模块尚未就绪", 503)
+            raise ModuleError("The video module is not ready yet", 503)
         if self.video.get("state") not in {"running", "idle", "finished"}:
-            raise ModuleError("视频检测未在运行", 409)
+            raise ModuleError("Video detection is not running", 409)
         return self.modules["video"].call("pose", timeout=10)
 
     def video_start(self, source, mode):
         with self.video_lock:
             if self.home_monitoring["enabled"] and mode != "live":
-                raise ValueError("请先暂停居家守护，再播放视频样例")
+                raise ValueError("Pause home monitoring before playing a video sample")
             if self.video.get("state") == "running":
-                raise ValueError("视频检测正在运行")
+                raise ValueError("Video detection is running")
             self.video_mode = mode
             self.video_run = uuid.uuid4().hex
             self.video_finalized = False
@@ -614,7 +613,7 @@ class System:
             self.video_finalized = True
             self.video_run = None
             self.poll_video(force=True)
-            self.store.set_coverage("vision", "unavailable", "实时视频已停止")
+            self.store.set_coverage("vision", "unavailable", "Live video stopped")
             return self.video
 
     def poll_video(self, force=False):
@@ -654,7 +653,7 @@ class System:
                     continue
                 def add_clip(event, record=record):
                     event["evidence"].update(record)
-                    Events.timeline(event, "evidence_saved", "原视频引擎已保存事件片段")
+                    Events.timeline(event, "evidence_saved", "The original video engine saved the event clip")
                 self.store.update_event(eid, add_clip)
 
     def check_coverage(self):
@@ -662,18 +661,18 @@ class System:
             fresh = time.time() - self.video_last_frame_at < 8
             visible = self.video.get("person_visible", False)
             self.store.set_coverage("vision", "active" if fresh and visible else "reduced",
-                "实时画面有效" if fresh and visible else ("画面中未检测到人体" if fresh else "视频数据已超时"))
+                "Live image is valid" if fresh and visible else ("No person detected in the image" if fresh else "Video data timed out"))
         else:
-            self.store.set_coverage("vision", "unavailable", "正在样例回放" if self.video_mode == "replay" and self.video.get("state") == "running" else "未开启实时视频")
+            self.store.set_coverage("vision", "unavailable", "Replaying a sample" if self.video_mode == "replay" and self.video.get("state") == "running" else "Live video is not on")
         if self.sensor["state"] == "connected":
             fresh = time.time() - (self.sensor.get("last_received") or 0) < 5
-            self.store.set_coverage("accel", "active" if fresh else "reduced", "已接收实时传感器数据" if fresh else "传感器数据已超时")
+            self.store.set_coverage("accel", "active" if fresh else "reduced", "Live sensor data received" if fresh else "Sensor data timed out")
         else:
-            self.store.set_coverage("accel", "unavailable", "传感器未连接")
+            self.store.set_coverage("accel", "unavailable", "Sensor not connected")
         consent = self.store.settings()["audio_consent"]
         fresh_audio = consent and self.audio_last_received and time.time() - self.audio_last_received < 20
         self.store.set_coverage("audio", self.audio_quality["state"] if fresh_audio else "unavailable",
-            self.audio_quality["reason"] if fresh_audio else ("未开启音频授权" if not consent else "未连接连续麦克风输入"))
+            self.audio_quality["reason"] if fresh_audio else ("Audio consent is not on" if not consent else "No continuous microphone input connected"))
 
     def status(self):
         coverage = [r for r in self.store.coverage() if r["ended_at"] is None]
@@ -770,10 +769,10 @@ class System:
 
     def signal_results(self, result, stream_id):
         for alarm in result.get("alarms", []):
-            self.events.create("accel", alarm, "live", "实时传感器", f"sensor:{stream_id}:{alarm['t_alarm']}",
+            self.events.create("accel", alarm, "live", "Live sensor", f"sensor:{stream_id}:{alarm['t_alarm']}",
                                at=datetime.fromtimestamp(alarm["wall_alarm"], timezone.utc).isoformat(timespec="milliseconds"))
         for evidence in result.get("events", []):
-            event = self.events.create("accel", evidence, "live", "实时传感器", f"sensor:{stream_id}:{evidence['t_alarm']}",
+            event = self.events.create("accel", evidence, "live", "Live sensor", f"sensor:{stream_id}:{evidence['t_alarm']}",
                 at=datetime.fromtimestamp(evidence.get("wall_alarm") or time.time(), timezone.utc).isoformat(timespec="milliseconds"))
             if "snippet" not in event["evidence"]:
                 self.store.update_event(event["id"], lambda item, e=evidence: item["evidence"].update(e))
@@ -782,7 +781,7 @@ class System:
         with self.sessions_lock:
             active = [m for m in self.session_metadata.values() if m.get("active")]
             if active:
-                raise ValueError("请先结束当前运动训练")
+                raise ValueError("Please end the current exercise session first")
             inactive = [sid for sid, meta in self.session_metadata.items() if not meta["active"]]
             for old_sid in inactive[:-99]:
                 self.session_metadata.pop(old_sid, None)
@@ -814,7 +813,7 @@ class System:
             if not self.session_metadata[sid]["active"]:
                 if action == "end":
                     return next(s for s in self.store.sessions() if s["session_id"] == sid)
-                raise ValueError("训练已经结束")
+                raise ValueError("The session has already ended")
             if action == "end":
                 self.session_cancel[sid].set()
             result = self.save_session(self.modules["exercise"].call("control", session_id=sid, action=action))
@@ -842,13 +841,13 @@ class System:
                     return self.modules["exercise"].call("trace", session_id=sid)
         path = RUNTIME / "exercise-traces" / f"{sid}.json"
         if not path.is_file():
-            raise ValueError("这次训练未保留骨架诊断，请开始新的训练")
+            raise ValueError("No skeleton diagnostics were retained for this session. Please start a new session.")
         return json.loads(path.read_text(encoding="utf-8"))
 
     def start_camera_session(self, exercise, target, index, handover=None):
         with self.sessions_lock:
             if any(meta["active"] for meta in self.session_metadata.values()):
-                raise ValueError("请先结束当前运动训练")
+                raise ValueError("Please end the current exercise session first")
             owner = "exercise-opening"
             if not handover:
                 self.cameras.acquire(index, owner)
@@ -1008,19 +1007,19 @@ class System:
 
     def audio_analyze(self, data, task, mode, event_id=None):
         if not self.store.settings()["audio_consent"]:
-            raise ValueError("需先在设置中获得长者的音频处理授权")
+            raise ValueError("The older adult's audio-processing consent must be recorded in Settings first")
         result = self.modules["audio"].call("analyze", timeout=120, data=base64.b64encode(data).decode(), task=task)
         if not self.store.settings()["audio_consent"]:
-            raise ValueError("音频授权已撤回，结果已丢弃")
+            raise ValueError("Audio consent was withdrawn; the result was discarded")
         result.pop("transcript", None)
         if task == "reply":
             if not event_id:
-                raise ValueError("语音回复需要关联一个事件")
+                raise ValueError("A voice reply must be linked to an event")
             event = self.events.inquiry_reply(event_id, result)
             return {"result": result, "event": event}
         help_result = result.get("help_result", {}) if task == "monitor" else result if task == "help" else {}
         if help_result.get("help"):
-            event = self.events.create("audio", help_result, mode, "麦克风" if mode == "live" else "音频回放")
+            event = self.events.create("audio", help_result, mode, "Microphone" if mode == "live" else "Audio replay")
             help_result["event_id"] = event["id"]
         stored = self.store.save_sound({"task": task, "result": result}, mode)
         return {"result": result, "id": stored["id"]}
@@ -1032,9 +1031,7 @@ class System:
         with self.store.connection() as conn:
             rows = conn.execute("SELECT * FROM notifications WHERE kind='webhook' AND status IN ('queued','retry') AND next_at<=? ORDER BY created_at LIMIT 1", (time.time(),)).fetchall()
         for row in rows:
-            # The receiver gets the English interface text; the stored record keeps the original.
             sent = json.loads(row["payload"])
-            sent.update({key: translate(sent[key]) for key in ("title", "message") if key in sent})
             try:
                 with httpx.Client(timeout=5, follow_redirects=False) as client:
                     response = client.post(destination, json=sent, headers={"Idempotency-Key": row["id"]})
@@ -1126,4 +1123,4 @@ class System:
             module.close()
         self.cameras.close()
         for channel in ("vision", "accel", "audio"):
-            self.store.set_coverage(channel, "unavailable", "服务已停止")
+            self.store.set_coverage(channel, "unavailable", "Service stopped")

@@ -56,7 +56,7 @@ class AlgorithmProcess:
                     except json.JSONDecodeError:
                         log.warning("%s emitted non-protocol output", self.name)
             finally:
-                responses.put({"ok": False, "fatal": True, "error": "模块进程已退出"})
+                responses.put({"ok": False, "fatal": True, "error": "The module process exited"})
 
         threading.Thread(target=read, daemon=True, name=f"{self.name}-reader").start()
         self.state = "loading"
@@ -73,7 +73,7 @@ class AlgorithmProcess:
                 response = self.responses.get(timeout=timeout)
             except (OSError, queue.Empty) as exc:
                 self.close()
-                self.state, self.error = "unavailable", "模块超时或连接中断，已释放进程，可重新初始化"
+                self.state, self.error = "unavailable", "The module timed out or the connection was lost. The process was released and can be initialized again"
                 log.exception("%s.%s failed", self.name, method)
                 raise ModuleError(self.error) from exc
             self.last_call = time.time()
@@ -83,7 +83,7 @@ class AlgorithmProcess:
                 except psutil.NoSuchProcess:
                     pass
             if not response.get("ok"):
-                self.error = response.get("error", "模块不可用")
+                self.error = response.get("error", "Module unavailable")
                 if response.get("fatal"):
                     self.state = "unavailable"
                 log.warning("%s.%s: %s", self.name, method, self.error)
@@ -98,7 +98,7 @@ class AlgorithmProcess:
 
     def health(self):
         if self.process and self.process.poll() is not None and self.state == "ready":
-            self.state, self.error = "unavailable", "模块进程已退出，可重新初始化"
+            self.state, self.error = "unavailable", "The module process exited and can be initialized again"
         return {"id": self.name, "state": self.state, "error": self.error,
                 "details": self.details, "last_call": self.last_call,
                 "pid": self.process.pid if self.process and self.process.poll() is None else None}

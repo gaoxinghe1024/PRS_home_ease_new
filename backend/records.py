@@ -58,7 +58,7 @@ def drop_evidence(names):
                     path.unlink()
                     removed[key] += 1
                 except OSError:
-                    log.warning("无法删除 %s", path)
+                    log.warning("Cannot delete %s", path)
     if names and ENGINE_DB.is_file():
         placeholders = ",".join("?" * len(names))
         try:
@@ -67,7 +67,7 @@ def drop_evidence(names):
                     f"DELETE FROM falls WHERE clip IN ({placeholders})", names).rowcount
         except sqlite3.Error:
             # 视频工作进程可能正占用该库；片段文件已删除，明细留待下次清理。
-            log.warning("无法清理引擎明细 %s", ENGINE_DB)
+            log.warning("Cannot clear the engine details %s", ENGINE_DB)
     return removed
 
 
@@ -80,7 +80,7 @@ def drop_exercise_traces(ids):
             try:
                 path.unlink()
             except OSError:
-                log.warning("无法删除训练诊断 %s", path)
+                log.warning("Could not delete training diagnostics %s", path)
 
 
 class Records:
