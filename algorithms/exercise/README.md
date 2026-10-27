@@ -1,31 +1,39 @@
-# HomeEase Algorithm 2
+# Algorithm 2: Exercise Recognition and Rep Counting
 
-四动作骨架时序识别与完整周期计数。包含真实数据下载、训练、结构／特征消融、姿态 CNN 对比、可加载权重、Python SDK、本地视频／摄像头入口、HTTP API 和交接文档。
+Skeleton-based temporal recognition of four home exercises with complete-cycle repetition counting. This folder contains the real-data download, training, architecture / feature ablations, a pose CNN comparison, the trained weights, a Python SDK, a local video / camera entry point, an HTTP API and the documentation.
 
-支持 `chair_sit_to_stand`、`squat`、`standing_leg_raise`、`hurdle_step`。计数必须经历完整的四阶段顺序，失去可见性、暂停或换人后重新开始一个完整周期。
+Supported exercises: `chair_sit_to_stand`, `squat`, `standing_leg_raise`, `hurdle_step`. A repetition is only counted after the full four-phase sequence; after a loss of visibility, a pause or a change of person a complete new cycle is required.
 
-系统部署补充：独立 SDK/API 默认 `action_scope="open"`，保留本报告的原解码。系统的摄像头和上传训练使用新增 `action_scope="training"`，将动作支持度条件化到已选择的四动作训练场景；直腿抬腿、跨步训练另对原输入和左右镜像输入的预测取均值。模型权重、特征函数、阶段阈值与计数器不变，深蹲和坐站仍只推理原输入。状态用 `inference_views` 标识推理方式。该选项及真人零计数排查见 [部署记录](../docs/exercise-integration.md)，原报告精度不能直接代表该模式的真人效果。
+**Deployed model:** the optimized **hierarchical causal TCN `opt_tcn_b4_w48`** (62,453 parameters, 64-frame window). On the fixed reconstructed test replays it reaches action Macro-F1 0.9612, joint phase Macro-F1 0.8203, count MAE 0.10 reps and MAPE 1.25% (the first-round default had a MAPE of 23.47%). Model and decoder were selected on the validation set and locked before the test. These results come from projected public mocap data and do not represent accuracy on real camera video of older adults. Full process: [OPTIMIZATION.md](docs/OPTIMIZATION.md).
 
-当前默认算法为优化后的 **分层因果 TCN `opt_tcn_b4_w48`**：62,453 参数，64 帧窗口。固定测试重建回放中，动作 Macro-F1 0.9612、联合阶段 Macro-F1 0.8203、计数 MAE 0.10 次、MAPE 1.25%；首轮默认 MAPE 为 23.47%。模型与 decoder 由验证集选择并在本轮测试前锁定，接口 v1 可直接使用新权重。完整过程见 [优化记录](docs/OPTIMIZATION.md)。这些结果不代表老人真实摄像头精度。
+## Pipeline
 
-## 本机启动
-
-```powershell
-Set-Location E:\gc2-project-algorithm\algorithm2
-.\.venv\Scripts\python.exe -m uvicorn homeease.api:app --host 127.0.0.1 --port 8002 --workers 1
+```text
+camera frame -> YOLO11n-pose (COCO 17 keypoints) -> stable80 skeleton features
+             -> causal TCN (action head + per-exercise phase heads)
+             -> ordered-transition decoder -> complete-cycle counter
 ```
 
-接口浏览器：<http://127.0.0.1:8002/docs>，健康检查：<http://127.0.0.1:8002/health>。已有训练权重，可直接推理，不需要重新训练。项目虚拟环境复用本机 `E:\conda_envs\dl` 的 CUDA PyTorch。
+## How HomeEase uses it
 
-## 使用算法
+The integrated system ([`backend/workers.py`](../../backend/workers.py)) runs this package in its own worker process through the original FastAPI contract (`homeease.api.create_app`) and feeds it camera frames through `homeease.pose.PoseEstimator`. The standalone SDK / API defaults to `action_scope="open"`, the original decoding of the report. The system's camera and upload sessions use the added `action_scope="training"`, which conditions action support on the four chosen training exercises; for straight-leg raise and hurdle step it also averages the predictions of the original and the left-right mirrored input. Weights, feature functions, phase thresholds and the counter are unchanged, and squat and sit-to-stand still infer the original input only. The state reports the inference mode in `inference_views`. Details: [exercise integration record](../../docs/exercise-integration.md).
 
-```powershell
-# 离线真实骨架回放，同时检查实际 HTTP 集成
-.\.venv\Scripts\python.exe scripts/replay_demo.py --url http://127.0.0.1:8002
-# 摄像头，q 结束，p 暂停／继续
-.\.venv\Scripts\python.exe scripts/run_video.py --source 0 --exercise chair_sit_to_stand
-# 本地视频，不弹出窗口
-.\.venv\Scripts\python.exe scripts/run_video.py --source path\exercise.mp4 --exercise squat --no-display
+## Run it on its own
+
+```bash
+cd algorithms/exercise
+python -m uvicorn homeease.api:app --host 127.0.0.1 --port 8002 --workers 1
+```
+
+API explorer: <http://127.0.0.1:8002/docs>, health check: <http://127.0.0.1:8002/health>. The trained weights are included, so inference works without retraining.
+
+```bash
+# offline replay of real skeletons, also checking the HTTP integration
+python scripts/replay_demo.py --url http://127.0.0.1:8002
+# camera: q quits, p pauses / resumes
+python scripts/run_video.py --source 0 --exercise chair_sit_to_stand
+# local video without a window
+python scripts/run_video.py --source path/to/exercise.mp4 --exercise squat --no-display
 ```
 
 ```python
@@ -37,13 +45,13 @@ state = session.update(timestamp_ms=0, keypoints=coco17_points, person_id="perso
 report = session.control("end")
 ```
 
-`coco17_points` 为 17 个 `[x, y, confidence]`，横坐标向右、纵坐标向下，x/y 使用相同单位。实时流会因果重采样到 30 Hz。
+`coco17_points` are 17 `[x, y, confidence]` points with x to the right and y downward, both in the same unit. Live streams are causally resampled to 30 Hz.
 
-## 复现实验
+## Reproduce the experiments
 
-新机器先创建 Python 3.11 环境，按设备从 PyTorch 官方安装合适的 CPU 或 CUDA 版本，然后安装 `requirements.txt`。本项目不包含虚拟环境在其他机器上的可移植保证。
+Create a Python 3.11 environment, install the CPU or CUDA build of PyTorch for your device from the official site, then install `requirements.txt`.
 
-```powershell
+```bash
 python -m pip install -r requirements.txt
 python scripts/download_data.py --movements m01 m02 m05 m06 m07
 python scripts/prepare_data.py
@@ -56,23 +64,22 @@ python scripts/optimize_top.py --finalize
 python scripts/audit_optimized.py
 python scripts/robustness.py
 python scripts/replay_demo.py
-python -m pytest -q
 python scripts/build_optimization_report.py
 python scripts/build_report.py
 ```
 
-## 交付导航
+## Contents
 
-- [详细开发记录](docs/DEVELOPMENT.md)：需求、数据、标签、模型、实验、选择理由、局限和复现。
-- [优化与自检记录](docs/OPTIMIZATION.md)：三个强候选的优化、原模型对照、验证集选择锁及实际训练日志。
-- [实际实验结果](docs/RESULTS.md)：默认配置、首轮与优化轮对比、分动作误差、计算成本及压力测试。
-- [系统接口与 AI 接入指南](docs/API.md)：完整 HTTP／SDK 契约、字段、错误、示例及可直接交接的集成提示词。
-- [机器可读 OpenAPI](docs/openapi.json)：可生成系统端客户端。
-- `artifacts/selected.json` 与 `selected_pose.json`：验证集选择的默认模型。
-- `reports/comparison.csv`、`experiments.json`、`pose_comparison.json`：实际结果。
-- `examples/*_replay.json`：四种真实测试参与者的重建骨架回放。
-- [最终验证记录](reports/verification.md)：自动测试、实际服务回放、视频入口验证与尚未验证的范围。
+- [DEVELOPMENT.md](docs/DEVELOPMENT.md): requirements, data, labels, models, experiments, selection rationale, limitations and reproduction.
+- [OPTIMIZATION.md](docs/OPTIMIZATION.md): optimization of the three strongest candidates, comparison with the original model, the validation selection lock and training logs.
+- [RESULTS.md](docs/RESULTS.md): default configuration, first-round vs optimized comparison, per-exercise errors, compute cost and stress tests.
+- [API.md](docs/API.md): the complete HTTP / SDK contract, fields, errors and examples.
+- [DATA_CARD.md](docs/DATA_CARD.md): data sources, splits, labels and evaluation limits.
+- [openapi.json](docs/openapi.json): machine-readable OpenAPI.
+- `artifacts/selected.json` and `selected_pose.json`: the default models selected on validation.
+- `reports/comparison.csv`, `experiments.json`, `pose_comparison.json`: measured results.
+- `examples/*_replay.json`: reconstructed skeleton replays of real test participants for all four exercises.
 
-## 结果适用范围
+## Scope of the results
 
-四动作实验使用 UI-PRMD 真实 3D 骨架投影，阶段标签为明确记录的运动学弱标注。计数评估使用原始分段重复拼成的回放，不是自然连续家庭视频。COCO 子集用于比较通用姿态估计，不代表老年人摄像头计数精度。应在系统同学采集的连续视频上人工标记阶段和计数，再验证摄像头链路，才能宣称满足 proposal 的相对误差 ≤5% 目标。
+The four-exercise experiments use projections of real UI-PRMD 3D skeletons, with explicitly documented kinematic weak labels for the phases. Count evaluation uses replays built from the original segmented repetitions, not natural continuous home video. The COCO subset compares general pose estimation and does not represent counting accuracy on older adults. Meeting the proposal's <=5% relative error target requires manually labelled phases and counts on continuous camera video and a validation of the full camera chain.

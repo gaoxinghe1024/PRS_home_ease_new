@@ -1,75 +1,75 @@
-# HomeEase 算法 2 系统接口与交接文档
+# HomeEase Algorithm 2: Interface and Integration Guide
 
-## 1. 接入结论
+## 1. Integration summary
 
-推荐系统端把摄像头图像在本地转成 COCO 17 关键点，再调用本服务的骨架流接口。这样算法 1 和算法 2 可以共用同一套 Pose CNN。已有图像入口 `homeease.pose.PoseEstimator` 和本地视频程序 `scripts/run_video.py`，无需把原始视频传到服务器。
+The recommended setup converts camera images into COCO 17 keypoints locally and then calls this service's skeleton-stream interface, so Algorithm 1 and Algorithm 2 can share the same pose CNN. An image entry point (`homeease.pose.PoseEstimator`) and a local video program (`scripts/run_video.py`) are included; raw video never has to be sent to a server.
 
-HTTP API v1，默认地址 `http://127.0.0.1:8002`。接口完全由当前代码导出到 `docs/openapi.json`。启动时加载实际权重，权重缺失会使启动失败，不返回假预测。系统集成可先用 `examples/*_replay.json` 做四动作端到端验收。
+HTTP API v1, default address `http://127.0.0.1:8002`. The interface is exported from the current code to `docs/openapi.json`. The real weights are loaded at startup; missing weights make startup fail instead of returning fake predictions. `examples/*_replay.json` can be used for an end-to-end acceptance test of all four exercises.
 
-部署扩展：创建会话可传 `action_scope:"open"|"training"`，默认 `open` 保留原报告模式。`training` 只适用于用户已指定四种训练动作之一的场景，使用四动作内部相对支持度通过原 0.15 类别门槛；计数器和输入中断规则保持不变。SDK 的 `ExerciseSession(..., action_scope="training")` 同义，状态和导出保留该字段。动作概率仍返回模型的五类分布，因此 `recognized_exercise` 仍可能为 `other`，它不是用户选择目标的重命名。
+Deployment extension: a session can be created with `action_scope:"open"|"training"`. The default `open` keeps the original report mode. `training` is only for the case where the user has already chosen one of the four training exercises; the original 0.15 class gate is then applied to the relative support among the four exercises. The counter and the input-interruption rules are unchanged. The SDK's `ExerciseSession(..., action_scope="training")` is equivalent, and state and exports keep the field. Action probabilities are still the model's five-class distribution, so `recognized_exercise` can still be `other`; it is not a renaming of the user's chosen target.
 
-仅 `training` 的 `standing_leg_raise`、`hurdle_step` 使用 `inference_views:"mirror_average"`：分别以原输入和原训练脚本使用的左右镜像输入进行推理，平均 17 类联合概率，再运行原 decoder 与计数器。镜像变换同时反转 x、交换全部六对左右关节，不更改 y 或置信度；两套历史在每次原输入中断时一起重置。此模式增加推理开销，阶段概率和动作概率均取两视图的平均结果，不能当作单次原输入推理的概率。深蹲、坐站及全部 `open` 会话使用 `inference_views:"original"`，保留原输入路径。权重、特征函数、配置阈值与计数器均未修改。该部署扩展不继承原报告精度；最近真人直腿抬腿输入仍为零，跨步仅通过截断骨架回放观察到改善，详见部署记录。
+Only `training` sessions of `standing_leg_raise` and `hurdle_step` use `inference_views:"mirror_average"`: inference runs on the original input and on the left-right mirrored input used by the original training script, the 17-class joint probabilities are averaged, and then the original decoder and counter run. The mirror flips x and swaps all six left/right joint pairs without changing y or confidence; both histories reset together at every interruption of the original input. This mode costs extra inference, and both phase and action probabilities are averages of the two views, so they must not be read as single-pass probabilities. Squat, sit-to-stand and all `open` sessions use `inference_views:"original"`, the original input path. Weights, feature functions, configured thresholds and the counter are not modified. This extension does not inherit the accuracy of the original report; see the deployment record in the project docs.
 
-模型替换由 `artifacts/selected.json` 控制。系统端直接使用 HTTP 或 `Predictor`；窗口长度、stable80 特征、训练 mean/std 和分层概率合成都由 checkpoint 与 SDK 内部加载，系统端继续发送相机平面 COCO 17 点。不要在客户端额外做骨架归一化或写死旧版网络结构。服务重启后重新创建会话，并检查 `/health` 的 `model_id`。
+The model is selected by `artifacts/selected.json`. The system uses HTTP or `Predictor` directly; window length, stable80 features, training mean/std and the hierarchical probability composition are loaded from the checkpoint inside the SDK, and the system keeps sending camera-plane COCO 17 points. Do not add skeleton normalization on the client or hard-code an older network structure. After a service restart, create new sessions and check `model_id` in `/health`.
 
-### 当前优化后默认算法
+### Current optimized default algorithm
 
-**`opt_tcn_b4_w48`**：分层残差因果 TCN，4 个 block、宽度 48、62,453 参数；输入为 stable80，部署窗口 64 帧／30 Hz。动作头输出五类动作概率，每种目标动作有四类条件阶段概率。实际权重为 `artifacts/opt_tcn_b4_w48.pt`，mean/std 随权重保存。Pose 前端仍是 YOLO11n-pose@640。
+**`opt_tcn_b4_w48`**: hierarchical residual causal TCN, 4 blocks, width 48, 62,453 parameters; stable80 input, 64-frame deployment window at 30 Hz. The action head outputs five action probabilities, and each target exercise has four conditional phase probabilities. Weights: `artifacts/opt_tcn_b4_w48.pt`, with mean/std saved alongside. The pose frontend is YOLO11n-pose@640.
 
-默认 decoder 为 `ordered_transition`，阶段证据阈值 0.25，消抖 0.033 秒，运动阶段目标动作支持门槛仍为 0.15。它在已经观察到向外与最高点后，可用稳定回到起点的后验概率推断短暂返回阶段；必须再次确认基线才计数，缺少最高点或被中断的周期不补齐。
+The default decoder is `ordered_transition`, phase evidence threshold 0.25, debounce 0.033 s, and the target-action support gate for motion phases is still 0.15. Once the outward and peak phases have been seen, it can infer a short return phase from a stable posterior of being back at the start; the baseline must be confirmed again before a rep is counted, and cycles missing the peak or interrupted are never completed artificially.
 
-| 指标 | 原默认 GRU | 优化后默认 TCN |
+| Metric | Original default GRU | Optimized default TCN |
 |---|---:|---:|
-| 验证计数 MAE | 1.00 次 | 0.10 次 |
-| 测试动作 Macro-F1 | 0.8213 | 0.9612 |
-| 测试联合阶段 Macro-F1 | 0.7007 | 0.8203 |
-| 测试计数 MAE | 1.80 次 | 0.10 次 |
-| 测试非零会话 MAPE | 23.47% | 1.25% |
-| 测试周期 recall／precision | 详见原报告 | 0.9872／1.0000 |
-| 同轮 CPU 时序推理 P50 | 8.926 ms | 5.619 ms |
-| 参数量 | 55,185 | 62,453 |
+| Validation count MAE | 1.00 reps | 0.10 reps |
+| Test action Macro-F1 | 0.8213 | 0.9612 |
+| Test joint phase Macro-F1 | 0.7007 | 0.8203 |
+| Test count MAE | 1.80 reps | 0.10 reps |
+| Test MAPE on non-zero sessions | 23.47% | 1.25% |
+| Test cycle recall / precision | see original report | 0.9872 / 1.0000 |
+| Same-run CPU temporal inference P50 | 8.926 ms | 5.619 ms |
+| Parameters | 55,185 | 62,453 |
 
-测试共十个重建会话、78 个参考周期；TCN 匹配 77 个周期、漏一次抬腿、没有多计。这里的阶段标签是运动学弱标签，计数来自公共 mocap 原分段重复的重建回放，**不是老人真实视频精度**。原测试集前一轮已经查看，本轮根据验证集锁定方案后复用测试集比较，不称为全新盲测。
+The test set has ten reconstructed sessions with 78 reference cycles; the TCN matches 77 cycles, misses one leg raise and has no spurious count. Phase labels are kinematic weak labels and counts come from reconstructed replays of the original segment repetitions of public mocap data, **not accuracy on real videos of older adults**. The original test set had been seen in an earlier round; this round locked the choice on the validation set and then reused the test set for comparison, so it is not a fresh blind test.
 
-优化 GRU 在这份测试回放计数 MAPE=0%，但验证 MAE=0.80 次且计算成本较高；不能因为看到了测试结果就替换已锁定的 TCN。部署选择兼顾验证性能与计算成本。训练过程、CPU 实测、三个候选和逐会话结果见 [OPTIMIZATION.md](OPTIMIZATION.md) 与 [RESULTS.md](RESULTS.md)。
+The optimized GRU reaches a count MAPE of 0% on this test replay, but its validation MAE is 0.80 reps and its compute cost is higher; seeing the test result is no reason to replace the locked TCN. The deployment choice balances validation performance and compute cost. Training process, CPU measurements, the three candidates and per-session results: see [OPTIMIZATION.md](OPTIMIZATION.md) and [RESULTS.md](RESULTS.md).
 
-计时是本机 CPU 单次时序前向，不含 Pose CNN 与 HTTP 开销。固定模型在 15°／75°投影压力测试的 MAPE 均为 15%，45°加原始单位标准差 1 的坐标噪声时为 24.58%；常规投影结果不能覆盖极端视角与真实关键点噪声，系统验收需同时测试这些输入条件。
+Timing is a single CPU temporal forward pass on the development machine, without the pose CNN or HTTP overhead. In projection stress tests the fixed model has a MAPE of 15% at both 15 and 75 degrees, and 24.58% at 45 degrees with coordinate noise of standard deviation 1 (original units); results under regular projections do not cover extreme viewpoints and real keypoint noise, so system acceptance has to test these input conditions too.
 
-## 2. 启动与部署边界
+## 2. Startup and deployment limits
 
-```powershell
-Set-Location E:\gc2-project-algorithm\algorithm2
-.\.venv\Scripts\python.exe -m uvicorn homeease.api:app --host 127.0.0.1 --port 8002 --workers 1
+```bash
+cd algorithms/exercise
+python -m uvicorn homeease.api:app --host 127.0.0.1 --port 8002 --workers 1
 ```
 
-- 只能使用一个 worker。会话和幂等缓存保存在进程内，多 worker 不能共享状态。
-- 默认只监听 localhost。部署到家庭局域网时由系统负责鉴权、TLS、设备与用户权限、请求路由。
-- 服务重启会清空会话。系统负责保存终态报告、开始新会话并在界面标记中断，不能恢复半个周期。
-- 最多 100 个保留会话，结束后调用 DELETE 释放。状态读取不修改模型；每个会话有自己的特征历史和计数器。
-- 单个请求体最多 2 MB，一批最多 300 帧。通常每 5 至 15 帧发送一批，使界面及时更新。
-- 请求在 CPU 上执行时序模型。视频 Pose CNN 可以单独使用 GPU。`Predictor(device="cuda")` 可在 Python 集成中使用 CUDA。
-- 原始图像和音频不在本服务中保存，HTTP 接口仅接收关键点。会话报告也不附原始关键点。
+- Use exactly one worker. Sessions and the idempotency cache live in the process; several workers cannot share them.
+- Listens on localhost by default. For a home LAN the system is responsible for authentication, TLS, device and user permissions and request routing.
+- A restart clears all sessions. The system stores final reports, starts a new session and marks the interruption in the UI; half a cycle cannot be resumed.
+- At most 100 retained sessions; call DELETE after ending one. Reading state does not modify the model; every session has its own feature history and counter.
+- Request bodies are limited to 2 MB and batches to 300 frames. Sending a batch every 5 to 15 frames keeps the UI responsive.
+- The temporal model runs on the CPU per request. The video pose CNN can use the GPU separately; `Predictor(device="cuda")` uses CUDA in a Python integration.
+- No raw image or audio is stored by this service; the HTTP interface only receives keypoints, and session reports contain no raw keypoints.
 
-## 3. 动作与完整周期
+## 3. Exercises and complete cycles
 
-| exercise 枚举 | 含义 | 一个完整周期 |
+| `exercise` value | Meaning | One complete cycle |
 |---|---|---|
-| `chair_sit_to_stand` | 椅子坐站 | sitting → rising → standing → lowering → sitting |
-| `squat` | 深蹲动作 | standing → lowering → squatting → rising → standing |
-| `standing_leg_raise` | 站立直腿抬腿 | standing → lifting → raised → lowering → standing |
-| `hurdle_step` | 跨步抬腿 | standing → stepping → raised → returning → standing |
+| `chair_sit_to_stand` | Chair sit-to-stand | sitting -> rising -> standing -> lowering -> sitting |
+| `squat` | Squat | standing -> lowering -> squatting -> rising -> standing |
+| `standing_leg_raise` | Standing straight-leg raise | standing -> lifting -> raised -> lowering -> standing |
+| `hurdle_step` | Hurdle step | standing -> stepping -> raised -> returning -> standing |
 
-状态新增只读 `counter_stage`：`-1` 未确认起始姿态，`0` 起始姿态，`1` 去程，`2` 顶点，`3` 回程。它直接反映原计数器已确认的阶段，可能与瞬时最大概率的 `phase` 不同；完整返回起始姿态后 `count` 增加，阶段回到 `0`。暂停、中断或结束会清除未完成阶段到 `-1`，不会清除已完成次数。该字段仅供界面提示，不改变模型或计数。
+The read-only `counter_stage` field reports the stage the original counter has confirmed: `-1` start posture not confirmed, `0` start posture, `1` outward, `2` peak, `3` return. It can differ from `phase`, the momentary most likely phase; after a complete return to the start posture `count` increases and the stage goes back to `0`. Pausing, an interruption or ending clears an unfinished stage to `-1` without clearing completed reps. The field is only for UI hints and does not change the model or the count.
 
-选择动作由 exercise 指定，识别模型同时返回 `recognized_exercise`。静止基线在动作之间可能相同，计数阶段按选定动作条件化；运动阶段还要求选定动作概率 ≥0.15，否则输出 other 并停止该周期。一侧完整抬起并回到基线计一周期，接口不提供左右腿分别统计。目标完成不会自动结束，额外完整周期会继续增加计数。
+The exercise is given by `exercise`, and the model also returns `recognized_exercise`. The still baseline can look the same for several exercises, so counting phases are conditioned on the chosen exercise; motion phases additionally require a probability of at least 0.15 for the chosen exercise, otherwise `other` is output and that cycle stops. A full raise of one side and the return to the baseline count as one cycle; left and right legs are not counted separately. Reaching the target does not end the session, and further complete cycles keep increasing the count.
 
-动作名称对应公开数据集的实际动作。数据集不是为虚弱老人定义的训练处方；家庭训练的动作幅度、扶持条件与安排由产品或专业人员决定。当前模型不能评判是否适合某一位老人，也不输出疗效、平衡评分或跌倒风险。
+The exercise names correspond to the actual movements of the public dataset. The dataset is not a training prescription for frail older adults; movement range, support and scheduling of home training are decided by the product or by professionals. The model cannot judge whether an exercise suits a particular person and outputs no therapeutic effect, balance score or fall risk.
 
-## 4. 关键点与时间协议
+## 4. Keypoint and time protocol
 
-`schema_name="coco17"`，`coordinate_space="camera_xy"`。每帧 17×3，顺序如下：
+`schema_name="coco17"`, `coordinate_space="camera_xy"`. Each frame is 17x3, in this order:
 
-| 索引 | 关节 | 索引 | 关节 |
+| Index | Joint | Index | Joint |
 |---|---|---|---|
 | 0 | nose | 1 | left_eye |
 | 2 | right_eye | 3 | left_ear |
@@ -81,36 +81,36 @@ Set-Location E:\gc2-project-algorithm\algorithm2
 | 14 | right_knee | 15 | left_ankle |
 | 16 | right_ankle | | |
 
-每个点是 `[x, y, confidence]`。x 向右、y 向下，confidence 范围 0 至 1。可以使用像素坐标或 x/y 同比例的相机平面单位。不要把 x 分别除以图像宽、y 除以高，非正方形图像会因此扭曲角度。镜像时交换左右关节语义，训练与部署要一致。拒绝 NaN、Inf、错误长度、越界 confidence 和未声明字段；x/y 绝对值最多 10,000,000，避免异常大数在 float32 中溢出。
+Each point is `[x, y, confidence]`: x to the right, y downward, confidence between 0 and 1. Pixel coordinates or any camera-plane unit with the same scale for x and y can be used. Do not divide x by the image width and y by the height separately; on non-square images that distorts angles. When mirroring, swap the left/right joint semantics, consistently in training and deployment. NaN, Inf, wrong lengths, out-of-range confidence and undeclared fields are rejected; |x| and |y| are limited to 10,000,000 so huge values cannot overflow float32.
 
-`timestamp_ms` 是当前设备单调递增的观测时间，单位毫秒，范围 0 至 1e15。可以从 0 开始，也可使用持续的单调时钟。时间戳在一批内和批次之间都必须严格递增。不要使用 HTTP 请求到达时间来替代视频帧采集时间，不要重复末帧填充网络间隔。
+`timestamp_ms` is the device's monotonically increasing observation time in milliseconds, between 0 and 1e15. It can start at 0 or come from a running monotonic clock. Timestamps must strictly increase within a batch and across batches. Do not use the HTTP arrival time instead of the frame capture time, and do not repeat the last frame to fill network gaps.
 
-输入建议 30 Hz，可接收其他采样率，服务以因果线性插值重采样到 30 Hz，等待当前观测后处理它之前的插值时刻，不预测未来。超过 250 ms 的间隔会重置半周期和特征历史。低采样率不能保证保留短暂阶段，30 Hz 的离线结果不能用于推断 5 Hz 的效果。
+30 Hz input is recommended; other rates are accepted and causally resampled to 30 Hz by linear interpolation, processing interpolation times only after the current observation has arrived, without predicting the future. A gap above 250 ms resets the half cycle and the feature history. Low sampling rates cannot guarantee that short phases survive, and offline results at 30 Hz say nothing about 5 Hz.
 
-两肩、两髋、两膝、两踝 confidence 均需 ≥0.3。腿部长度或躯干长度退化为零时进入 `degenerate_pose`，即使 confidence 很高也不计数。缺人、严重遮挡时仍发送当前时间戳和 confidence=0 的 17 个点，使系统及时进入 `insufficient_pose`。稳定 `person_id` 标识当前人，变化时中断计数。自带视频适配器对零人或多人画面拒绝计数；已有多人系统应先跟踪并选择目标人。
+Both shoulders, hips, knees and ankles need confidence >= 0.3. When the leg or torso length degenerates to zero the state becomes `degenerate_pose` and nothing is counted, even with high confidence. When the person is missing or heavily occluded, still send the current timestamp with 17 points of confidence 0 so the system enters `insufficient_pose` promptly. A stable `person_id` identifies the current person, and a change interrupts counting. The bundled video adapter refuses to count frames with zero or several people; a multi-person system should track and select the target person first.
 
-## 5. HTTP 路由
+## 5. HTTP routes
 
-| 方法和路径 | 用途 | 成功状态 |
+| Method and path | Purpose | Success status |
 |---|---|---|
-| GET `/health` | 确认服务和模型已加载 | 200 |
-| POST `/v1/sessions` | 创建并开始一个训练会话 | 201 |
-| POST `/v1/sessions/{id}/frames` | 发送一批骨架，获得当前状态 | 200 |
-| GET `/v1/sessions/{id}` | 读取当前状态或终态报告 | 200 |
-| POST `/v1/sessions/{id}/control` | pause、resume、end | 200 |
-| DELETE `/v1/sessions/{id}` | 释放会话和缓存 | 204 |
+| GET `/health` | Confirm the service and model are loaded | 200 |
+| POST `/v1/sessions` | Create and start an exercise session | 201 |
+| POST `/v1/sessions/{id}/frames` | Send a batch of skeletons and get the current state | 200 |
+| GET `/v1/sessions/{id}` | Read the current state or the final report | 200 |
+| POST `/v1/sessions/{id}/control` | pause, resume, end | 200 |
+| DELETE `/v1/sessions/{id}` | Release the session and its cache | 204 |
 
-### 创建会话
+### Create a session
 
 ```json
 {"exercise": "squat", "target_reps": 10}
 ```
 
-`exercise` 默认 chair_sit_to_stand。`target_reps` 默认 10，范围 1 至 10000。服务返回 UUID `session_id` 和完整状态，`status="running"`、`quality="waiting_for_input"`、count=0。
+`exercise` defaults to chair_sit_to_stand, `target_reps` to 10 (range 1 to 10000). The service returns a UUID `session_id` and the full state with `status="running"`, `quality="waiting_for_input"` and count=0.
 
-### 发送骨架
+### Send skeletons
 
-请求结构如下，`keypoints` 必须是完整 17 点，真实合法示例在 `examples/squat_frames.json`，不要把下方说明性字符串直接发送。
+The request looks like this; `keypoints` must be the complete 17 points. A real valid example is `examples/squat_frames.json`; do not send the descriptive string below.
 
 ```json
 {
@@ -118,76 +118,76 @@ Set-Location E:\gc2-project-algorithm\algorithm2
   "schema_name": "coco17",
   "coordinate_space": "camera_xy",
   "frames": [
-    {"timestamp_ms": 0, "person_id": "person-1", "keypoints": "17 个 [x,y,confidence]"}
+    {"timestamp_ms": 0, "person_id": "person-1", "keypoints": "17 x [x, y, confidence]"}
   ]
 }
 ```
 
-`request_id` 必填，1 至 128 字符。同一会话保留最近 128 个请求的结果，完全相同请求的重试返回原始结果，不再运行模型也不加次数。相同 request_id 的不同内容返回 409。超过缓存窗口的重试通常因时间戳过期返回 409。系统必须按会话串行发送，先收到第 N 批确认再发送第 N+1 批。
+`request_id` is required (1 to 128 characters). Each session keeps the results of its latest 128 requests: retrying an identical request returns the original result without running the model or adding reps, and the same request_id with different content returns 409. Retries beyond the cache window usually fail with 409 because the timestamps are stale. The system must send sequentially per session and wait for batch N to be acknowledged before sending batch N+1.
 
-每个批次先验证全部帧的结构、有限数值和时间顺序，再开始处理，非法后半批不会使前半批悄悄生效。遇到服务运行时异常应读取会话当前时间戳确认接收状态，无法确认时结束会话并重新开始，不自行假设计数。
+Every batch is validated completely (structure, finite values, time order) before processing, so an invalid second half never silently applies the first half. After a runtime error of the service, read the session's current timestamp to confirm what was accepted; if that cannot be confirmed, end the session and start a new one instead of assuming a count.
 
-### 会话控制
+### Session control
 
 ```json
 {"action": "pause"}
 ```
 
-pause 清除未完成周期，已完成 count 保留。resume 同样从新周期开始。暂停期间发送帧返回 409。end 固定会话终态，重复 end 仍返回终态，结束后不再接收帧。DELETE 后任何路由均返回 404。控制命令顺序由系统管理，end 后不能 resume。
+pause clears the unfinished cycle and keeps the completed count; resume also starts a fresh cycle. Frames sent while paused return 409. end freezes the final state; repeating end returns that state again, and no frames are accepted afterwards. After DELETE every route returns 404. The system manages the order of control commands; a session cannot be resumed after end.
 
-## 6. 输出字段
+## 6. Output fields
 
-| 字段 | 类型 | 语义 |
+| Field | Type | Meaning |
 |---|---|---|
-| api_version | string | 固定 v1 |
-| session_id | string | 会话 UUID |
-| status | string | running、paused、ended |
-| exercise | string | 系统指定的训练动作 |
-| action_scope | string | open 原报告模式；training 指定四动作训练上下文 |
-| inference_views | string | original 单视图；mirror_average 原输入及左右镜像的联合概率平均 |
-| recognized_exercise | string | 当前最可能动作或 other，静止初段可能不确定 |
-| exercise_probabilities | object | 四动作和 other 的类别概率和，合计约 1 |
-| phase | string | 当前动作阶段或 other，枚举见动作表 |
-| phase_confidence | number | 联合动作／阶段分类器的最大类别概率，未经可靠校准 |
-| phase_probabilities | object | 选定动作内的条件阶段概率；运动阶段动作支持不足时 other=1 |
-| count | integer | 已完成有效周期，不是四舍五入的回归值 |
-| counter_stage | integer | 原计数器确认的阶段，-1 未就绪，0 起始，1 去程，2 顶点，3 回程 |
-| target_reps | integer | 系统设置的目标 |
-| progress | number | min(count/target_reps,1) |
-| target_completed | boolean | count ≥ target_reps |
-| elapsed_s | number | 首帧至末帧的观测时间，包含暂停跨度 |
-| active_duration_s | number | 运行中实际观测覆盖时间，不包含暂停恢复跨度或 >250ms 缺帧间隔 |
-| valid_duration_s | number | 相邻有效可见观测覆盖时间，且没有失效中断 |
-| quality | string | waiting_for_input、good、insufficient_pose、paused 等 |
-| last_timestamp_ms | number/null | 最后接受的观测时间 |
-| interruptions | array | reason 与 timestamp_ms，中断会重置半周期 |
-| cycles | array | 完成的重复事件，含 rep_index、start_s、end_s、duration_s |
-| model_id | string | 实际选定时序模型标识 |
-| model_validation | string | 当前模型的实验验证范围标记 |
-| request_id | string | 帧接口专有，当前请求 ID |
-| accepted_frames | integer | 帧接口专有，本批接受数量 |
-| new_cycles | array | 帧接口专有，仅本批新增周期 |
+| api_version | string | always v1 |
+| session_id | string | session UUID |
+| status | string | running, paused, ended |
+| exercise | string | the training exercise chosen by the system |
+| action_scope | string | open: original report mode; training: four-exercise training context |
+| inference_views | string | original: single view; mirror_average: joint probabilities averaged over the original and mirrored input |
+| recognized_exercise | string | the most likely exercise now, or other; can be uncertain during the still start |
+| exercise_probabilities | object | class probabilities of the four exercises and other, summing to about 1 |
+| phase | string | current phase of the exercise or other (see the exercise table) |
+| phase_confidence | number | highest class probability of the joint action/phase classifier, not reliably calibrated |
+| phase_probabilities | object | conditional phase probabilities within the chosen exercise; other=1 when the action support is too low in a motion phase |
+| count | integer | completed valid cycles, not a rounded regression value |
+| counter_stage | integer | stage confirmed by the original counter: -1 not ready, 0 start, 1 outward, 2 peak, 3 return |
+| target_reps | integer | target set by the system |
+| progress | number | min(count/target_reps, 1) |
+| target_completed | boolean | count >= target_reps |
+| elapsed_s | number | observation time from the first to the last frame, including pauses |
+| active_duration_s | number | time actually covered by observations while running, excluding pause spans and gaps above 250 ms |
+| valid_duration_s | number | time covered by consecutive valid visible observations without invalidating interruptions |
+| quality | string | waiting_for_input, good, insufficient_pose, paused, ... |
+| last_timestamp_ms | number/null | last accepted observation time |
+| interruptions | array | reason and timestamp_ms; an interruption resets the half cycle |
+| cycles | array | completed repetitions with rep_index, start_s, end_s, duration_s |
+| model_id | string | id of the temporal model actually selected |
+| model_validation | string | marker of the experimental validation scope of the model |
+| request_id | string | frames route only: current request id |
+| accepted_frames | integer | frames route only: frames accepted in this batch |
+| new_cycles | array | frames route only: cycles added by this batch |
 
-`cycles` 时间是相对会话第一帧的秒数。`start_s` 是起始基线阶段经消抖确认的时间，`end_s` 是回到基线阶段经消抖确认的时间，不是医学动作起止的人工精确边界。quality 恢复后可以立即显示 good，但必须重新经历完整周期才能新增 count。`interruptions` 保存 timestamp_gap、person_changed、insufficient_pose、paused 等原因。
+Cycle times are seconds relative to the first frame of the session. `start_s` is when the start baseline phase was confirmed after debouncing, `end_s` when the return to the baseline was confirmed; they are not exact hand-labelled medical start and end points. quality can show good right after visibility returns, but a complete new cycle is needed before count increases. `interruptions` records reasons such as timestamp_gap, person_changed, insufficient_pose and paused.
 
-## 7. 错误与系统处理
+## 7. Errors and how the system handles them
 
-业务错误格式：`{"error":{"code":"..."},"api_version":"v1"}`。参数验证错误使用 FastAPI 标准 `{"detail":[...]}`，含 loc、msg、type，客户端不要依赖英文错误文本。
+Business errors: `{"error":{"code":"..."},"api_version":"v1"}`. Validation errors use the standard FastAPI `{"detail":[...]}` with loc, msg and type; clients should not depend on the error text.
 
-| HTTP | code／来源 | 处理 |
+| HTTP | code / source | Handling |
 |---|---|---|
-| 404 | SESSION_NOT_FOUND | 创建新会话，不复用旧 ID |
-| 409 | SESSION_NOT_RUNNING | 停止发送，检查 paused／ended 状态 |
-| 409 | SESSION_ENDED | 保存终态，再创建新会话 |
-| 409 | TIMESTAMP_NOT_INCREASING | 修复队列顺序；不要偷偷改变原帧时间戳 |
-| 409 | REQUEST_ID_CONFLICT | 修复幂等 ID 生成，内容不同不能复用 ID |
-| 413 | BODY_TOO_LARGE | 减小批次 |
-| 422 | 参数／帧校验 | 修复 schema、枚举、坐标、confidence 或数量 |
-| 429 | SESSION_LIMIT_REACHED | 释放旧会话 |
+| 404 | SESSION_NOT_FOUND | create a new session, never reuse the old id |
+| 409 | SESSION_NOT_RUNNING | stop sending, check for paused / ended |
+| 409 | SESSION_ENDED | store the final state, then create a new session |
+| 409 | TIMESTAMP_NOT_INCREASING | fix the queue order; never silently change the original frame timestamps |
+| 409 | REQUEST_ID_CONFLICT | fix the idempotency id generation; different content cannot reuse an id |
+| 413 | BODY_TOO_LARGE | send smaller batches |
+| 422 | parameter / frame validation | fix the schema, enumeration, coordinates, confidence or count |
+| 429 | SESSION_LIMIT_REACHED | release old sessions |
 
-网络超时重发同一 request_id 和完全相同 JSON 字段值。quality 失效是 200 下的正常业务状态，界面显示计数暂不可用，禁止用最后可信阶段填补缺失帧。
+After a network timeout, resend the same request_id with exactly the same JSON field values. A degraded quality is a normal business state returned with 200; the UI shows that counting is temporarily unavailable and must never fill missing frames with the last trusted phase.
 
-## 8. 可运行 Python HTTP 客户端
+## 8. Runnable Python HTTP client
 
 ```python
 import json
@@ -210,14 +210,14 @@ Path("session-report.json").write_text(json.dumps(ended.json(), indent=2))
 requests.delete(f"{base}/v1/sessions/{sid}").raise_for_status()
 ```
 
-## 9. SDK 与 Pose CNN 复用
+## 9. SDK and pose CNN reuse
 
 ```python
 from homeease.engine import Predictor, ExerciseSession
 from homeease.pose import PoseEstimator
 
-predictor = Predictor(device="cpu")  # 进程共用权重，不共用会话历史
-pose = PoseEstimator(device=0)  # 或 cpu，CNN 参数由 selected_pose.json 决定
+predictor = Predictor(device="cpu")  # weights shared per process, session histories are not
+pose = PoseEstimator(device=0)  # or cpu; the CNN is chosen by selected_pose.json
 session = ExerciseSession(predictor, exercise="standing_leg_raise", target_reps=10)
 points, person_id = pose.estimate(frame_bgr)
 state = session.update(capture_timestamp_ms, points, person_id)
@@ -226,38 +226,14 @@ session.control("resume")
 final_report = session.control("end")
 ```
 
-已有 Pose CNN 可直接绕过 PoseEstimator，使用同一 COCO 格式调用 update。SDK 也接受 12×3，顺序是 COCO 的索引 5 至 16；HTTP 为减少歧义只接受 17×3。SDK 时间戳同样严格递增；抛出 ValueError 的稳定 code 与 HTTP 表一致。摄像头多人跟踪由系统拥有，自带适配器只处理单人画面。
+An existing pose CNN can bypass PoseEstimator and call update with the same COCO format. The SDK also accepts 12x3 in the order of COCO indices 5 to 16; to avoid ambiguity HTTP only accepts 17x3. SDK timestamps must also strictly increase, and the stable codes of the raised ValueError match the HTTP table. Multi-person camera tracking belongs to the system; the bundled adapter only handles single-person frames.
 
-## 10. 给系统同学 AI 的集成提示词
+## 10. Integration checklist
 
-```text
-把 HomeEase 算法2接入现有系统。先读取 algorithm2/docs/API.md、
-algorithm2/docs/openapi.json 和 algorithm2/README.md，然后检查现有项目的摄像头、
-训练会话、报告存储及UI结构。直接复用 algorithm2/artifacts 的已训练权重，
-不得重新写一个计数启发式来替代算法。
-
-实现四个动作选项 chair_sit_to_stand、squat、standing_leg_raise、hurdle_step。
-开始训练时创建 /v1/sessions，摄像头使用已有Pose CNN或homeease.pose.PoseEstimator，
-按COCO17 [x,y,confidence]协议串行发送骨架批次。帧采集时间戳单调递增，
-person_id稳定，网络重试使用同一request_id和同一内容。
-
-显示动作、计数、目标进度及quality。计数以服务count为准，禁止客户端自行加一。
-暂停/继续/结束分别调用control，结束后保存完整报告，再DELETE释放会话。
-失去可见性时发送零confidence，提示暂不可计数。服务重启后新建会话，
-保留已经保存的报告并标记中断，不恢复半周期。
-
-先用 examples/*_replay.json 对四动作验收，检查SDK与HTTP得到相同结果，
-再用连续摄像头视频人工记录真实次数验证。当前公共骨架结果不等于家庭视频准确率。
-坚持单worker服务，局域网部署由系统负责认证和用户权限。集成修改完成后
-运行算法tests以及系统自身测试，并交付启动方法、改动文件和验收结果。
-```
-
-## 11. 交接验收清单
-
-1. GET health 返回 ready，model_id 与 artifacts/selected.json 一致。
-2. 四个示例可完整回放；计数与 reports/replay_sessions.json 一致。
-3. 重发同一批次不会增加计数，乱序帧返回 409。
-4. pause、遮挡、换人和 >250 ms 缺帧不会跨中断拼接重复。
-5. 原始视频保持在本地，系统只保存必要报告。
-6. 服务重启能正确处理会话丢失，结束会话及时删除。
-7. 连续摄像头数据有独立人工计数，报告模型错误、遮挡和视角条件。
+1. GET /health returns ready, and model_id matches artifacts/selected.json.
+2. All four examples replay completely, with counts matching reports/replay_sessions.json.
+3. Resending a batch does not increase the count, and out-of-order frames return 409.
+4. Pausing, occlusion, a change of person and gaps above 250 ms never join repetitions across the interruption.
+5. Raw video stays local and the system only stores the reports it needs.
+6. A service restart handles lost sessions correctly, and ended sessions are deleted promptly.
+7. Continuous camera data has independent manual counts, and the report states model errors, occlusion and viewpoint conditions.

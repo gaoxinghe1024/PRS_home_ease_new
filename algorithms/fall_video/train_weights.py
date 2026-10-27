@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-train_weights.py —— 在【当前 Python 环境】重新导出 A4 权重
+train_weights.py - re-export the A4 weights in the CURRENT Python environment
 ================================================================
-为什么需要它？
-  A4 的基学习器里有 sklearn / xgboost 模型，pickle 反序列化对这两个库的
-  版本很敏感。standalone/a4_weights.pkl 是在另一个环境（sklearn 1.5.1 /
-  xgboost 2.1.1）里导出的，换到本环境（如 animedev：sklearn 1.9 /
-  xgboost 3.x）可能加载失败。
+Why is this needed?
+  The A4 base learners include sklearn / xgboost models, and unpickling them is sensitive to the versions
+  of these two libraries. standalone/a4_weights.pkl was exported in another environment (sklearn 1.5.1 /
+  xgboost 2.1.1) and may fail to load in a newer one (for example sklearn 1.9 /
+  xgboost 3.x).
 
-  所以这里用【当前环境】重新训练一次 A4，导出到 systems/a4_weights.pkl。
-  engine.py 会优先加载这个文件（找不到才回退 standalone 的）。
+  So A4 is trained once more in the CURRENT environment and exported to systems/a4_weights.pkl;
+  engine.py loads that file first (and falls back to the one in standalone/ only if it is missing).
 
-训练数据用的是之前已经用「YOLO 检测 + 自研 P1 姿态」推理好的骨架缓存，
-不需要重新跑检测（节省大量时间），模型结构与超参与论文中的 A4 完全一致。
+The training data is the skeleton cache already produced by "YOLO detection + our P1 pose model",
+so detection does not have to run again (which saves a lot of time); model structure and hyper-parameters are exactly those of A4.
 
-用法：
-  E:/anaconda3/envs/animedev/python.exe train_weights.py
+Usage:
+  python train_weights.py
 """
 import os
 import sys
@@ -23,7 +23,7 @@ import time
 import pickle
 
 HERE = os.path.dirname(os.path.abspath(__file__))               # systems/
-ROOT = os.path.abspath(os.path.join(HERE, ".."))                 # 项目根
+ROOT = os.path.abspath(os.path.join(HERE, ".."))                 # project root
 STANDALONE = os.path.join(ROOT, "standalone")
 for _p in (STANDALONE,
            os.path.join(ROOT, "00_common"),
@@ -34,7 +34,7 @@ for _p in (STANDALONE,
 
 import numpy as np
 
-# 与 main.py / engine.py 用同一份类定义（pickle 类路径统一为 a4_core.*）
+# Same class definitions as main.py / engine.py (pickle class paths are always a4_core.*)
 from a4_core import HybridAlgorithm, make_windows
 from splits import unified_pool
 from pose_extract import extract_skeleton_sequence
@@ -55,7 +55,7 @@ def _gt_intervals(dataset, seq):
 def build_train_items():
     items = []
     for d, s, *_ in unified_pool():
-        dd = extract_skeleton_sequence(d, s)      # 读骨架缓存
+        dd = extract_skeleton_sequence(d, s)      # read the skeleton cache
         kpts = dd["kpts"]
         fidx = dd["frame_idx"]
         fps = SRC_FPS[d]
@@ -69,11 +69,11 @@ def build_train_items():
 
 def main():
     t0 = time.time()
-    print("[1/2] 构建训练数据（读取骨架缓存 YOLO+P1 的真实产出）...", flush=True)
+    print("[1/2] building training data (reading the YOLO+P1 skeleton cache) ...", flush=True)
     items = build_train_items()
-    print(f"      共 {len(items)} 条序列，用时 {time.time()-t0:.1f}s", flush=True)
+    print(f"      {len(items)} sequences in {time.time()-t0:.1f}s", flush=True)
 
-    print("[2/2] 训练 A4 混合集成（7 基学习器 OOF Stacking + XGBoost 元学习器）...",
+    print("[2/2] training the A4 hybrid ensemble (7 base learners, OOF stacking + XGBoost meta-learner) ...",
           flush=True)
     alg = HybridAlgorithm()
     alg.fit(items)
@@ -81,13 +81,13 @@ def main():
     with open(OUT_PATH, "wb") as f:
         pickle.dump({"bases": alg.bases, "meta": alg.meta}, f)
 
-    # 立刻回读验证，确保本环境能加载
+    # Read it back immediately to make sure this environment can load it
     with open(OUT_PATH, "rb") as f:
         back = pickle.load(f)
-    print(f"[完成] 权重已保存 → {OUT_PATH}")
-    print(f"       基学习器 {len(back['bases'])} 个，元学习器 "
-          f"{'已训练' if back['meta'] is not None else '无'}，"
-          f"总用时 {time.time()-t0:.1f}s")
+    print(f"[done] weights saved -> {OUT_PATH}")
+    print(f"       {len(back['bases'])} base learners, meta-learner "
+          f"{'trained' if back['meta'] is not None else 'none'}, "
+          f"total {time.time()-t0:.1f}s")
 
 
 if __name__ == "__main__":

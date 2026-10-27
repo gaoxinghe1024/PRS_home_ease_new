@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""数据源：只读引用父工程 `Fall_Acc_Single/data/urfd/csv` 的 URFD 序列。
+"""Data source: read-only reference to the URFD sequences of the parent project `Fall_Acc_Single/data/urfd/csv`.
 
-**不复制任何数据**进 systems/。系统启动后：
-  · 模拟数据模式 —— 从本模块列出的序列中任选一条回放/整段检测；
-  · 也支持用户上传自己的 CSV（见 preprocess.read_acc_csv）。
+**No data is copied** into this folder. Once the system runs:
+  - sample data mode: replay / detect any sequence listed by this module;
+  - users can also upload their own CSV (see preprocess.read_acc_csv).
 
-若脱离父工程单独部署，可设置环境变量 `FALL_SYSTEM_DATA_DIR` 指向一份
-`{seq}-acc.csv` 目录。
+When deployed without the parent project, set the environment variable `FALL_SYSTEM_DATA_DIR` to a folder
+of `{seq}-acc.csv` files.
 """
 import os
 import glob
@@ -30,7 +30,7 @@ def is_available():
 
 
 def list_sequences():
-    """返回 {'fall': [...], 'adl': [...]}，按序号排序。序列自带类别线索。"""
+    """Return {'fall': [...], 'adl': [...]} sorted by number. The sequence names carry the class."""
     d = acc_csv_dir()
     if not os.path.isdir(d):
         return {"fall": [], "adl": []}
@@ -42,12 +42,12 @@ def list_sequences():
 def acc_csv(seq):
     p = os.path.join(acc_csv_dir(), f"{seq}-acc.csv")
     if not os.path.isfile(p):
-        raise FileNotFoundError(f"序列不存在: {seq}")
+        raise FileNotFoundError(f"Sequence not found: {seq}")
     return p
 
 
 def sequence_meta(seq):
-    """序列元信息（不含任何标注文件，仅由命名推断类别用于演示提示）。"""
+    """Sequence metadata (no annotation file; the class is inferred from the name only, as a demo hint)."""
     kind = "fall" if str(seq).startswith("fall") else ("adl" if str(seq).startswith("adl") else "unknown")
     return {"seq": seq, "kind": kind,
-            "hint": "URFD 跌倒序列" if kind == "fall" else ("URFD 日常动作序列" if kind == "adl" else "自定义序列")}
+            "hint": "URFD fall sequence" if kind == "fall" else ("URFD daily-activity sequence" if kind == "adl" else "Custom sequence")}

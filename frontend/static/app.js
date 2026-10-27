@@ -99,9 +99,9 @@ function navigate(){const requested=location.hash.slice(1).split("?")[0]||(house
 async function refresh(){if(refreshBusy)return;refreshBusy=true;try{const results=await Promise.allSettled([api("/api/status",{timeout:12000}),api("/api/events"),api("/api/sessions"),api("/api/notifications"),app.page==="audio"?api("/api/sounds"):Promise.resolve(app.sounds),api("/api/settings")]);if(results[0].status==="rejected")throw results[0].reason;app.status=results[0].value;if(results[5].status==="fulfilled"){app.settings=results[5].value;if(!app.settings.audio_consent){if(app.audioStream)stopAudioLive();if(app.audioRecorder?.state==="recording")app.audioRecorder.stop();app.recordingStream?.getTracks().forEach(t=>t.stop());app.recordedBlob=null;}}if(results[1].status==="fulfilled")app.events=results[1].value;if(results[2].status==="fulfilled")app.sessions=results[2].value;if(results[3].status==="fulfilled")app.notices=results[3].value;if(results[4].status==="fulfilled")app.sounds=results[4].value;$("connectionState").innerHTML='<span class="dot green"></span>System connected';const n=app.events.filter(e=>e.state==="open"&&e.mode==="live").length;$("navEventCount").textContent=n;$("navEventCount").hidden=!n;$("noticeDot").hidden=!app.notices.some(n=>n.status!=="seen"&&n.kind==="inapp");syncExerciseSwitches();if(app.page==="algorithms"||app.page==="plan")loadAlgorithms();for(const notice of app.notices){if(app.ready&&!app.noticeIds.has(notice.id)&&notice.kind==="inapp"&&notice.mode==="live"){toast(`${notice.title} · ${notice.message}`);if("Notification" in window&&Notification.permission==="granted")new Notification(notice.title,{body:notice.message,tag:notice.event_id});}app.noticeIds.add(notice.id);}app.ready=true;renderCurrent();if(app.selectedEvent&&$("eventDialog").open){const latest=app.events.find(e=>e.id===app.selectedEvent.id);if(latest&&latest.revision!==app.selectedEvent.revision&&!$("eventDetail").contains(document.activeElement)){renderEventDetail(latest);}}}catch(e){$("connectionState").innerHTML='<span class="dot red"></span>System connection lost';}finally{refreshBusy=false;}}
 function renderCurrent(){if(!app.status)return;if(!["overview","monitor"].includes(app.page)){for(const id of ["overviewFrame","monitorFrame"]){const image=$(id);if(image.dataset.streaming){image.removeAttribute("src");delete image.dataset.streaming;}}}renderModuleIndicators();if(app.page==="overview")renderOverview();if(app.page==="monitor")renderMonitor();if(app.page==="exercise")renderExerciseHistory();if(app.page==="audio")renderAudioHistory();if(app.page==="events")renderEvents();window.HomeMonitoring?.render();icons();}
 function renderModuleIndicators(){for(const m of app.status.modules){if(m.id==="exercise"){$("exerciseModelState").textContent=`Exercise module ${(stateNames[m.state]||m.state).toLowerCase()}`;$("exerciseModelState").className=`badge ${m.state==="ready"?"green":"amber"}`;}}const consent=app.settings?.audio_consent;$("audioConsentBadge").textContent=consent?"Local audio authorized":"Audio not authorized";$("audioConsentBadge").className=`badge ${consent?"green":"neutral"}`;$("audioConsentBanner").hidden=!!consent;if(app.page==="settings")renderModules();syncExerciseSwitches();}
-/* 设置页关掉的动作，在工作台上标出来并禁止开始，避免「练了却不计数」。 */
+/* Movements switched off in Settings are marked on the workbench and cannot be started, so nobody exercises without being counted. */
 function syncExerciseSwitches(){
-  // /api/status 给的是开关表本身，/api/algorithms 套了一层 switches，这里两种都要认。
+  // /api/status returns the switch table itself, /api/algorithms wraps it in switches; accept both.
   const status=app.status?.algorithms;
   const switches=status?.switches||(status&&!Array.isArray(status)?status:app.algorithms?.switches);
   if(!switches||!$("exerciseOptions"))return;
@@ -167,10 +167,10 @@ function loadFrame(id){
 }
 
 /* ---------------------------------------------------------------------------
-   画面叠加：目标检测框与骨架关键点。
-   原算法目录不可修改，也不能单独开关它自带的两类绘制，因此引擎以「干净画面」
-   输出，检测框与骨架由前端在画面之上独立绘制。开关只影响本机看到的画面，
-   不改变原算法的检测、阈值与判定结果。
+   Image overlays: detection box and skeleton keypoints.
+   The original algorithm folder is not modified and its two built-in drawings cannot be switched separately, so the engine
+   outputs a clean image and the frontend draws the detection box and skeleton on top. The switches only affect what this
+   screen shows; detection, thresholds and decisions of the original algorithm are unchanged.
 --------------------------------------------------------------------------- */
 const OVERLAY_KEYS = {boxes:"box",skeleton:"skeleton"};
 const OVERLAY_STORE = "homeease.videoOverlay";
@@ -280,7 +280,7 @@ function renderExerciseGuide(element,key){
   };
 }
 function chooseExercise(key){app.selectedExercise=key;document.querySelectorAll(".exercise-option").forEach(x=>{const selected=x.dataset.exercise===key;x.classList.toggle("selected",selected);x.setAttribute("aria-pressed",selected);});renderExerciseGuide($("exerciseGuide"),key);icons();syncExerciseSwitches();
-  // 从长者端计划进来时，把计划里的次数先填好，别让人以为要按默认值做。
+  // Coming from a plan item on the older adult's page, fill in the plan's rep target so nobody assumes the default applies.
   const planned=household?app.plan?.items?.find(item=>item.exercise===key&&item.enabled):null;
   if(planned&&$("targetReps"))$("targetReps").value=planned.target_reps;}
 function renderExerciseCycle(s){
@@ -308,7 +308,7 @@ async function startExercise(ev){
   await busy($("startExercise"),async()=>{
     const source=$("exerciseSource").value;
     let uploadId=null;
-    // 从长者端的计划卡片进来时，目标次数取计划里的设定。
+    // Coming from a plan card on the older adult's page, the rep target comes from the plan.
     const planItem=household&&app.plan?.items?.find(item=>item.exercise===app.selectedExercise&&item.enabled);
     if(planItem)$("targetReps").value=planItem.target_reps;
     if(source==="upload"){
@@ -503,7 +503,7 @@ async function stopAudioLive(){
 
 async function loadReport(overview=false){try{const report=await api(`/api/reports?days=${overview?7:app.reportDays}&mode=${overview?"live":app.reportMode}`);if(overview){app.report=report;if(app.page==="overview")drawBars($("overviewChart"),report.series,"reps","#579579");return;}app.report=report;renderReport();}catch(e){toast(e.message,true);}}
 function renderReport(){const r=app.report;if(!r)return;const s=r.summary;$("reportRange").textContent=`${r.series[0].date} to ${r.series.at(-1).date} · ${r.mode==="live"?"Live records":"Sample / replay"}`;$("reportMetrics").innerHTML=metric("Confirmed fall",s.confirmed_falls,"reps","shield-alert",`${s.false_alarms} false alarms`)+metric("Unresolved events",s.open_events,"","bell-ring",`${s.unresolved_outcomes} results undetermined`)+metric("Completed sessions",s.sessions,"reps","activity",`${s.participation_days} days participated`)+metric("Valid exercise reps",s.reps,"reps","check-check","Total completed sessions")+metric("Voice answered",s.voice_answered,"","speech","The inquiry got a valid answer")+metric("High risk, no answer",s.voice_high_risk,"","shield-alert","The inquiry got no valid answer",s.voice_high_risk?"metric-risk":"")+metric("Not asked",s.voice_not_asked,"","circle-help","Not started or in progress");renderReportRecords(r);drawBars($("safetyChart"),r.series,"events","#bc8d58");drawBars($("exerciseReportChart"),r.series,"reps","#5d83bb");$("coverageSummary").innerHTML=r.mode==="live"?Object.entries(s.coverage_unavailable_s).map(([ch,n])=>`<div><span class="muted small">${channels[ch]} limited / unavailable time</span><strong>${duration(n)}</strong></div>`).join(""):"";$("coverageHistory").innerHTML=r.coverage.length?`<table><thead><tr><th>Channel</th><th>Start</th><th>End</th><th>Status</th><th>Reason</th></tr></thead><tbody>${r.coverage.slice(0,30).map(c=>`<tr><td>${channels[c.channel]}</td><td>${dateTime(c.started_at)}</td><td>${c.ended_at?dateTime(c.ended_at):"Ongoing"}</td><td><span class="badge ${c.state==="active"?"green":"amber"}">${c.state==="active"?"Valid":c.state==="reduced"?"Limited":"Unavailable"}</span></td><td>${esc(c.reason)}</td></tr>`).join("")}</tbody></table>`:empty(r.mode==="replay"?"Replays are not counted in live monitoring coverage":"No coverage records","radio","",true);$("exerciseSummary").innerHTML=`<div class="exercise-summary-grid">${Object.entries(s.reps_by_exercise).map(([key,n])=>`<div>${names[key]}<strong>${n}<small>reps</small></strong></div>`).join("")}</div>`;$("exportCsv").href=`/api/reports/export.csv?days=${app.reportDays}&mode=${app.reportMode}`;$("printReport").href=`/reports/print?days=${app.reportDays}&mode=${app.reportMode}`;icons();}
-/* 危险操作确认框：样式与工作台一致，避免浏览器原生弹窗打断视觉。 */
+/* Confirmation dialog for destructive actions: styled like the workbench instead of the browser's native dialog. */
 function askConfirm(title,message,accept,cancel){
   return new Promise(resolve=>{
     const mask=document.createElement("div");
@@ -530,7 +530,7 @@ function askConfirm(title,message,accept,cancel){
 }
 function recordSummary(result){return `Safety events ${result.events||0}, exercise sessions ${result.sessions||0}, notifications ${result.notifications||0}, video clips ${result.clips||0}`;}
 
-/* 报告记录：逐条勾选删除，或清空整个报告范围。删除范围与报告范围共用同一时间窗口。 */
+/* Report records: tick-and-delete, or clear the whole report range. Deletion and the report share the same time window. */
 function reportRows(){return Array.from(document.querySelectorAll("#reportRecords .row-pick"));}
 function reportPicked(){return reportRows().filter(row=>row.checked);}
 function syncReportPicker(){
@@ -596,11 +596,11 @@ function renderModules(){$("moduleList").innerHTML=app.status.modules.map(m=>`<d
 async function loadDiagnostics(){try{const d=await api("/api/diagnostics");$("diagnosticsList").innerHTML=d.logs.length?d.logs.slice(0,30).map(x=>`<div class="diagnostic-item"><time>${dateTime(x.at)}</time><span>${esc(x.module)} · ${esc(x.action)}${x.payload.error?`<br>${esc(x.payload.error)}`:""}</span></div>`).join(""):empty("No run records","list", "",true);}catch(e){toast(e.message,true);}}
 
 /* ---------------------------------------------------------------------------
-   后台算法开关。开关只决定「原算法要不要跑」，模型、阈值与判定保持原样：
-   - 后台常驻：服务在跑就一直跑，不依赖任何页面是否打开；
-   - 视频跌倒检测：与家庭守护同一件事，两个入口同步；
-   - 加速度跌倒检测：数据来自手机端 /sensor，后台只做接收与调度；
-   - 四种运动：分别开关，关掉后既不再自动开始，也不再接受新的训练请求。
+   Background algorithm switches. A switch only decides whether the original algorithm runs; models, thresholds and decisions stay as they are:
+   - Always on in background: runs as long as the service runs, whether or not any page is open;
+   - Video fall detection: the same thing as home monitoring; both entry points stay in step;
+   - Accelerometer fall detection: data comes from the phone page /sensor; the background only receives and schedules it;
+   - Four movements: switched individually; when off they neither start automatically nor accept new sessions.
 --------------------------------------------------------------------------- */
 const algorithmCopy = {
   resident:{title:"Always on in background",note:"While the service runs, switched-on algorithms start by themselves; closing the page or locking the screen makes no difference"},
@@ -613,8 +613,8 @@ function algorithmToggles(){
     .concat(Object.keys(names).map(key=>[key,document.querySelector(`[data-algorithm="${key}"]`)]))
     .filter(([,input])=>input);
 }
-/* 三个安全开关在模板里是静态节点，不像四种动作那样由 renderExerciseSwitches 现造，
-   所以事件只在这里绑一次；重复绑定会让一次点击发两次请求。 */
+/* The three safety switches are static nodes in the template, unlike the four movements built by renderExerciseSwitches,
+   so their events are bound only here; binding twice would send two requests per click. */
 function bindAlgorithmToggles(){
   for(const [key,input] of algorithmToggles()){
     if(input.dataset.bound)continue;
@@ -622,8 +622,8 @@ function bindAlgorithmToggles(){
     input.onchange=()=>setAlgorithm(key,input.checked);
   }
 }
-/* 「后台算法」页里四种动作的开关。单独成函数，初始化时先渲染一次，
-   之后 refresh() 只改勾选状态，不会重复生成 DOM。 */
+/* Switches for the four movements on the Background algorithms page. A separate function renders them once at startup;
+   refresh() afterwards only updates the checked state and never rebuilds the DOM. */
 function renderExerciseSwitches(){
   const box=$("exerciseSwitches");
   if(!box||box.children.length)return;
@@ -688,7 +688,7 @@ async function setAlgorithm(key,value){
   }
 }
 
-/* 运动计划：照护者设定，长者端展示并逐项完成。 */
+/* Movement plan: set by the caregiver, shown on the older adult's page and completed item by item. */
 let planDraft=null;
 function planItemRow(item,index){
   const key=item.exercise,guide=exerciseGuides[key];
@@ -755,7 +755,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   restoreOverlay();$("toggleBoxes").onclick=()=>setOverlay("box",!app.overlay.box);$("toggleSkeleton").onclick=()=>setOverlay("skeleton",!app.overlay.skeleton);setOverlay("box",app.overlay.box);setOverlay("skeleton",app.overlay.skeleton);
   $("signalSource").onchange=()=>$("signalUploadField").hidden=$("signalSource").value!=="upload";$("analyzeSignal").onclick=()=>busy($("analyzeSignal"),async()=>{let result;if($("signalSource").value==="sample")result=await api("/api/signal/sample",{method:"POST"});else{const file=$("signalFile").files[0];if(!file)throw new Error("Please choose a CSV file");const form=new FormData();form.append("file",file);result=await api("/api/signal/analyze",{method:"POST",body:form});}drawLines($("signalChart"),[{values:result.waveform.ax,color:"#547bb4"},{values:result.waveform.ay,color:"#5a9877"},{values:result.waveform.az,color:"#bf9459"}],{labels:result.waveform.t.map(t=>`${t.toFixed(1)}s`)});drawLines($("signalProbabilityChart"),[{values:result.info.probs,color:"#52886d"}],{min:0,max:1,threshold:.5,labels:result.info.t_end.map(t=>`${t.toFixed(1)}s`)});$("signalState").textContent="Replay analysis finished";$("signalResult").innerHTML=`${result.info.n_windows} windows · ${result.records.length} suspected fall events ${result.records.map(e=>`<button class="text-action" data-event="${e.id}">View #${e.id.slice(0,6)} ${icon("arrow-right")}</button>`).join(" ")}`;await refresh();icons();});
   $("exerciseOptions").innerHTML=Object.entries(names).map(([key,name],index)=>`<button type="button" class="exercise-option ${index===0?"selected":""}" data-exercise="${key}" aria-pressed="${index===0}" data-switch-card="${key}"><img src="/static/media/${key}-pose.png" alt="${name} skeleton movement"><span class="selection-mark">${icon("check")}</span><span class="exercise-off-badge" hidden>detection off</span><div><strong>${esc(exerciseGuides[key].title)}</strong><small>${["Complete sit / stand cycle","Complete squat / stand-up cycle","Complete leg raise / lowering cycle","Complete step / return cycle"][index]}</small></div></button>`).join("");document.querySelectorAll("[data-exercise]").forEach(b=>b.onclick=()=>chooseExercise(b.dataset.exercise));$("exerciseSource").onchange=()=>{$("exerciseUploadField").hidden=$("exerciseSource").value!=="upload";$("exerciseCameraField").hidden=$("exerciseSource").value!=="camera";};$("exerciseForm").onsubmit=startExercise;
-  // 长者端点计划里某一项进来时，直接选中那个动作，目标次数在开始训练时套用计划值。
+  // When the older adult opens a plan item, select that movement directly; the plan's rep target applies when the session starts.
   const fromPlan=household?sessionStorage.getItem("homeease.plan"):null;
   if(fromPlan&&names[fromPlan])sessionStorage.removeItem("homeease.plan");
   chooseExercise(names[fromPlan]?fromPlan:app.selectedExercise);

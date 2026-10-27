@@ -1,234 +1,233 @@
-# HomeEase 算法 2 开发记录
+# HomeEase Algorithm 2: Development Record
 
-## 任务与交付范围
+## Task and scope
 
-依据 `proposal.docx` 第 3.2 节、第 9.3 节和第 10 节，以及原始汇报 PPT 第 15 至 17 页，实现摄像头骨架驱动的椅子坐站阶段识别、完整周期计数、会话日志与系统接口。比较姿态 CNN、骨架运动学特征、时序模型和单模型／集成策略，测量精度与计算成本。原始 PPT 和 proposal 不作修改。
+Based on sections 3.2, 9.3 and 10 of the project proposal and slides 15 to 17 of the original presentation, implement camera-skeleton-driven phase recognition for the chair sit-to-stand, complete-cycle counting, session logs and a system interface. Pose CNNs, skeleton kinematic features, temporal models and single-model / ensemble strategies are compared, and accuracy and compute cost are measured. The original slides and proposal are not modified.
 
-要求完整的 `sitting -> rising -> standing -> lowering -> sitting` 周期才增加计数。暂停、可见性不足、时间戳断裂时不得跨中断拼接周期。记录重复数、目标进度、时间和数据质量，暂不提供未经验证的医学、平衡或姿态质量评分。
+A count is only added for a complete `sitting -> rising -> standing -> lowering -> sitting` cycle. Pausing, insufficient visibility and broken timestamps must never join a cycle across the interruption. Repetitions, target progress, timing and data quality are recorded; no unvalidated medical, balance or posture-quality score is provided.
 
-## 初始环境与数据调查
+## Initial environment and data survey
 
-- 日期：2026-10-08，用户时区 Asia/Shanghai。
-- 工作目录原先只有两个原始 Office 文件，无现成代码，无 Git 仓库。
-- GPU：NVIDIA GeForce RTX 4060 Laptop GPU，8 GB 显存。
-- 已有运行环境：`E:\conda_envs\dl\python.exe`，Python 3.11.15，PyTorch 2.11.0+cu128，CUDA 可用。
-- 系统 `python` 为不可用的 WindowsApps 别名，`py` 未登记 Python。项目将使用独立虚拟环境并复用现有 PyTorch，不修改全局环境。
-- UI-PRMD 官方主页本次访问返回 403。公开镜像 `jkaethee/UI-PRMD_Exercise_Model` 包含原始 Segmented Movements 与 Incorrect Segmented Movements 文本。下载时固定提交并保存每个文件的 SHA-256、Git blob SHA 和原始 URL。
-- UI-PRMD 的 `m05` 是 sit-to-stand，`m01` 是 deep squat，可用于有挑战性的负样本。镜像预处理后的 `.npy` 不作为原始输入，避免继承不明确的过滤方法。
-- MM-Fit 官方站可访问，其下载约 1.74 GB，但动作集合并不包含椅子 sit-to-stand，不能直接当作该任务的测试集。
-- 原始骨架片段／动作标注与人工逐帧阶段标注不同。后续将如实记录弱标签来源和计数真值适用范围，绝不把派生阶段标注称为人工金标准。
+- Date: 2026-10-08, user time zone Asia/Shanghai.
+- The working folder initially contained only the two original Office files: no code and no Git repository.
+- GPU: NVIDIA GeForce RTX 4060 Laptop GPU, 8 GB.
+- Existing environment: Python 3.11.15 with PyTorch 2.11.0+cu128, CUDA available.
+- The project uses its own virtual environment and reuses the existing PyTorch without changing the global environment.
+- The official UI-PRMD home page returned 403 at the time. The public mirror `jkaethee/UI-PRMD_Exercise_Model` contains the original Segmented Movements and Incorrect Segmented Movements text files. Downloads pin a commit and store the SHA-256, Git blob SHA and original URL of every file.
+- UI-PRMD `m05` is sit-to-stand and `m01` deep squat, which serves as a challenging negative. The mirror's preprocessed `.npy` files are not used as raw input, to avoid inheriting an unclear filtering method.
+- The official MM-Fit site was reachable (about 1.74 GB), but its exercise set has no chair sit-to-stand, so it cannot serve as a test set for this task.
+- Original skeleton segments / action annotations are not manual per-frame phase annotations. The source of the weak labels and the scope of the count ground truth are recorded as they are; derived phase labels are never called a manual gold standard.
 
-## 开发进度
+## Development progress
 
-1. 已完成：读取需求材料，检查硬件与已有环境，确认四组实验设计与集成文档要求。
-2. 已完成：下载真实数据并检查骨架格式、坐站片段起止与标注能力，全部 2,000 文件的 SHA-256 和 Git blob SHA 离线校验通过。
-3. 已完成：特征、模型、因果推理、计数器、HTTP／SDK、摄像头入口及接口测试。
-4. 已完成：11 个模型配置训练、单模型／集成统一重评、28 组 decoder 候选、4 组姿态 CNN 测量、视角和噪声压力测试及结果汇总。
-5. 已完成：真实权重流／批推理、四动作 HTTP／SDK 回放一致性、视频入口冒烟测试、24 项测试、接口启动与最终交接材料。
-6. 已完成：用户要求的自检优化；训练三个强候选、因果归一化与分层网络、验证集校准、缩窗等价检查和测试前选择锁。详细过程与每个 epoch 记录见 [OPTIMIZATION.md](OPTIMIZATION.md)。
+1. Done: read the requirements, checked hardware and the existing environment, confirmed the four groups of experiments and the integration documentation requirements.
+2. Done: downloaded the real data and checked the skeleton format, sit-to-stand segment boundaries and annotation capability; all 2,000 files passed the SHA-256 and Git blob SHA check offline.
+3. Done: features, models, causal inference, counter, HTTP / SDK, camera entry point and interface tests.
+4. Done: training of 11 model configurations, common re-evaluation of single models / ensembles, 28 decoder candidates, 4 pose CNN measurements, viewpoint and noise stress tests and the result summary.
+5. Done: real-weight streaming / batch inference, HTTP / SDK replay consistency for all four exercises, a video entry smoke test, 24 tests, service startup and the final handover material.
+6. Done: the requested self-check optimization: three strong candidates trained, causal normalization and a hierarchical network, validation-set calibration, a window-shrinking equivalence check and a selection lock before testing. The detailed process and every epoch record: see [OPTIMIZATION.md](OPTIMIZATION.md).
 
-## 最终交付结论
+## Final result
 
-优化后的默认模型为 **`opt_tcn_b4_w48`**，分层残差因果 TCN，4 个 block、宽度 48，62,453 参数，stable80 特征，部署 64 帧窗口。训练最佳 epoch=10，原训练窗口 96 帧在验证等价检查后缩至 64。默认 decoder 为 ordered_transition，阈值 0.25、消抖 0.033 秒。权重、统计量和实际选择配置均已保存。当前 CPU 实测见 [RESULTS.md](RESULTS.md) 与优化记录；默认前端仍为 YOLO11n-pose@640，COCO 子集 PCK 93.55%，GPU 完整调用 P50 15.33 ms／P95 98.22 ms。
+The optimized default model is **`opt_tcn_b4_w48`**: a hierarchical residual causal TCN with 4 blocks, width 48, 62,453 parameters, stable80 features and a 64-frame deployment window. The best training epoch is 10; the original 96-frame training window was shrunk to 64 after the validation equivalence check. The default decoder is ordered_transition with threshold 0.25 and debounce 0.033 s. Weights, statistics and the actual selected configuration are all saved. Current CPU measurements: see [RESULTS.md](RESULTS.md) and the optimization record. The default frontend is still YOLO11n-pose@640, with PCK 93.55% on the COCO subset and a full GPU call P50 of 15.33 ms / P95 98.22 ms.
 
-当前测试动作 Macro-F1 **0.9612**，联合阶段 Macro-F1 **0.8203**，10 个重建会话计数 MAE **0.10 次**，八个非零参考会话 MAPE **1.25%**。原默认 GRU 的对应值为 0.8213、0.7007、1.80 次和 23.47%。当前模型匹配 77/78 个周期，漏一次直腿抬腿、没有多计；其余三个动作的数量均正确。有限公共回放上达到 ≤5%，**真实家庭视频的精度验收仍未完成**。
+Current test action Macro-F1 **0.9612**, joint phase Macro-F1 **0.8203**, count MAE over 10 reconstructed sessions **0.10 reps**, MAPE over the eight non-zero reference sessions **1.25%**. The corresponding values of the original default GRU are 0.8213, 0.7007, 1.80 reps and 23.47%. The current model matches 77/78 cycles, misses one straight-leg raise and has no spurious count; the counts of the other three exercises are all correct. It reaches <=5% on the limited public replay, but **accuracy acceptance on real home video is still open**.
 
-三个优化候选中，GRU 的测试回放恰好没有数量误差，但验证 MAE=0.80 次，高于所选 TCN 的 0.10 次，计算成本也更高。最终按验证集表现与 CPU 延迟选择 TCN，并在本轮测试之前记录模型与 decoder 的哈希锁。原测试集在首轮及诊断时已查看，本轮复用比较无法视为新的独立盲测；弱标签、二维投影、两名测试参与者等限制仍需保留。
+Of the three optimization candidates, the GRU happens to have no count error on the test replay, but its validation MAE is 0.80 reps, higher than the selected TCN's 0.10 reps, and its compute cost is higher. The TCN was chosen on validation performance and CPU latency, and a hash lock of model and decoder was recorded before this round's test. The original test set had been seen in the first round and during diagnosis, so reusing it here is not a new independent blind test; the limits of weak labels, 2D projection and two test participants remain.
 
-交接文件包括根 README、当前开发记录、OPTIMIZATION.md、API.md、机器可读 OpenAPI、DATA_CARD.md、RESULTS.md、首轮及三份优化 checkpoint、公共姿态权重、选择锁、原始数据／图片来源和哈希、逐实验／会话结果、四动作回放和验证记录。无需重新训练即可启动服务。
+The handover includes the README, this development record, OPTIMIZATION.md, API.md, the machine-readable OpenAPI, DATA_CARD.md, RESULTS.md, the first-round and three optimized checkpoints, public pose weights, the selection lock, sources and hashes of the raw data and images, per-experiment / per-session results, and replays of the four exercises. The service starts without retraining.
 
-## 需求调整与实现决策
+## Requirement changes and implementation decisions
 
-用户随后增加两个明确要求：交付方便系统同学 AI 直接使用的接口文档；动作不局限于坐站，扩展到三四个动作。因此最终实现四动作：椅子坐站 `m05`、深蹲 `m01`、站立直腿抬腿 `m06`、跨步抬腿 `m02`。额外下载 `m07` 肩部抬举作不应计数的真实负样本。先前仅坐站的探索训练被停止，最终报告和权重均来自四动作版本。
+Two explicit requirements were added later: an interface document the system team can use directly, and more than one exercise (three or four instead of only sit-to-stand). The final implementation therefore covers four exercises: chair sit-to-stand `m05`, deep squat `m01`, standing straight-leg raise `m06` and hurdle step `m02`. Shoulder raise `m07` was downloaded as a real negative that must not be counted. The earlier sit-to-stand-only exploration was stopped, and the final report and weights all come from the four-exercise version.
 
-四动作关联下肢或平衡训练场景，但公共数据的深蹲、跨步和抬腿幅度不等于适合虚弱老人的家庭训练方案。实现提供识别与统计，未验证预防跌倒的临床效果，也不指定个人训练处方。
+The four exercises relate to lower-limb and balance training, but the squat, hurdle-step and leg-raise ranges of the public data are not a home training plan suited to frail older adults. The implementation provides recognition and statistics; it has not validated a clinical fall-prevention effect and prescribes no individual training.
 
-## 数据处理全过程
+## Complete data processing
 
-### 下载与来源保存
+### Download and provenance
 
-`scripts/download_data.py` 使用 GitHub 只读 API 查找原始文本，并固定镜像提交 `475c66aba07731adbe1c90a15462fd30be564593`。只取 Kinect 下的 Positions 与 Angles，包含正确和不正确执行。五种动作共 2,000 个文本文件，98,438,042 字节。每个骨架片段对应一对位置／角度文件，共 1,000 个片段。每动作 10 人、每人 10 次正确及 10 次不正确执行。镜像仓库及数据均为第三方来源，项目没有把镜像公开可下载理解为无条件再分发许可。
+`scripts/download_data.py` finds the original text files through the read-only GitHub API and pins mirror commit `475c66aba07731adbe1c90a15462fd30be564593`. Only Kinect Positions and Angles are used, including correct and incorrect executions. The five exercises total 2,000 text files and 98,438,042 bytes. Each skeleton segment is a pair of position / angle files, 1,000 segments in total: 10 people per exercise, each with 10 correct and 10 incorrect executions. The mirror and the data are third-party sources; the project does not read public downloadability of the mirror as an unconditional redistribution licence.
 
-原始单位保留。下载 manifest 保存每个文件的 URL、大小、SHA-256 和 Git blob SHA。训练没有使用镜像内已经过滤、缩放或分割成派生 `.npy` 的数组，而是自行重建骨架。网络错误指数退避重试，不合成替代样本。
+Original units are kept. The download manifest stores the URL, size, SHA-256 and Git blob SHA of every file. Training does not use the mirror's arrays that were already filtered, scaled or split into derived `.npy` files; the skeletons are rebuilt from scratch. Network errors are retried with exponential backoff, and no substitute samples are synthesized.
 
-### 坐标重建
+### Coordinate reconstruction
 
-原始 `T×66` 包含 22 关节的局部坐标，以及与之对应的 Euler 角。根节点为绝对坐标，其余关节通过树结构前向运动学重建：
+The raw `Tx66` data contains local coordinates of 22 joints and the corresponding Euler angles. The root is absolute; the other joints are rebuilt by forward kinematics along the tree:
 
 ```text
 R_global[j] = R_global[parent] @ R_local[j]
 p_global[j] = p_global[parent] + R_global[parent] @ p_local[j]
 ```
 
-Euler 使用 xyz 角的标准旋转矩阵，根、躯干、左右手臂、左右下肢沿各自父节点累积。相较直接把局部偏移当成相机位置，该步骤保留真实屈膝、屈髋和抬腿运动。
+Euler angles use the standard xyz rotation matrices, accumulated along each parent for the root, torso, both arms and both legs. Compared with treating local offsets directly as camera positions, this keeps the real knee flexion, hip flexion and leg raising.
 
-选择 COCO 兼容的两肩、两肘、两腕、两髋、两膝、两踝，共 12 个关节。将真实 3D 骨架投影到斜侧相机平面，纵坐标反转为 y 向下。训练视角 25°、45°、65°，常规验证／测试为 45°。这些是**真实骨架的程序投影增强**，不是实际 RGB 摄像头采样；结果必须保留这一区别。
+Twelve COCO-compatible joints are kept: both shoulders, elbows, wrists, hips, knees and ankles. The real 3D skeleton is projected onto an oblique camera plane with the vertical axis flipped so y points down. Training views are 25, 45 and 65 degrees; regular validation / test uses 45 degrees. These are **programmatic projections of real skeletons as augmentation**, not samples from an actual RGB camera, and results must keep that distinction.
 
-### 参与者划分
+### Participant split
 
-在投影、归一化和窗口之前划分：s01–s06 训练、s07–s08 验证、s09–s10 测试。训练 600 片段、验证 200、测试 200。正确与不正确执行都按原始参与者归属。投影变体不可能跨集合共享同一人。
+The split happens before projection, normalization and windowing: s01-s06 training, s07-s08 validation, s09-s10 test, i.e. 600 training, 200 validation and 200 test segments. Correct and incorrect executions follow their original participant, so projection variants can never share a person across sets.
 
-固定划分便于课程项目复现，但测试仅两名参与者，不足以得出面向所有老人群体的稳定泛化结论。测试集不参与归一化、训练 checkpoint、集成成员、消抖阈值或部署模型选择。
+The fixed split makes the course project reproducible, but with only two test participants it cannot support a stable generalization claim for all older adults. The test set takes no part in normalization, checkpoints, ensemble members, debounce thresholds or deployment model selection.
 
-### 标签与计数真值
+### Labels and count ground truth
 
-UI-PRMD 的原始动作类型、参与者和分段重复编号是来源标注。数据没有满足 PPT 所述人工逐帧阶段金标准。本项目显式使用 `weak_kinematic_offline_v2`：坐站和深蹲取根节点高度；跨步取较高膝的相对根高度；直腿抬腿取较高踝的相对根高度。先离线 Gaussian 平滑，使用片段 5%／95% 分位数把运动幅度归一化，按低端、高端和导数方向生成基线、向外、最高点和返回阶段。深蹲的方向与坐站相反。
+UI-PRMD's original action type, participant and segment repetition number are source annotations. The data does not provide the manual per-frame phase gold standard described in the slides. The project explicitly uses `weak_kinematic_offline_v2`: sit-to-stand and squat use the root height, hurdle step the height of the higher knee relative to the root, and straight-leg raise the height of the higher ankle relative to the root. After offline Gaussian smoothing, the motion range is normalized with the 5% / 95% quantiles of the segment, and baseline, outward, peak and return phases are derived from the low end, the high end and the direction of the derivative. The squat direction is the opposite of sit-to-stand.
 
-这是一种运动学弱标签。标签生成可以使用完整片段，因为它是离线训练目标，但在线输入只使用当前与过去帧，不使用未来、整段分位数、真值计数或片段边界。阶段 F1 反映对这套弱标签的拟合，不能写成“人工阶段识别准确率”。
+This is a kinematic weak label. Label generation may use the whole segment because it is an offline training target, but online input only uses the current and past frames, never the future, whole-segment quantiles, true counts or segment boundaries. Phase F1 reflects the fit to these weak labels and must not be reported as "manual phase recognition accuracy".
 
-正确动作片段按同一参与者的 e01–e10 拼接，平移水平和深度轴的初始脚位置以消除片段摄像头位移，保留原始时间和垂直运动。每人每动作构成一个**重建回放**。深蹲、抬腿与跨步每片段完成一个基线返回周期，来源参考 count=10。坐站片段是“站—坐—站”，因此从首个坐姿到最后一个坐姿之间只有 9 个完整“坐—站—坐”周期，参考 count=9；首尾半周期不补齐，也不反转／循环旋转数据。
+Correct-execution segments are concatenated per participant from e01 to e10, shifting the horizontal and depth axes to the initial foot position to remove per-segment camera offsets while keeping the original timing and vertical motion. Each person and exercise forms one **reconstructed replay**. For squat, leg raise and hurdle step each segment completes one baseline-return cycle, so the source reference is count=10. Sit-to-stand segments are "stand - sit - stand", so between the first and last seated posture there are only 9 complete "sit - stand - sit" cycles, and the reference is count=9; the half cycles at the start and end are not completed, and the data is not reversed or rotated cyclically.
 
-每个集合有四动作×两人=8 个正回放，加两人的肩部动作负回放，共 10 个会话、78 个正周期。数量真值由来源分段编号和完整周期边界推导；周期精确时间匹配的参考边界由弱标签生成，二者验证能力不同。逐周期匹配容差为 ±0.5 秒，以贪心一对一匹配统计 TP、FP、FN。
+Each set has four exercises x two people = 8 positive replays, plus negative shoulder-exercise replays of the two people: 10 sessions and 78 positive cycles. The count ground truth is derived from the source segment numbers and complete-cycle boundaries; the reference boundaries for exact cycle timing come from the weak labels, so the two have different validation power. Cycles are matched with a tolerance of +/-0.5 s by greedy one-to-one matching to count TP, FP and FN.
 
-所有正确片段的运动信号绘制为 40 张审计图，存放 `reports/figures/source_audit_mXX_sYY.png`。某些抬腿／跨步数据有尖峰和抖动，不能当成高质量连续视频标签。计数日志保留每个预测事件，以便检查误计与漏计，MAPE 中排除参考 count=0 的会话，同时独立报告负会话误计数。
+The motion signals of all correct segments are plotted in 40 audit figures, `reports/figures/source_audit_mXX_sYY.png`. Some leg-raise / hurdle-step data has spikes and jitter and cannot be treated as high-quality continuous video labels. The count log keeps every predicted event so false and missed counts can be inspected; MAPE excludes sessions with reference count=0, and false counts on negative sessions are reported separately.
 
-## 骨架特征实现
+## Skeleton features
 
-本节及随后“结构消融”“训练流程”“计数器”记录首轮实现。当前部署在其基础上加入 stable80、分层头和验证集优化，准确配置与训练参数见 [OPTIMIZATION.md](OPTIMIZATION.md)，不要用本节的原 hybrid／64 帧训练配置重建当前权重。
+This section and the following sections on architecture ablation, training and the counter describe the first-round implementation. The current deployment adds stable80, hierarchical heads and validation-set optimization on top; the exact configuration and training parameters are in [OPTIMIZATION.md](OPTIMIZATION.md). Do not rebuild the current weights from the original hybrid / 64-frame training configuration in this section.
 
-每帧以双髋中心消除平移，以双腿的股骨加胫骨平均长度归一化，避免直接依赖身高和图像缩放。三组特征使用同样的参与者划分和训练流程：
+Each frame is translated to the hip centre and normalized by the average thigh plus shin length of both legs, so features do not depend directly on body height or image scale. Three feature groups share the participant split and training procedure:
 
-| 特征组 | 维度 | 内容 |
+| Feature group | Dimensions | Content |
 |---|---:|---|
-| coords | 24 | 12 关节归一化二维坐标 |
-| kinematics | 16 | 左右膝角余弦、左右髋角余弦、髋相对踝高度、躯干水平／垂直方向、踝间距离，加 8 维因果速度 |
-| hybrid | 64 | 24 坐标、8 运动学量、24 坐标速度、8 运动学速度 |
+| coords | 24 | normalized 2D coordinates of 12 joints |
+| kinematics | 16 | cosines of left/right knee and hip angles, hip height relative to the ankles, torso horizontal / vertical direction, ankle distance, plus 8 causal velocities |
+| hybrid | 64 | 24 coordinates, 8 kinematic values, 24 coordinate velocities, 8 kinematic velocities |
 
-因果 EMA 系数 0.65，只与上一观测混合。速度由后向差分计算，按真实 dt，限制在 [-8,8] 避免抖动爆炸。训练和服务共用 `FeatureExtractor`，没有各自写一套预处理。训练统计量按特征计算 mean/std，std 至少 0.1，然后原样保存到 checkpoint 并用于部署。
+The causal EMA coefficient is 0.65 and only mixes with the previous observation. Velocities are backward differences over the real dt, clipped to [-8, 8] so jitter cannot explode. Training and serving share one `FeatureExtractor` rather than two separate preprocessing implementations. Training statistics are per-feature mean/std with std at least 0.1, stored as they are in the checkpoint and used in deployment.
 
-## 时序模型与结构消融
+## Temporal models and architecture ablation
 
-模型输出 17 个联合动作／阶段类别：四动作各四阶段，加其他动作。动作概率由每个动作的四阶段概率求和。独立动作识别不依赖系统指定的动作。计数阶段会条件化到用户选择的训练动作，解决静止站立属于多种动作的天然歧义；运动阶段还要求选定动作概率 ≥0.15，避免随意从极小的条件概率中创造一个周期。
+The models output 17 joint action/phase classes: four phases for each of the four exercises, plus other. Action probabilities are the sums of each exercise's four phase probabilities. Action recognition does not depend on the exercise chosen by the system. Counting phases are conditioned on the training exercise chosen by the user, which resolves the natural ambiguity of standing still belonging to several exercises; motion phases additionally require a probability of at least 0.15 for the chosen exercise, so a cycle is never created from a tiny conditional probability.
 
-实现均基于 PyTorch，自行编写网络、训练循环与状态机，没有调用外部动作分类服务。采用领域成熟的卷积、循环、注意力运算；没有用简单 MLP 作为最终模型。
+Everything is implemented in PyTorch with our own networks, training loop and state machine, without any external action-classification service. Established convolution, recurrence and attention operations are used; a simple MLP is not used as the final model.
 
-| 实验 | 变化 |
+| Experiment | Change |
 |---|---|
-| tcn_b2_w32 / b3_w32 / b4_w32 | 残差 block 数 2、3、4 |
-| tcn_b3_w32 / b3_w64 | 隐藏通道 32、64 |
-| ds_tcn_b3_w32 / ds_tcn_b4_w64 | 深度可分离卷积替代常规卷积 |
-| gru_b2_w32 / gru_b2_w64 | 两层单向 GRU、不同宽度 |
-| transformer_b2_w32 | 两层、四头因果 Transformer |
-| tcn_coords / tcn_kinematics / tcn_b3_w32 | 坐标、运动学、混合特征 |
-| soft_vote_top2 | 验证集选择的两模型等权概率集成 |
+| tcn_b2_w32 / b3_w32 / b4_w32 | 2, 3, 4 residual blocks |
+| tcn_b3_w32 / b3_w64 | 32 and 64 hidden channels |
+| ds_tcn_b3_w32 / ds_tcn_b4_w64 | depthwise separable convolutions instead of regular ones |
+| gru_b2_w32 / gru_b2_w64 | two-layer unidirectional GRU, different widths |
+| transformer_b2_w32 | two-layer, four-head causal Transformer |
+| tcn_coords / tcn_kinematics / tcn_b3_w32 | coordinate, kinematic and hybrid features |
+| soft_vote_top2 | equal-weight probability ensemble of the two models selected on validation |
 
-TCN 使用核宽 3，每个 block 两个因果卷积，dilation 为 1、2、4、8。2、3、4 block 的感受野分别为 13、29、61 帧，都位于部署 64 帧窗口内。深度可分离版本将深度卷积与逐点卷积分开。GRU 为单向，Transformer 使用上三角注意力屏蔽和正弦位置编码。测试通过改变未来帧验证当前输出不变。
+The TCN uses kernel width 3 with two causal convolutions per block and dilations 1, 2, 4, 8. With 2, 3 and 4 blocks the receptive fields are 13, 29 and 61 frames, all within the 64-frame deployment window. The depthwise separable version splits depthwise and pointwise convolutions. The GRU is unidirectional, and the Transformer uses an upper-triangular attention mask with sinusoidal positional encoding. Tests verify that changing future frames leaves the current output unchanged.
 
-## 训练过程与参数
+## Training procedure and parameters
 
-- 固定随机种子 42，同一个 seed 用于 Python、NumPy 和 PyTorch。
-- 输入 64 帧窗口，约 2.13 秒。每片段以 stride=16 帧采训练窗口，并加入末帧窗口。
-- 片段开始之前以第一帧复制填充输入，填充部分标签为 ignore_index=-100，不参与训练损失。
-- batch size 64，单进程 DataLoader，避免 Windows 工作进程的启动成本和状态差异。
-- AdamW，学习率 0.002，weight decay 0.001，cosine 学习率调度。
-- dropout 0.1，训练特征加标准差 0.015 的噪声；验证与测试不加随机噪声。
-- 按训练标签频数倒平方根加权的交叉熵，梯度范数裁剪 1。
-- 每配置 25 epochs，每五 epochs 计算验证集联合阶段 Macro-F1，保存最高验证分数的 checkpoint。
-- 本机 GPU：RTX 4060 Laptop 8 GB；CPU：Intel Core i7-12700H；CPU 测速统一使用 4 个 PyTorch 线程。
+- Fixed random seed 42 for Python, NumPy and PyTorch.
+- 64-frame input windows, about 2.13 s. Training windows are sampled per segment with stride 16 frames, plus the final-frame window.
+- Before the start of a segment the input is padded by repeating the first frame; padded labels are ignore_index=-100 and take no part in the loss.
+- Batch size 64, single-process DataLoader, avoiding the start-up cost and state differences of Windows worker processes.
+- AdamW, learning rate 0.002, weight decay 0.001, cosine learning-rate schedule.
+- Dropout 0.1 and feature noise with standard deviation 0.015 during training; no random noise in validation and test.
+- Cross-entropy weighted by the inverse square root of the training label frequencies, gradient norm clipped to 1.
+- 25 epochs per configuration; joint phase Macro-F1 on validation every five epochs, keeping the checkpoint with the best validation score.
+- Local GPU: RTX 4060 Laptop 8 GB; CPU: Intel Core i7-12700H; CPU timings always use 4 PyTorch threads.
 
-初期坐站训练的 5 至 10 epoch 已基本收敛，后续损失下降但验证分数波动，表明小规模公开骨架数据容易过拟合。因此四动作阶段统一预算 25 epoch，并按验证 checkpoint 评估，不用最后一个训练 epoch 代替模型选择。
+Early sit-to-stand training had essentially converged after 5 to 10 epochs; afterwards the loss kept falling while validation scores fluctuated, showing that small public skeleton datasets overfit easily. The four-exercise phase models therefore use a common budget of 25 epochs and are evaluated at the validation checkpoint instead of the last training epoch.
 
-## 完整周期状态机与实时行为
+## Complete-cycle state machine and real-time behaviour
 
-通用阶段顺序为 `rest -> outbound -> hold -> return -> rest`，再映射为各动作的展示名称。初始站着不会为坐站补一个坐姿，末尾半周期不计。基线阶段需消抖确认，周期最短 0.6 秒、最长 30 秒。状态机保留已观察到的完整进展，对边界附近退回一个阶段的抖动不重复创建周期，不允许缺少向外阶段、最高点或最终回到基线。
+The generic phase order is `rest -> outbound -> hold -> return -> rest`, mapped to the display names of each exercise. Standing at the start does not add a seated phase for sit-to-stand, and a half cycle at the end is not counted. Baseline phases need debounced confirmation; a cycle lasts at least 0.6 s and at most 30 s. The state machine keeps the complete progress already observed, does not create duplicate cycles when jitter near a boundary steps back one phase, and never allows a missing outward phase, peak or final return to the baseline.
 
-暂停、低关键点 confidence、换人、>250 ms 缺帧会立即丢弃半周期、清空特征窗口。恢复后保留已完成 count，但重新等待完整周期。服务因果重采样到 30 Hz，输入质量检查与阶段模型分开，不能把缺失数据当成“没有运动”。
+Pausing, low keypoint confidence, a change of person and gaps above 250 ms immediately drop the half cycle and clear the feature window. After recovery the completed count is kept, but a complete new cycle is required. The service causally resamples to 30 Hz, and input quality checks are separate from the phase model, so missing data is never read as "no motion".
 
-短暂最高点可能有充分模型后验概率却未成为 argmax，因此实现两个 decoder：逐帧 argmax，以及按完整顺序推进的后验概率状态机。后者只在下一个必需阶段有足够概率时推进，基线需 ≥0.5，运动阶段候选阈值 0.25、0.35、0.5，不允许跳阶段。它使用模型预测概率，不读取真实关节高度或参考边界，测试确认缺少最高点时仍不计数。
+A short peak may have a solid posterior probability without becoming the argmax, so two decoders are implemented: per-frame argmax, and a posterior state machine that advances in the complete order. The latter only advances when the next required phase has enough probability: the baseline needs >= 0.5, and motion-phase thresholds of 0.25, 0.35 and 0.5 are candidates; phases cannot be skipped. It uses the model's predicted probabilities and never reads true joint heights or reference boundaries; tests confirm that nothing is counted when the peak is missing.
 
-验证参与者 s07 的直腿抬腿数据出现高幅度尖峰，多个模型几乎没有预测出返回阶段，导致整段漏计。因此另外比较 `ordered_transition`：模型已确认向外与最高点之后，如果稳定起始姿态后验 ≥0.6，也可作为返回动作的证据，再进入返回并等待最终基线确认。它允许由“已抬起且已回到起点”推断中间很短的返回过程，不制造最高点或跨数据失效补周期；展示的 phase 仍保留模型原始预测。测试验证缺少最高点或没有回到基线都不能计数。
+The straight-leg-raise data of validation participant s07 has high-amplitude spikes, and several models predicted almost no return phase, missing the whole session. So `ordered_transition` is also compared: once the model has confirmed the outward phase and the peak, a stable start-posture posterior >= 0.6 also counts as evidence of the return, which then enters the return phase and waits for the final baseline confirmation. It allows inferring a very short return from "raised and back at the start", without inventing a peak or completing cycles across invalid data; the displayed phase stays the model's raw prediction. Tests verify that a missing peak or no return to the baseline is never counted.
 
-消抖候选为 0、0.033、0.067、0.1 秒，三个 decoder 共 28 组参数。只用验证回放选择，优先最低 MAE，再看周期 recall、较长消抖及较高概率阈值。相同候选网格用于所有模型的统一重评，默认模型再由验证精度与 CPU 延迟选定。运行时沿用选择参数。这是对训练数据少、过渡阶段短这一实测问题的结构化解码比较。多个候选也增加小验证集过拟合风险，不能通过更多阈值尝试取代新参与者评估。
+Debounce candidates are 0, 0.033, 0.067 and 0.1 s, so the three decoders have 28 parameter sets. Selection uses only the validation replays: lowest MAE first, then cycle recall, longer debounce and higher probability threshold. The same candidate grid is used to re-evaluate all models, and the default model is then chosen by validation accuracy and CPU latency. The runtime uses the selected parameters. This is a structured decoding comparison for the measured problem of little training data and short transition phases. More candidates also raise the risk of overfitting a small validation set, so further threshold trials cannot replace evaluation on new participants.
 
-## 姿态 CNN 对比设计
+## Pose CNN comparison design
 
-使用 Ultralytics 官方预训练 YOLO11n、s、m pose 权重，比较 n@320、n@640、s@640、m@640。它们是公共预训练感知前端，未冒充从零训练过的 COCO 网络；时序动作模型是本项目实际训练的。
+Official pre-trained Ultralytics YOLO11n, s and m pose weights are compared as n@320, n@640, s@640 and m@640. They are public pre-trained perception frontends and are not presented as COCO networks trained from scratch; the temporal action model is what this project actually trained.
 
-下载 COCO 2017 官方关键点标注，按 image_id 排序，确定前 100 张含 ≥6 个标注关键点、人体 area>4096 且非 crowd 的验证图像。共 198 个标注人体、2,482 个可见关键点。完整保存图片哈希和来源，不挑选模型表现好的样本。
+The official COCO 2017 keypoint annotations were downloaded and sorted by image_id, taking the first 100 validation images that contain a non-crowd person with >= 6 annotated keypoints and area > 4096: 198 annotated people and 2,482 visible keypoints. Image hashes and sources are stored in full, with no picking of samples the models do well on.
 
-预测框与真值按 IoU≥0.5 一对一匹配。PCK@0.2 使用人体 bbox 最长边的 20% 作距离阈值，漏检人体的关键点计错误。另报包含漏检为零的平均 OKS。这里的 PCK 和平均 OKS 不是标准全量 COCO AP，不把宽容的 PCK 写成精细关节精度或椅子计数准确率。子集仅用于轻量前端的相对比较。
+Predicted boxes are matched one-to-one to ground truth at IoU >= 0.5. PCK@0.2 uses 20% of the longest side of the person bbox as the distance threshold, and keypoints of missed people count as errors. The mean OKS with misses counted as zero is also reported. This PCK and mean OKS are not the standard full COCO AP; a lenient PCK is not reported as fine joint accuracy or chair counting accuracy. The subset only serves a relative comparison of lightweight frontends.
 
-计时包含实际图像预处理、模型前向、后处理和结果返回，batch=1，预热 8 次；GPU 前后同步，报告 P50／P95。初轮测量与训练并行，存在争用，最终在训练结束后重跑独立计时，以最终报告为准。选择 PCK 距离最高值不超过 3 个百分点的候选中 P50 最小者。
+Timing includes real image preprocessing, the forward pass, post-processing and returning results, with batch=1 and 8 warm-up runs; the GPU is synchronized before and after, and P50 / P95 are reported. The first measurements ran in parallel with training and were contended, so independent timing was repeated after training; the final report counts. Among candidates within 3 percentage points of the best PCK, the one with the lowest P50 is selected.
 
-## 指标、选择规则与结果文件
+## Metrics, selection rules and result files
 
-联合阶段 Macro-F1、动作 Macro-F1、分类混淆矩阵、计数 MAE、MAPE、`max(0,1-MAPE)` 形式的相对计数 accuracy、会话完全正确率、完整周期 precision/recall 以及 missed/spurious cycles 均保存。
+Joint phase Macro-F1, action Macro-F1, the classification confusion matrix, count MAE, MAPE, relative count accuracy as `max(0, 1-MAPE)`, exact-session rate, complete-cycle precision/recall and missed/spurious cycles are all stored.
 
-单模型 CPU 测速固定输入 1×64×D，模型 eval，inference_mode，预热 30 次，测量 200 次，记录参数量、纯权重大小和 P50／P95。集成的时序 CPU 延迟在主表中是两个成员独立测量的相加估算，并在 JSON 明确标记；尤其 P95 相加不等于联合分布的 P95。最终部署链路另作 SDK／HTTP 与感知入口验证。
+Single-model CPU timing uses a fixed 1x64xD input with the model in eval and inference_mode, 30 warm-up runs and 200 measurements, recording the parameter count, raw weight size and P50 / P95. The ensemble's temporal CPU latency in the main table is the sum of the two members measured separately and is marked as such in the JSON; in particular the summed P95 is not the P95 of the joint distribution. The final deployment path was verified separately through the SDK / HTTP and perception entry points.
 
-默认模型只用验证结果选择：先保留计数 MAE 距离最好值 ≤0.25 的候选，再保留其中联合阶段 F1 距离最好值 ≤0.02 的候选，最终选择 CPU P50 最小者。测试只用于最后报告，不作为部署选择条件。
+The default model is selected on validation results only: keep the candidates whose count MAE is within 0.25 of the best, of those keep the ones whose joint phase F1 is within 0.02 of the best, and finally choose the lowest CPU P50. The test set is only used for the final report and is never a deployment selection criterion.
 
-最终数值由实验 JSON 自动汇总到 [RESULTS.md](RESULTS.md)，主比较表在 `reports/comparison.csv`，逐会话及逐类细节在 `reports/experiments.json`，姿态前端在 `reports/pose_comparison.json`。读取报告时应一起看分动作结果，整体平均不能掩盖跨步或抬腿的漏计。
+The final numbers are aggregated automatically from the experiment JSON into [RESULTS.md](RESULTS.md); the main comparison table is `reports/comparison.csv`, per-session and per-class details are in `reports/experiments.json`, and the pose frontends in `reports/pose_comparison.json`. Read the per-exercise results together with the report: an overall average can hide missed hurdle steps or leg raises.
 
-## 接口与系统集成
+## Interface and system integration
 
-`homeease.engine.Predictor` 负责进程共享权重，`ExerciseSession` 持有单人单次会话状态。HTTP 路由、数据 schema、错误码、幂等和生命周期定义在 [API.md](API.md)。`scripts/export_openapi.py` 从真实 FastAPI 应用导出机器可读接口，避免人工文档与代码不一致。
+`homeease.engine.Predictor` holds the weights shared per process, and `ExerciseSession` holds the state of one person's session. HTTP routes, data schema, error codes, idempotency and lifecycle are defined in [API.md](API.md). `scripts/export_openapi.py` exports the machine-readable interface from the real FastAPI app so the handwritten document cannot drift from the code.
 
-帧批次先校验所有数据，request_id 以 SHA-256 内容摘要实现最近 128 次幂等，所有时间戳严格递增，会话内加锁。body 上限 2 MB，包括无 Content-Length 的请求。支持暂停、继续、结束与释放，保留完成事件、持续时间、训练目标和中断记录。会话是内存状态，单 worker 部署，系统端保存最终报告并处理服务重启。
+Frame batches are validated completely first; request_id idempotency over the latest 128 requests uses a SHA-256 content digest; all timestamps strictly increase, and each session is locked. The body limit is 2 MB, also for requests without Content-Length. Pause, resume, end and release are supported, and completed events, durations, the training target and interruptions are kept. Sessions are in memory with a single-worker deployment; the system stores the final report and handles service restarts.
 
-摄像头程序支持本地文件和 webcam，输出 JSON 报告，不上传视频。共享 PoseEstimator 允许算法 1 与 2 使用同一组关键点。SDK／HTTP 不自行推断训练处方，输出中包含实际 model_id 和当前验证范围，便于系统侧追溯。
+The camera program supports local files and webcams and writes a JSON report without uploading video. The shared PoseEstimator lets Algorithms 1 and 2 use the same keypoints. The SDK / HTTP infer no training prescription, and their output includes the actual model_id and the current validation scope so the system can trace them.
 
-## 验证过程与发现的问题
+## Verification and issues found
 
-测试覆盖四动作完整周期、阶段边界抖动、所有模型的未来帧隔离、非法批次原子校验、幂等、乱序、会话生命周期、参与者隔离、暂停时长、中断恢复、退化骨架拒绝计数、概率顺序解码，以及实际 checkpoint 的批推理／流推理和四动作 HTTP／SDK 一致性。最终测试记录另存 reports/verification.md。
+Automated tests (used during development) covered complete cycles of all four exercises, jitter at phase boundaries, future-frame isolation of every model, atomic validation of invalid batches, idempotency, out-of-order frames, the session lifecycle, participant isolation, pause durations, recovery after interruptions, refusing to count degenerate skeletons, ordered probability decoding, and batch / streaming inference of the real checkpoints with HTTP / SDK consistency for all four exercises.
 
-开发中统一重评脚本的一次预览没有加载 checkpoint state_dict，出现与训练报告明显不一致的动作 F1。通过同一原始片段对照已保存权重推理发现并修复，错误预览不进入最终模型选择或交付结果。后续增加真实 checkpoint 的 SDK／批推理一致性检查，确保报告来自实际训练权重。
+During development, one preview of the common re-evaluation script did not load the checkpoint state_dict and showed an action F1 clearly inconsistent with the training report. Comparing inference of the saved weights on the same raw segment found and fixed it; the faulty preview never entered model selection or the delivered results. A consistency check of the SDK / batch inference of real checkpoints was added afterwards to make sure reports come from the actually trained weights.
 
-主训练长时命令打印全部 11 模型完成和选择结果后，工具返回码为 1，没有附 Python traceback。随后对所有 checkpoint 重新加载、统一评估和校验，均正常完成；最终评估、回放、视频入口和测试命令返回 0。没有把该长时进程状态直接当作模型文件有效的证明，而是以实际重加载与推理验证为准。
+After the long main training command printed the completion of all 11 models and the selection result, the tool returned exit code 1 without a Python traceback. All checkpoints were then reloaded, evaluated together and checked, all successfully; the final evaluation, replay, video entry and test commands returned 0. The state of the long-running process was never taken as proof that the model files are valid; actual reloading and inference were the basis.
 
-首轮 `pytest -q` 为 24 passed，health 的模型 ID 为 gru_b2_w64。优化轮新增分层因果性／概率合成、stable80 不变性和按需窗口等价测试，重新验证实际权重与接口；当前完整验证结果见 [verification.md](../reports/verification.md)。存在一条 Starlette 关于 TestClient 使用 httpx 的依赖弃用提示，不影响本次接口测试。
+The first round passed 24 tests, with gru_b2_w64 as the model id in health. The optimization round added tests for hierarchical causality / probability composition, stable80 invariance and on-demand window equivalence, and verified the real weights and interface again (28 tests passed).
 
-## 可复现命令与文件结构
+## Reproduction commands and folder layout
 
-完整命令见根目录 [README.md](../README.md)。一次规范运行顺序：download_data、prepare_data、train_compare、evaluate_select、benchmark_pose、replay_demo、export_openapi、pytest、build_report。统一重评必须在所有四动作训练结束之后执行，不能把早期单动作 checkpoint 混入最终结果。
+A regular run in order: download_data, prepare_data, train_compare, evaluate_select, benchmark_pose, replay_demo, export_openapi, build_report. The common re-evaluation must run after all four-exercise training has finished, so no early single-exercise checkpoint is mixed into the final results.
 
 ```text
-algorithm2/
-  homeease/               特征、网络、计数器、SDK、API、Pose CNN
-  scripts/                数据下载、预处理、训练、评估、演示、报告
-  artifacts/              所有训练 checkpoint、姿态权重、默认选择
-  data/raw/uiprmd/         原始文本及可追溯 manifest
-  data/processed/          原始骨架、弱标签、参与者划分
-  data/coco/               独立姿态估计对比数据
-  reports/                实测结果、事件、图表
-  docs/                   开发记录、API、OpenAPI、结果和数据卡
-  examples/               真实测试参与者的四动作重建回放
-  tests/                  语义与集成测试
+algorithms/exercise/
+  homeease/               features, networks, counter, SDK, API, pose CNN
+  scripts/                data download, preprocessing, training, evaluation, demos, reports
+  artifacts/              all training checkpoints, pose weights, the default selection
+  data/raw/uiprmd/        raw text files and the traceable manifest (downloaded, not in Git)
+  data/processed/         rebuilt skeletons, weak labels, participant split
+  data/coco/              separate pose-estimation comparison data (downloaded, not in Git)
+  reports/                measured results, events, figures
+  docs/                   development record, API, OpenAPI, results and data card
+  examples/               four-exercise reconstructed replays of real test participants
 ```
 
-## 限制与下一步验证
+## Limitations and next validation steps
 
-1. 测试仅两名公开数据参与者，不能用单个 seed 的课程实验代表老人群体泛化。
-2. 2D 投影骨架与实际 Pose CNN 的误差分布不同，四动作骨架结果没有验证真实视频端到端计数。
-3. 阶段标签为弱标签，独立人工阶段与连续自然视频的计数金标准仍需要采集。
-4. 重建会话只含相同动作连续片段和一种肩部负样本，尚未覆盖走动、弯腰、换椅子等真实家庭干扰。
-5. 正面、遮挡、宽松衣物和腿部离开画面可能失败，视角增强不能替代真实多视角测试。
-6. 不正确执行片段用于动作／阶段训练，但未训练“动作质量合格”分类器，count 的 valid 只指完整可见周期。
-7. 接口和离线回放验证不等于已实测设备摄像头，亦未测七天稳定性、系统通知或实际老人使用。
-8. proposal 的 ≤5% 目标只有通过独立连续视频评估才能判断是否完成。结果未达到时会原样报告。
+1. Only two public-data participants are in the test set; a single-seed course experiment cannot represent generalization to older adults.
+2. Projected 2D skeletons have a different error distribution from a real pose CNN; the four-exercise skeleton results do not validate end-to-end counting on real video.
+3. Phase labels are weak labels; independent manual phase labels and a count gold standard on continuous natural video still need to be collected.
+4. Reconstructed sessions only contain consecutive segments of the same exercise and one shoulder negative; real household disturbances such as walking, bending or changing chairs are not covered yet.
+5. Frontal views, occlusion, loose clothing and legs leaving the frame can fail; viewpoint augmentation cannot replace real multi-view tests.
+6. Incorrect-execution segments are used for action / phase training, but no "movement quality acceptable" classifier was trained; valid in count only means a completely visible cycle.
+7. Interface and offline replay validation is not a test with a real device camera; seven-day stability, system notifications and real use by older adults were not tested.
+8. Whether the proposal's <=5% target is met can only be decided by evaluation on independent continuous video. If it is not met, that will be reported as it is.
 
-优先补充四动作真实连续视频，参与者划分后人工标记重复和四阶段，并加入日常行为负样本。可使用当前 PoseEstimator 批量提取与部署一致的关键点，再沿用当前训练与评估脚本微调。不要用测试失败视频调完阈值再当原始测试报告。
+The priority is real continuous video of the four exercises, split by participant, with manually labelled repetitions and four phases, plus negatives from daily activities. The current PoseEstimator can extract keypoints in batch exactly as in deployment, and the current training and evaluation scripts can be reused for fine-tuning. Do not tune thresholds on failing test videos and then report them as the original test.
 
-## 优化轮开发与验证汇总
+## Summary of the optimization round
 
-用户要求自检并只优化效果较好的 1–3 个算法。因此继续优化两个 TCN（4／5 block、宽度 48）和一个两层 GRU（宽度 64），没有重训全部候选。共同改进包括 stable80、分层动作／阶段学习、窗口末八帧监督、训练参与者跨重复上下文、速度／镜像增强、AdamW 正则化和验证集 decoder 校准。独立优化记录保存全部候选、每五个 epoch 的指标、最优 checkpoint、选择锁和计算成本。
+The request was to self-check and optimize only the 1-3 best algorithms. So two TCNs (4 / 5 blocks, width 48) and a two-layer GRU (width 64) were optimized further, without retraining all candidates. Common improvements are stable80, hierarchical action / phase learning, supervision of the last eight frames of each window, cross-repetition context of training participants, speed / mirror augmentation, AdamW regularization and validation-set decoder calibration. The separate optimization record stores all candidates, metrics every five epochs, the best checkpoints, the selection lock and compute costs.
 
-发现长窗口预展开造成约 994 MiB 连续数组分配失败后，实现按需切片的数据集并用测试逐项验证等价。三份优化权重均在后续独立评估中重加载，完成验证／测试概率缓存。长时训练命令最后一次打印全部完成与选择结果后仍返回了非零状态，没有 Python 异常；后续独立校准、测试评估、部署审计、实际 HTTP 回放和测试均返回 0，因此以实际重加载和推理验证作为交付依据。
+After finding that pre-expanding long windows failed to allocate a contiguous array of about 994 MiB, an on-demand slicing dataset was implemented and tested item by item for equivalence. All three optimized weights were reloaded in a later independent evaluation and their validation / test probability caches completed. The long training command again returned a non-zero status after printing the completion and selection results, without a Python exception; the subsequent independent calibration, test evaluation, deployment audit, real HTTP replay and tests all returned 0, so actual reloading and inference are the basis of the delivery.
 
-选中的 TCN 在全部验证数据上从 96 缩到 64 帧，最大概率差 5.36×10⁻⁷，动作与阶段 argmax 全部一致。校准后 MAE=0.10，阈值 0.25、消抖 0.033。正式测试前记录 checkpoint 哈希，之后固定模型运行测试和压力检查。同轮 CPU 单次前向 P50 从原 GRU 的 8.926 ms 降至 TCN 的 5.619 ms，参数从 55,185 增至 62,453。
+The selected TCN was shrunk from 96 to 64 frames over all validation data with a maximum probability difference of 5.36e-7 and identical action and phase argmax everywhere. After calibration MAE=0.10, threshold 0.25, debounce 0.033. The checkpoint hash was recorded before the formal test, and the fixed model then ran the test and stress checks. In the same run the CPU single forward P50 dropped from 8.926 ms for the original GRU to 5.619 ms for the TCN, while parameters grew from 55,185 to 62,453.
 
-最终 **28 项自动测试通过**。实际 localhost 服务已重启为 `opt_tcn_b4_w48`，四动作 s09 回放的 SDK／HTTP 数量分别是 9／10／10／10，结果一致。两人肩部负样本对四目标均零计数，静止姿态对四目标均零；真实 COCO 图片组成的静止视频也通过 Pose CNN 至 JSON 报告链路，count=0。
+Finally **28 automated tests passed**. The real localhost service was restarted with `opt_tcn_b4_w48`, and the SDK / HTTP counts of the s09 replays of the four exercises are 9 / 10 / 10 / 10 in both. Both people's shoulder negatives count zero for all four targets, a still posture counts zero for all four, and a still video made from real COCO images also passes the pose CNN to JSON report chain with count=0.
 
-45°常规测试投影达到 MAPE=1.25%，但 15°和 75°压力测试为 15%，加原始单位标准差 1 的坐标噪声时为 24.58%。优化没有消除全部视角与噪声问题，不能将主表平均数写成无条件部署精度。原始数据、标签和划分均保持；首轮结果和文档已归档到 reports/optimization/baseline。详细实验、失败修复和复现命令见 [OPTIMIZATION.md](OPTIMIZATION.md)。
+The regular 45 degree test projection reaches MAPE=1.25%, but the 15 and 75 degree stress tests give 15%, and 24.58% with coordinate noise of standard deviation 1 in original units. The optimization did not remove every viewpoint and noise problem, so the averages of the main table must not be reported as unconditional deployment accuracy. Raw data, labels and splits are unchanged; the first-round results are archived in reports/optimization/baseline. Detailed experiments, failure fixes and reproduction commands: see [OPTIMIZATION.md](OPTIMIZATION.md).
 
-## 引用与第三方依赖
+## References and third-party dependencies
 
-- 项目需求：原始 proposal 第 3.2、9.3、10 节；原始 PPT 第 15–17 页，后续用户明确扩展到四动作和系统接口文档。
-- UI-PRMD 官方：<https://webpages.uidaho.edu/ui-prmd/>；本次使用的固定镜像：<https://github.com/jkaethee/UI-PRMD_Exercise_Model/tree/475c66aba07731adbe1c90a15462fd30be564593>。
-- UI-PRMD 坐标说明参考：<https://github.com/aakash2016/ui-prmd-python> 与 <https://github.com/tejas1904/UI-PRMD-Visualize-python-port>；项目自行实现前向运动学与特征。
-- MM-Fit 官方：<https://mmfit.github.io/>，调研后未用于最终坐站／四动作训练。
-- COCO 2017 keypoints：<https://cocodataset.org/#keypoints-2017>，图片许可按各原始图像记录及 COCO 说明。
-- YOLO11：<https://docs.ultralytics.com/models/yolo11/>，Ultralytics 权重与库按其 AGPL-3.0／企业许可条款处理，系统方分发前确认适用要求。
-- TCN 方法：Bai, Kolter, Koltun, 2018，<https://arxiv.org/abs/1803.01271>。
-- GRU 方法：Cho et al., 2014，<https://arxiv.org/abs/1406.1078>。
-- Transformer 方法：Vaswani et al., 2017，<https://arxiv.org/abs/1706.03762>。
+- Project requirements: sections 3.2, 9.3 and 10 of the original proposal; slides 15-17 of the original presentation, later explicitly extended to four exercises and a system interface document.
+- UI-PRMD official: <https://webpages.uidaho.edu/ui-prmd/>; pinned mirror used here: <https://github.com/jkaethee/UI-PRMD_Exercise_Model/tree/475c66aba07731adbe1c90a15462fd30be564593>.
+- UI-PRMD coordinate references: <https://github.com/aakash2016/ui-prmd-python> and <https://github.com/tejas1904/UI-PRMD-Visualize-python-port>; the project implements its own forward kinematics and features.
+- MM-Fit official: <https://mmfit.github.io/>, surveyed but not used for the final sit-to-stand / four-exercise training.
+- COCO 2017 keypoints: <https://cocodataset.org/#keypoints-2017>; image licences follow each original image record and the COCO terms.
+- YOLO11: <https://docs.ultralytics.com/models/yolo11/>; Ultralytics weights and library are subject to AGPL-3.0 / enterprise licence terms, to be confirmed by the system side before distribution.
+- TCN: Bai, Kolter, Koltun, 2018, <https://arxiv.org/abs/1803.01271>.
+- GRU: Cho et al., 2014, <https://arxiv.org/abs/1406.1078>.
+- Transformer: Vaswani et al., 2017, <https://arxiv.org/abs/1706.03762>.

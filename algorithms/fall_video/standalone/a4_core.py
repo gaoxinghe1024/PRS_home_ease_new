@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-a4_core.py —— A4 混合集成核心（与 main.py 同目录，供其 import）
+a4_core.py - core of the A4 hybrid ensemble (same folder as main.py, imported by it)
 ================================================================
 
-包含：滑窗、运动学特征提取、时序网络、A4 集成（fit + predict）。
-独立成文件是为了让 train_a4.py 和 main.py 共享同一套类定义，
-从而 pickle 序列化的类路径（a4_core.KinematicBase 等）能被两端一致解析。
+Contains: sliding windows, kinematic feature extraction, the temporal network and the A4 ensemble (fit + predict).
+It is a separate file so that train_a4.py and main.py share the same class definitions,
+and the pickled class paths (a4_core.KinematicBase etc.) resolve the same way on both sides.
 
-仅依赖第三方包：numpy, torch, sklearn, xgboost。
+Third-party dependencies only: numpy, torch, sklearn, xgboost.
 """
 import numpy as np
 import torch
@@ -226,7 +226,7 @@ def _build_temporal_xy(items, device):
 
 
 class HybridAlgorithm:
-    """A4：多样化基学习器 + OOF Stacking + XGBoost 元学习器。"""
+    """A4: diverse base learners + OOF stacking + XGBoost meta-learner."""
     def __init__(self, n_folds=3, temporal_epochs=25):
         from sklearn.ensemble import RandomForestClassifier
         from sklearn.linear_model import LogisticRegression

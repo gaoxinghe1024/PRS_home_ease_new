@@ -1,223 +1,90 @@
-# 运动计数接入排查（更新至 2026-10-16）
+# Exercise Integration Record (Algorithm 2)
 
-本次以 `gaoxinghe1024/PRS_home_ease_new` 的最新 `main` 提交 `deaaf07` 为基线，在 `E:\gc2_new` 验证，已包含队友合并的算法3与中英文界面更新。上一轮 `5380ae1` 上的本地排查通过 stash 备份后合入新版，未采用本机旧系统作为基线。算法1、算法3保留新版原样。算法2仅在 `exercises.py`、`engine.py`、`api.py` 增加可选训练上下文和跨步阶段连续性处理；权重、特征、计数器、原选定阈值和实验报告均未修改。完整性清单明确更新上述三个源码的哈希，其余原有 113 项无变化。
+This record explains how Algorithm 2 was connected to live cameras in HomeEase, why a few **deployment-only** counting extensions were added on top of the original model, and how each was checked. The trained weights, feature functions, the original decoder thresholds and the experiment reports of Algorithm 2 are unchanged. The standalone SDK / API default (`action_scope="open"`, original decoding) still reproduces the published results; the extensions below are only enabled for the system's camera and upload sessions.
 
-## 结论和边界
+> The results of the extensions come from replays of recorded camera skeletons and from user feedback in field tests without per-repetition manual labels. They are **not** accuracy figures and do not inherit the 1.25% MAPE of the original report.
 
-原默认模式的四动作骨架回放均能计数。系统入口与原 SDK 的计数、完整周期、阶段概率及有效时长一致。两轮真人零计数输入在原 SDK 中也为零，排除了这些输入的计数在网页或接口中丢失的解释。关键点中断和动作类别门槛均会阻断周期。
+## Summary of deployment settings
 
-原算法要求双肩、双髋、双膝、双踝置信度均达到 0.3；帧间隔超过 250 ms、关键点不足或人员变化都会重置未完成周期。部分骨架可绘制，并不表示计数所需的八个点持续有效。骨架完整但缺少模型要求的某个阶段时，也不能增加计数。本次没有放宽这些规则。
+| Exercise | `action_scope` | `inference_views` | Phase / counting policy | Max input gap |
+|---|---|---|---|---|
+| Squat | `training` | `original` | original decoder | 250 ms |
+| Chair sit-to-stand | `training` | `original` | `counting_policy="pose_cycle_v2"` | 400 ms |
+| Standing straight-leg raise | `training` | `mirror_average` | `counting_policy="pose_cycle_v1"` | 250 ms |
+| Hurdle step | `training` | `mirror_average` | `phase_policy="action_gap_hold_v1"` | 250 ms |
+| Sample replays (all) | `open` | `original` | original | 250 ms |
 
-新增训练上下文后，第二轮保留的真实骨架通过 SDK 和完整系统 HTTP 链路均得到 3 次；随后真人会话 `463aa7cf-b2d9-412b-819a-183d65b5551c` 计到 3 次，用户确认深蹲准确。指导后坐站会话计到 2 次，用户确认可以；直腿抬腿、跨步仍反馈零，后续排查见末节。
+Every session state, report and diagnostic export records these fields, so a stored session can always be replayed with the policy it actually used.
 
-### 最小部署修改
+## 1. Training action scope
 
-原 decoder 在目标动作阶段不为站立时，要求 `P(目标动作) >= 0.15`。真人骨架中常由 `other` 占据大部分概率，即使四种训练动作内部相对支持深蹲，仍会被整体拒绝。
+**Problem.** On real camera skeletons the original decoder often decoded the chosen exercise as `other`. In motion phases it requires `P(chosen exercise) >= 0.15`, and with real input most probability went to `other` (around 1-2% support for the squat during the descent), even when the four training exercises clearly favoured the squat. Repetitions were cleared before completion, so live squats counted zero.
 
-新增可选 `action_scope="training"`，只在用户已明确选择四种训练之一时将支持度改为 `P(目标动作) / sum(P(四种训练动作))`；仍使用原 0.15 门槛区分四个动作，阶段后验、0.25 阶段门槛、0.033 秒消抖、四阶段顺序和中断规则全部保留。原始五类动作概率照常返回，没有填补关键点、修改模型概率、另写角度计数或重训模型。
+**Change.** With `action_scope="training"`, used only when the user has explicitly chosen one of the four exercises, support becomes `P(chosen) / sum(P(four training exercises))`; the original 0.15 gate still separates the four exercises. Phase posteriors, the 0.25 phase threshold, the 0.033 s debounce, the four-phase order and all interruption rules are unchanged, and the original five-class probabilities are still returned.
 
-`ExerciseSession` 和算法 API 默认 `action_scope="open"`，对应原报告模式。系统摄像头、上传视频的指定训练使用 `training`，仓库骨架样例回放使用 `open`。状态、报告和诊断保留 `action_scope`，回放脚本默认沿用原记录，也可显式指定 `--action-scope open|training` 对比。新增模式的效果应作为部署补充，不能套用原报告的 1.25% MAPE 作为真人精度。
+**Checks.** Removing the gate entirely also produced 3 counts but gave 414 false cycles in 68 negative checks, so it was rejected. The adopted normalization left all 16 public positive sessions unchanged and kept all 68 negative checks (shoulder negatives against four targets, cross-exercise input and still input) at zero. A recorded live session went from 0 to 3 through both the SDK and the full HTTP chain, and the user confirmed the live squat count as accurate.
 
-取消全部动作支持门槛的候选虽然也能计到 3，但在 68 个负检查中产生 414 个误周期，已排除。采用的四动作内部归一化方案在当前 84 项检查中：16 个正会话与原结果相同，68 个负检查均为 0。检查包括验证/测试的两个肩部负会话对四个目标、跨动作输入和四种目标的静止输入；这是已有公共骨架检查，不是家庭环境误计率保证。
+## 2. Mirror averaging for the two leg exercises
 
-### 已采集真人输入的复查
+**Problem.** After on-screen guidance, straight-leg raise and hurdle step still counted zero. With about 47 s of continuous valid input, the conditional peak probability of the straight-leg raise never exceeded about 0.04, far below 0.25, so occlusion alone did not explain it, and the SDK gave the same zero as the web page.
 
-- 会话 `c0fa390e-acff-4b90-bac1-4b8bf52da423` 共约 169.29 秒、2128 帧，必需关节完整率 29.6%。原 SDK 报告 114 次关键点不足、52 次人员状态变化、1 次时间间隔中断。
-- 最后 60 秒保留 705 帧，其中 307 帧八点完整，有约 20.75 秒、11.52 秒的连续有效片段。因此关键点缺失不是零计数的完整解释。
-- 在这些有效片段内，原模型多次将所选动作解码为 `other`；对应下蹲处深蹲动作支持度约 1%～2%，低于原 decoder 的 0.15 门槛，未完成周期被原计数器清空。约 129.81 秒短暂到达 stage 2，130.04 秒解码为 `other`，没有走完起身返回周期。
-- 已知原摄像头为 640 × 480；307 帧八点完整输入中仍有 52 帧至少一个脚踝纵坐标达到 478 像素。画面边缘与视角是待实测因素，不能凭这些数字直接宣称为唯一根因。
-- 原训练数据为 3D 骨架的斜视投影，原报告已记录极端视角和摄像头域差异的限制。下一轮需保留全身和双脚入镜、约 45 度斜侧身的连续试做，复查原模型的动作支持度与阶段顺序。
+**Change.** For these two exercises in `training` sessions, inference runs on the original input and on its left-right mirror (x negated, the six left/right joint pairs swapped, exactly the augmentation of the original training script), with two independent causal histories and the same weights. The 17-class joint probabilities are averaged before the original decoder and counter. Any interruption of the original input clears both histories.
 
-第二轮会话 `7e22b3fa-69f1-4a91-ac0e-9acd9eeaba4a` 仍反馈 0，保存的 975 帧输入包含约 20.82 秒的完整骨架片段，脚踝贴边问题明显减少，但类别门槛仍导致解码为 `other`。同一输入在新增 `training` 模式下计到 3，完整 HTTP 系统复验的结束状态和诊断报告均为 3。训练模式仍会拒绝关键点缺失、多人、换人、暂停和超过 250 ms 的间隔。
+**Checks.** A truncated hurdle-step recording went from 0 to 3 in the SDK and the HTTP chain; the straight-leg recording stayed at 0. The 8 matching public sessions did not regress (one improved from 9 to 10), and 32 cross-exercise / shoulder negatives and 16 still checks stayed at 0. Time cost on the CPU: about 2.4 ms P50 per step for one view, about 5.4 ms for two.
 
-界面的“连续可见”和“输入中断”只统计输入质量，不表示模型已经确认完整动作。输入有效但阶段为 `other` 时单独显示“骨架有效，尚未确认所选动作”。没有补算次数、修改关节置信度或改写原计数器。
+Alternatives tried and **not** deployed: phase-probability calibration (counted a real hurdle-step input as 4 straight-leg raises), extra class-competition rules, two other trained candidates (false counts on public cross-exercise checks), lower thresholds, fixed arm coordinates, and fine-tuning only the phase heads.
 
-## 接入修复
+## 3. Phase continuity for the hurdle step (`action_gap_hold_v1`)
 
-- 上传视频原来经过 BGR 解码、JPEG 编码、JPEG 解码后才送入 PoseEstimator。现在在算法工作进程中直接逐帧解码并提交原始 BGR，与原 `scripts/run_video.py` 对齐，保留文件帧率和时间戳。随附视频前 30 帧的旧 JPEG 路径会造成最大约 1.544 的关键点数值差异；这 30 帧没有发生可见性门槛翻转，因此不能把该问题称为实时零计数的已证实根因。
-- 共享摄像头跳过早于会话起点的旧帧，避免多帧被截断成相同的 0 ms、触发时间戳冲突。
-- 暂停、继续、结束和快照均保留最新输入诊断。此前控制结果会覆盖帧诊断，使最终报告丢失排查线索。
-- 所有来源统一统计关键点完整率、缺失关节、采样率、最大间隔、原算法报告的中断次数及连续有效输入时长。诊断不参与模型推理或计数。
-- 界面展示八个关节的置信度，短暂中断在下一帧恢复后仍可查看。计数始终使用原 API 返回的 `count`。
+**Problem.** In hurdle-step sessions the decoder briefly rejected the action just after the support gate was met, clearing a repetition that the counter had already advanced to outward / peak / return.
 
-## 现场复现
+**Change.** Hurdle-step training sessions hold the confirmed phase for at most 0.15 s while waiting for the next valid decision. During the hold only the already confirmed phase is passed to the original counter; no new phase or repetition can be confirmed, and after the timeout the original interruption applies. Insufficient keypoints, a change of person, pausing and gaps above 250 ms still clear everything immediately.
 
-在新项目运行 `start.bat`，打开终端显示的地址。选择实际训练动作，完成动作后查看计数、八个关节状态、关键点完整率和中断次数。新项目与旧系统是独立服务；同一摄像头被其他服务占用时，应先停止其他服务的摄像头任务。
+**Checks.** A recorded hurdle-step clip went from 4 to 5; public matched sessions did not regress and 48 cross-exercise and still checks stayed at 0. Applying the same rule to the straight-leg raise or smoothing phase posteriors with an EMA degraded public sessions, so neither was used.
 
-训练旁的下载图标导出最近 180 秒、最多 1800 个实际骨架观测，不包含图像或录像。接口为 `GET /api/sessions/{sid}/diagnostics.json`，包含：
+## 4. Batched mirror inference
 
-- `schema_name: coco17`、`coordinate_space: camera_xy`；
-- 原始 `frames`，保留 `timestamp_ms`、`person_id`、17 个 `[x,y,confidence]` 点；
-- 原会话 `state`，包括阶段概率、计数和中断；
-- `truncated`，表示导出是否只包含部分输入。
+Mirroring doubled the model calls, and each real observation can require several 30 Hz interpolation steps, which lowered the effective camera sampling rate (temporal processing P50 about 63 / 84 ms per frame for the two leg exercises on CUDA). `MirroredPhaseStream.update_many` now evaluates all steps available at the current observation, for both views, in one batch. Each step still builds its own causal window of the original length from past data only, and outputs are passed to the decoder and counter in the original time order.
 
-结束训练时保存在 `runtime/exercise-traces/`，重启后仍可通过接口导出。删除对应训练记录时同步清除该文件。诊断原始输入不会写入普通历史列表或 Git。
+Temporal processing dropped to about 13 / 15 ms P50. A frame-by-frame comparison of the old and new paths (public inputs fed at 7.5 Hz, cross-exercise and still checks, five field recordings) showed identical counts, phases, recognized actions, quality, interruptions, cycles and valid durations, with a maximum posterior difference of about 1e-6 on CUDA and 5e-7 on the CPU.
 
-用原算法直接复现导出数据：
+## 5. Pose-based cycle confirmation for sit-to-stand and straight-leg raise
 
-```powershell
-.\.venv\Scripts\python.exe scripts\diagnose_exercise.py <诊断文件.json> --exercise squat
-# 同时检查四个动作：
-.\.venv\Scripts\python.exe scripts\diagnose_exercise.py <诊断文件.json> --exercise all
-```
+**Problem (2026-10-23).** Continuous visible sit-to-stand input still lacked the model's rising phase, and the motion part of straight-leg raises was still rejected by the action support gate. The original SDK also counted zero, so the web page was not losing counts.
 
-完整、未暂停且 `action_scope`、`inference_views`、`phase_policy` 相同的输入会额外比较 SDK 与系统的计数。截断输入缺少之前的模型历史；暂停也会清空模型历史，所以这些情况下不声称能逐项重现整个会话。旧版记录缺少 `inference_views` 或 `phase_policy` 时按 `original` 处理，不将新版镜像或阶段连续性模式与旧版记录的计数差别误报为接入丢数。SDK 同样为零时，需继续检查可见性、视角和阶段概率；不能通过补帧、填置信度或另写角度计数绕过原算法。
+**Change.** Camera / upload training sessions of these two exercises use an explicit deployment counting policy that derives the phase given to the existing `CycleCounter` from the end points and direction of the visible skeleton, with 0.1 s phase debouncing:
 
-## 本次验证
+- `pose_cycle_v1` (straight-leg raise): both feet down first, then the same fairly straight leg raised and put back. Half movements, bent-knee lifts and switching legs without putting the foot down cannot complete a cycle.
+- `pose_cycle_v2` (sit-to-stand): a confirmed seated start, standing fully upright, then seated again. Knee angle and normalized heights use end-point conditions with a gap between them. `setup_pose` reports standing / seated / transition / waiting separately, so standing at the start shows "Standing recognized - sit steady to start" instead of an error. Gaps of 250-400 ms with continuously valid keypoints keep the cycle; above 400 ms, insufficient confidence, a change of person or pausing still clear it. v2 also batches the single-view temporal inference of all steps available at the current frame.
 
-| 检查 | 结果 |
-| --- | --- |
-| 系统回归 | 43 项通过，包含新版撤回求助、英文覆盖与 85 秒输入保留测试 |
-| 算法2测试 | 原 28 项和新增 41 项全部通过，共 69 项，含阶段连续性、视图策略及双历史中断重置验证 |
-| 坐站 / 深蹲 / 站立抬腿 / 跨步回放 | 9 / 10 / 10 / 10，与原 SDK 一致 |
-| 共享内存摄像头入口（随附视频帧） | 原姿态模型的关键点误差为 0 |
-| 上传视频抽查 10 帧 | 关键点误差为 0，阶段、周期及计数一致 |
-| 浏览器四动作 | 中英文回放计数、完成状态、结束后骨架导出、分动作说明及实时阶段显示通过 |
-| 暂停、恢复及短暂关键点不足 | 原算法中断仍存在，诊断保留 |
-| 桌面 1440 / 手机 390 宽 | 无横向溢出、诊断及说明文字裁切、侧栏遮挡或空白骨架；四组示意图加载正常 |
-| 真实输入重放 | 原模式 0，新增训练模式 3，完整 HTTP 链路与结束后诊断报告均为 3 |
-| 原模式与训练模式对照 | 16 个正会话结果相同，68 个负检查均为 0 |
-| 算法完整性 | 116 项清单中 3 个源码条目明确更新，其余 113 项无变化；模型权重、特征、计数器、配置与报告保持原样 |
+The model's action and phase probabilities are still computed and stored: `model_phase` is the model's phase and `phase` the one used for counting. This policy is **not** the original classifier and does not inherit its accuracy; a skeleton also cannot prove that the hips actually touched the chair. Squat and hurdle step keep their policies, and the SDK / API default stays `original`.
 
-上传视频的阶段概率使用绝对容差 `1e-7`、相对容差 `0`；最终 CPU 对照中最大差异约 `6.6e-8`。关键点、计数、阶段、周期和输入质量分别核对，不用概率容差掩盖行为差异。
+**Checks.** Recorded inputs went from 0/0 to 3/2 (sit-to-stand) and from 0/0 to 3/3 (straight-leg raise); the newest sit-to-stand recording went from 0 to 5. Regression checks cover complete cycles, still input, half movements, bent knees, switching legs, interruptions, the 400 ms gap rule and the causality of batching.
 
-验证命令：
+## Integration fixes
 
-```powershell
-.\.venv\Scripts\python.exe -m pytest tests -q
-cd algorithm2
-..\.venv\Scripts\python.exe -m pytest tests -q
-cd ..
-$env:HOMEEASE_SYSTEM_DATA = "$PWD\runtime\exercise-parity"
-.\.venv\Scripts\python.exe scripts\verify_integrations.py --module exercise
-$env:HOMEEASE_TEST_URL = 'http://127.0.0.1:8012'
-node scripts\check-exercise.cjs
-```
+- **Uploaded video** used to go through BGR decode, JPEG encode and JPEG decode before pose estimation. The worker now decodes frames directly and submits raw BGR, like the original `scripts/run_video.py`, keeping the file's frame rate and timestamps (keypoint error 0 on spot checks).
+- **Shared camera.** One process opens each camera and passes raw BGR frames to both the video and exercise algorithms through shared memory (keypoint error 0 against the original pose model). Frames older than the session start are skipped, which removed duplicate 0 ms timestamps; camera hand-over between video monitoring and exercise sessions rebinds the owner without reopening the device.
+- **Diagnostics survive control actions.** Pause, resume, end and snapshots keep the latest input diagnostics (keypoint completeness, missing joints, sampling rate, largest gap, interruptions, continuous valid duration). Diagnostics never take part in inference or counting.
+- **UI.** The page shows the confidence of the eight required joints and a five-step progress indicator driven by the counter's read-only `counter_stage`; the count shown is always the API's `count`. "Body visible, selected exercise not yet recognized" is shown separately from input problems.
 
-修复版真人连续深蹲、指导后的坐站已获用户确认。第一轮其他三动作的输入尚未指导，不能用该轮输入建立准确率或完整次数真值。
+## Diagnostics export
 
-## 动作说明与指导复测
+The download icon next to a session exports up to the last 180 s or 1,800 skeleton observations (no images or video) through `GET /api/sessions/{sid}/diagnostics.json`: `schema_name: coco17`, `coordinate_space: camera_xy`, the raw `frames` with `timestamp_ms`, `person_id` and 17 `[x,y,confidence]` points, the session `state` (phase probabilities, count, interruptions) and `truncated`. Ended sessions are kept in `runtime/exercise-traces/` and deleted together with the session record; they are never written to Git.
 
-本轮按用户要求先补齐指导，再继续真人验证，不修改模型、计数器或阈值。
+## Exercise guidance
 
-- 原训练脚本 `algorithm2/scripts/optimize_top.py` 使用 25° / 45° / 65° 投影，并包含左右镜像增强。这是训练覆盖范围，不是服务中检查相机角度的硬门槛，也不保证所有该范围内的真人视角均准确。
-- 页面建议约 45° 斜侧视角，并解释正对镜头是 0°、纯侧身是 90°；左右侧均可，优先抬靠近镜头的一条腿，保持八个必需关键点完整可见。镜头约在髋高且水平、全身留空是减少遮挡和透视的拍摄建议。
-- 坐站：实际坐稳于椅子 → 起身站直 → 再坐稳，返回坐姿才增加一次。
-- 站立抬腿（m06）：单腿保持尽量伸直，向身体正前方抬起后放下站稳，每条腿的完整往返分别计一次。
-- 跨步（m02）：单腿屈膝向前抬起，如模拟跨过低横杆，再收回原位站稳；无需真实障碍物，区别于直腿抬腿。
-- 约 2 秒起始稳定、1～2 秒去程、顶点稍停、1～2 秒返回和约 1 秒复位是操作建议，不是新增计数门槛。幅度以舒适稳定为准，不要求达到示意图高度。
-- 四组 PNG 为解释动作差别的示意图，由 `scripts/render_exercise_guides.py` 生成，不是训练样本、现场录像或准确率证据。
-- 后续已将两项抬腿的 PNG 替换为原训练骨架参考，并增加 GIF 播放控制，具体来源见下节；深蹲和坐站仍为示意图。
-- 新增只读 `counter_stage`（-1 未就绪，0 起始，1 去程，2 顶点，3 回程）直接读取原计数器。网页的五步指示使用该字段，而不把模型瞬时 `phase` 当作已确认阶段；中断后回到起始提示，次数只取 API 的 `count`。
-- 开始前及训练中均保留动作说明、图示、计数定义和视角说明；关键点诊断可展开，中文与英文同步覆盖。
+The original training data are oblique projections at 25 / 45 / 65 degrees, so the pages recommend turning about 45 degrees to the camera with the head and both feet in frame and the camera level at hip height. The guides for the two leg exercises are rendered from real training skeletons (`m06_s01_e10`, `m02_s04_e08` at the original 45 degree projection) and include the arm posture of the training data: upper arms at shoulder height with bent elbows for the straight-leg raise, arms slightly out with hands at shoulder height for the hurdle step. These guides are visualizations of the training data, not counting rules or evidence of accuracy.
 
-未指导现场记录的 SDK 重放：坐站 0、直腿抬腿 3、跨步 2，与系统保留次数相符；直腿抬腿轨迹只保留最近 60 秒，不能据此重建整个会话。坐站一次已到回程但随后关键点不足，另一些去程阶段未得到确认；跨步在约 37.6 秒完整关键点输入中也有顶点证据不足。没有把这些现象全部归因于视角或用户动作。
+## Field-test history
 
-排查时比较了推断短暂去程和将阶段阈值由 0.25 放宽至 0.20 的候选：前者对这三份输入无改善；后者跨步从 2 变 3，但在公共负检查中产生 1 个误周期，均未采用。
+| Date | Exercise | Observation |
+|---|---|---|
+| 2026-10-16 | squat | 0 before the training action scope, then 3; user confirmed the count |
+| 2026-10-16 | sit-to-stand | 2 after guidance; user confirmed |
+| 2026-10-16 | straight-leg raise / hurdle step | 0 / 0 after guidance; about 5 each performed |
+| 2026-10-16 | both leg exercises, 5 performed each | 3 / 1 before batching (system and SDK identical) |
+| 2026-10-16 | both leg exercises after batching | 6 / 6; user reported "no problems" (no per-repetition labels) |
+| 2026-10-23 | sit-to-stand with `pose_cycle_v2` | user reported the result as good |
 
-## 直腿抬腿、跨步的后续排查
-
-用户指导后再次反馈：坐站可以；直腿抬腿、跨步各约做了 5 次，换过左右腿，没有换朝向，两项计数均为 0。两份保存输入均只保留最后 60 秒，不能将其计数与整场约 5 次直接计算准确率。
-
-直腿抬腿有约 47 秒连续有效输入，原模型的目标动作条件顶点概率最高约 0.04，远低于原 0.25 门槛，未能确认顶点；跨步也有连续有效动作片段。因此这两项不能全部归因为遮挡，也没有证据说明是网页把 SDK 次数丢掉。两份输入用原训练上下文直接流式重放仍为 0。
-
-部署新增左右镜像预测平均，仅用于训练上下文中的这两个动作。变换严格沿用原训练增强：x 反号并交换肩、肘、腕、髋、膝、踝的左右语义。使用同一权重、原特征函数和两套独立因果历史，对 17 类联合概率取均值后再交给原 decoder、计数器。所有原输入中断同时清空两套历史，不拼接中断前后的半周期。状态增加 `inference_views`，深蹲、坐站和 `open` 模式始终为 `original`，这两项训练为 `mirror_average`。
-
-实际 SDK 流式重放结果：最新跨步截断输入从 0 变为 3；最新直腿抬腿仍为 0。完整系统 HTTP 链路和结束后诊断保存的次数分别为 0、3，与 SDK 一致。相互作为另一个动作的输入时，两份最新记录的计数均为 0。公共验证/测试的 8 个对应动作会话没有退化，其中一个从 9 变为 10；32 个跨动作/肩部负检查及 16 个静止检查均为 0。可复现结果见 `artifacts/exercise_views_validation.json`，脚本为 `scripts/validate_exercise_views.py`。这些检查不是现场准确率或左右腿分别计数能力的证明。
-
-本机 CPU 的独立时序推理抽查：原单视图 P50/P95 约 2.44/3.23 ms，双视图约 5.36/7.15 ms（预热 30 次、记录 120 次，不含 Pose、HTTP、调度与相机开销）。这是本次本机抽查，不能替代原报告中的基准，也不保证其他设备可维持同等采样率。
-
-直腿抬腿问题尚未解决。站姿阶段概率校准曾使该记录计到 4，但同时将真实跨步输入误计为 4 次直腿抬腿；增加类别竞争条件仍会漏计或混淆，未接入。仓库另两个已训练候选模型也未解决该记录，且部分公共跨动作检查出现误计，没有替换原选定模型。没有采用角度阈值另写计数或根据用户约 5 次的反馈补算。
-
-网页已在动作选择和训练区域上方常驻醒目的加粗 **“建议斜侧身约 45° 训练”**，并保留正对为 0°、侧对为 90°及全身入镜说明。中英文同步覆盖。直腿抬腿后续需要在原模型的真实相机域适配上继续验证，不能把当前部署扩展标成四动作均已现场验收。
-
-## 完整文件交付
-
-原有 35 个 LFS 文件均已取得实际内容，交付分支 `fix/exercise-integration` 将它们保存为普通 Git 二进制文件。实际文件合计 282,243,909 字节，最大文件约 75.5 MB，低于 GitHub 单文件限制。模型、数据和训练报告不删减；历史提交不重写。虚拟环境、依赖缓存、运行数据库和现场诊断不上传。镜像版跨步现场复测仍为 0，直腿抬腿也未解决，不以分支上传表示四动作全部验收。
-
-## 镜像版现场复测与原动作参考
-
-用户反馈镜像版跨步仍为 0，本轮左右腿交替，约做 4～5 次。保存的完整输入有 323 帧、约 46.24 秒，其中 196 帧八点完整且为单人，有效时长约 34.27 秒。原 SDK 同样计为 0，与系统一致。该轮未确认 stage 2 顶点，不能将之前截断输入回放的 3 次当作现场修复成功，也不能把失败全部归因于间歇遮挡。
-
-继续放宽阶段门槛、用固定手臂坐标替换现场输入，以及仅调整两项抬腿阶段头的离线候选均未部署。固定手臂输入虽然使本轮跨步回放计到 5，但产生跨动作误计；冻结主干的候选只计到 3，直腿抬腿仍为 0，负检查也有退化。原模型权重、特征、阈值和计数器没有被这些实验覆盖。
-
-`scripts/audit_exercise_domain.py` 只比较输入分布，不参与计数。它在原训练集中每项 60 个正确动作片段与可见现场骨架间，核对髋中心坐标、两倍躯干长度归一化后的膝、踝、肘、腕高度。跨步训练顶点较高膝盖的中位 y 为 -0.130，现场全部可见阶段的 P05 为 0.158；直腿抬腿训练顶点较高脚踝的中位 y 为 -0.459，现场 P05 为 0.716。y 越大表示越低；现场与训练的手臂位置也明显不同。现场没有逐帧人工阶段标注，这些分布差异仅用于定位输入差异，不能作为计数阈值或证明唯一根因。结果见 `artifacts/exercise_hurdle_domain_audit.json`、`artifacts/exercise_leg_raise_domain_audit.json`。
-
-此前图示只有自然下垂的手臂，未覆盖原训练动作的手臂姿势。两项抬腿说明现已补充：直腿抬腿双上臂约肩高、屈肘双手向上；跨步双臂略打开、屈肘双手约肩高。顶点参考分别为直腿接近水平、屈膝接近髋高，同时明确小幅度可能漏计，不要求为计数勉强抬高。左右交替时先双脚落地站稳。45° 加粗提示和每腿完整往返算一次的规则保留。
-
-`scripts/render_training_guides.py` 从原训练正确片段中选择顶点高度接近训练中位数的片段，直腿示范另外要求活动膝盖伸展且双脚在投影中分开可见，以原 45° 投影生成 PNG 与可播放 GIF。来源分别为 `m06_s01_e10`、`m02_s04_e08`，帧索引和选择方式保存在 `artifacts/exercise_guide_sources.json`。这些筛选仅用于图示选材，不是新增计数门槛。静态参考默认显示，播放、停止控制仅替换图片，不访问摄像头或参与推理。它们是原训练骨架的可视化，不是现场录像，也不代表真人识别已验收。新参考指导下的现场效果仍待核对。
-
-本轮系统 42 项测试通过。两项动画在中英文、1440/390 宽度共 8 种组合中，实际像素移动、非空骨架、播放/停止、稳定尺寸和文字完整性均通过浏览器核对。原算法 116 项完整性清单没有本轮新增变化。
-
-## 原训练参考指导后的漏计与重复计数
-
-用户随后反馈两项抬腿明显改善，但每项实际约做 7～9 次，直腿前抬系统计 5 次、跨步计 4 次，仍有漏计和重复计数。这是整场近似次数，没有逐次人工时间标注，不能只比较总数就推断每个计数正确。
-
-- 跨步会话 `99bf0dc8-c5ad-4963-be96-aea614553e73` 约 61.78 秒，保留 430 帧，开始于 1.85 秒，已截断。原部署 SDK 重放保留片段计 4 次。
-- 直腿会话 `c12721db-ef1a-48e0-aac8-6c5088ada015` 约 84.69 秒，保留 363 帧，开始于 24.87 秒，已截断。整场 5 个计数全部发生在保存片段之前，保留片段重放为 0；这不是系统丢数。周期摘要中两次仅持续约 0.833 / 0.800 秒，值得排查重复，但缺少对应原始骨架，尚不能判定为误计。
-- 诊断时间范围由 60 秒增至 180 秒，实际观测上限仍为 1800 帧，不保存图像或录像。超过任一边界仍会截断；相应测试覆盖 85 秒、8 FPS 输入的开头及时间和帧数边界。该修改只补全诊断，不改变计数。
-
-跨步 `training` 模式新增 `phase_policy="action_gap_hold_v1"`。当目标动作刚满足原 0.15 支持度门槛、原计数器已进入去程/顶点/回程，而 decoder 短暂拒绝动作时，最多保留已确认阶段 0.15 秒，等待新的有效判断。等待期间只向原计数器提交当前已确认阶段，不确认新阶段或新次数；超时仍按原 decoder 中断。输入关键点不足、人员变化、暂停和超过 250 ms 的帧间隔仍立即清空模型历史及未完成周期。模型后验、原阶段阈值、消抖时间、周期长度规则和计数器源码均不改变。
-
-该处理只用于跨步训练。直腿前抬、深蹲、坐站及全部 `open` 会话保持原阶段处理；两项抬腿的镜像平均规则保持不变。SDK 可显式传 `phase_policy="original"` 重现此前部署行为，HTTP 状态和诊断增加只读 `phase_policy`。诊断脚本默认沿用记录策略，旧记录默认 `original`，可通过 `--phase-policy action_gap_hold_v1` 比较跨步候选，策略不同不声明与旧系统全场计数相等。
-
-`scripts/validate_exercise_continuity.py` 通过 SDK 对同一模型后验及同一输入比较前后策略，包含真实流式推理和公共骨架的批量因果推理。跨步保留片段从 4 变为 5；直腿保留片段仍为 0，不能据此宣称直腿漏计已修复。公共 8 个匹配会话计数无退化，48 个跨动作和静止检查均为 0。两份真实输入相互作为另一动作的检查，跨步输入仍误计为 2 次直腿、直腿输入仍误计为 1 次跨步，没有新增，但这些既有混淆没有解决。结果见 `artifacts/exercise_continuity_validation.json`。
-
-阶段后验 EMA 曾使公共直腿会话从 9 降至 5、10 降至 9，未采用。把阶段连续性也用于直腿的候选则使真实跨步输入的直腿计数从 2 增至 3，未部署；同时抑制低支持度的非最大阶段证据也没有消除该退化。当前没有根据用户约 7～9 次的反馈补算次数，也没有为压制疑似重复直接延长原最小周期。重复计数及剩余漏计仍需完整输入和准确次数的短会话核对，不能将本次离线增加 1 次当成现场验收通过。
-
-## 准确五次试做与推理合并
-
-用户确认本轮每项实际各做 5 次，“单腿完整抬起再落地”算一次，不是左右各一次算一组。两轮原始骨架均完整保留：
-
-- 直腿前抬 `fc48e52b-ae77-4d3b-b9e0-ebb9b17429d1`：392 帧、50.10 秒，339 帧八点完整；系统和原 SDK 均为 3 次。有约 45.87 秒连续有效输入。
-- 跨步抬腿 `f49719f3-2269-486f-b15e-1aadab2bbb08`：594 帧、74.09 秒，254 帧八点完整；系统和原 SDK 均为 1 次。缺失集中于准备和结束阶段，动作期间仍有约 33.13 秒连续有效输入，不能用整场完整率解释全部漏计。
-
-两项尚未达到现场验收要求。没有逐周期人工时间标注，不能根据骨架峰值个数替用户重新定义实际次数，也不能把总数调到 5 就宣布修复。
-
-检查发现双视图推理的系统开销会进一步降低摄像头采样率：同一实际观测需要补齐多个原有 30 Hz 插值时刻，旧路径为每个时刻、每个镜像分别调用模型。本机独立 CUDA 抽查中，直腿、跨步每帧有效骨架的时序处理 P50 约为 63.32 / 84.27 ms，姿态检测另需约 42 ms；这是局部性能测量，不是漏计的唯一根因。
-
-`MirroredPhaseStream.update_many` 将当前观测已经可以生成的时刻和两个视图合并为模型 batch。每个时刻仍单独构造原长度的因果历史窗口，沿用原特征提取、EMA、速度、标准化、左侧填充、左右镜像和概率均值；不把后一个时刻的数据放入前一个窗口，不等待下一帧。模型输出仍按原时间顺序逐个交给 decoder 和计数器。普通单视图及自定义 stream 保留逐时刻推理；暂停、遮挡、换人和超过 250 ms 的间隔仍清空两套历史及未完成周期。
-
-同机后续独立抽查中，两项时序处理 P50 约降至 13.38 / 14.75 ms；该抽查的姿态检测 P50 约 48.74 ms，系统总体性能还受姿态检测、进程通信、数据库和摄像头调度影响，不能把时序提速倍数直接当成全链路提速。保存输入重放仍为 3 / 1 次；性能优化无法恢复此前没有采到的帧，尚需新现场输入验证。
-
-`scripts/validate_exercise_batching.py` 对同一实际输入比较旧逐次镜像推理和新合并推理，逐帧核对次数、阶段、识别动作、输入质量、中断、周期和有效时长，并检查模型后验的数值误差。公共投影输入以每 4 帧一次的 7.5 Hz 实际观测送入 SDK，保持原 30 Hz 因果插值，以覆盖一帧产生多个推理时刻的路径。静止、跨动作及已保存现场记录也纳入比较；这里的“结果一致”是行为回归检查，不是正确率保证。
-
-CUDA 对照完成 8 个公共匹配检查、48 个跨动作与静止检查和 5 份现场记录，逐帧行为及周期相同，公共负检查均为 0。后验最大误差约 `9.54e-7`，小于明确设定的绝对容差 `2e-6`。CPU 对最新两份完整记录也逐帧一致，最大误差约 `4.62e-7`。这些对照分别在同一设备内比较新旧实现，不保证 CPU 与 CUDA 在所有原阈值边界上行为完全一致；部署继续使用原 CUDA 设备。旧记录采用当前阶段连续性策略比较两个计算路径，因此旧跨步保存次数 4 与当前策略重放 5 的区别沿用前节解释。
-
-结果分别保存于 `artifacts/exercise_batching_validation.json` 和 `artifacts/exercise_batching_cpu_validation.json`，只含统计及输入摘要，不含现场骨架坐标或录像。本轮系统 43 项、算法2 72 项测试通过，新增覆盖短历史填充、窗口滚动、两种模型、多成员、批次间续接、重置和因果独立性。116 项算法完整性检查通过，本次仅明确更新已有扩展文件 `engine.py` 的校验值。8001 服务的运动模块已重新加载提速版。
-
-## 最终现场反馈与主分支交付
-
-2026-10-16，用户完成提速版现场复测后反馈“没问题了”，并明确授权将当前完整版本更新到 GitHub `main`。最新直腿前抬、跨步记录的系统计数各为 6；用户未另行给出这两轮实际次数及逐次时间标注，因此将本次记为用户实测通过，不宣称 5/5 或普遍准确率 100%。前述 3/5、1/5 是提速前历史记录，保留用于说明排查过程，不作为本版最新验收结论。
-
-交付保留队友已有系统及算法3提交，包含算法2接入修复、动作说明、45° 醒目提示、镜像和阶段连续性处理、时序推理合并及验证资料。35 个原 LFS 模型和数据文件继续使用实际完整 Git 文件；不上传本机虚拟环境、运行数据库、摄像头骨架诊断或录像。
-
-
-## 2026-10-23：坐站和直腿前抬的摄像头周期确认
-
-本机新记录显示，连续可见的坐站输入仍缺少模型的 rising 阶段；直腿抬腿输入的运动部分被原动作支持门槛拒绝。原 SDK 对这些输入同样零计数，因此不是页面漏显示。
-
-系统的指定训练摄像头／上传入口对坐站、直腿前抬显式启用 `counting_policy="pose_cycle_v1"`。这是一项新的部署计数策略：用可见骨架的端点与运动方向给已有 CycleCounter 提供阶段，阶段消抖为 0.1 秒；不沿用原阶段分类器的完整周期精度声明。坐站必须先确认坐姿，再伸膝站直、回坐；直腿前抬必须先双脚落地、同一条较直的腿抬起、放回原位。膝角／归一化高度采用有间隔的端点条件，半程、弯膝提腿和未落地换腿不能完成周期。人体丢失、关键点置信度不足、换人、暂停和超过 250 ms 的输入间隔仍清空未完成周期。
-
-模型权重与原始动作、阶段概率继续保留；`model_phase` 记录原模型阶段，`phase` 展示实际用于当前计数的阶段，`counting_policy` 写入会话和诊断。新策略不等同于原分类器输出；单凭骨架也不能确认臀部实际接触了椅子。SDK/API 默认仍为 `original`；深蹲和跨步保持现有策略。诊断脚本读取记录的 counting_policy，也支持显式对照；策略不同不会声称重现旧系统次数。
-
-本机两份坐站历史输入由 0/0 变为 3/2，两份直腿输入由 0/0 变为 3/3。这是保留输入上的离线变化，缺少逐次人工标注，不能作为真人准确率或漏计全部消除的证明。完整周期、静止、半程、弯膝、换腿及输入中断已纳入回归；现场效果需用新会话复测。
-
-
-## 2026-10-23：坐站站立准备提示与低帧率周期连续性
-
-最新会话 `aaa440cf-e104-4d35-8428-ee82a23c952d` 的 450 帧中有 338 帧关键点完整，但系统为零。站立时骨架有效，旧版计数器等待坐姿起点而返回 other，网页据此误显示“尚未确认所选动作”。该会话另有 25 个 250～368 ms 的间隔，超过旧 250 ms 门槛，反复清空周期。
-
-坐站指定训练改用明确版本 `counting_policy="pose_cycle_v2"`。`setup_pose` 独立记录当前站立、坐姿、过渡和等待输入状态；识别到站立时展示“已识别站立，请先坐稳”，不会仅因计数尚未开始而标红。计数定义仍为先坐稳、站直、再坐稳，站立准备和单次坐下都不增加次数。中断后站立依然能识别，重新坐稳后才能开始新完整周期。
-
-v2 坐站的最大有效输入间隔为 400 ms，返回 `max_input_gap_ms`；250～400 ms 且人体关键点连续有效的输入可保持周期，超过 400 ms、关节置信度不足、换人或暂停仍清空未完成动作。前端用会话返回的门槛显示间隔状态。v1 保留旧 250 ms 门槛，可继续重现历史诊断；其余动作和原 SDK 模式保持原门槛。
-
-v2 的单视图时序推理将当前已到达帧对应的因果窗口合并为 batch；每个窗口仍只读自己的过去，不等候下一帧。模型权重、特征、后验和端点规则不变。原单视图 SDK/v1 仍用逐次调用，原镜像路径不变。CUDA 局部抽查中，每次 5 个已有插值时刻的时序处理 P50 从约 46.96 ms 降至 11.34 ms，最大后验差 `1.19e-7`；这不是摄像头整体帧率的实测保证。
-
-最新实际输入在真实 CUDA 模型中由 0 变为 5 次，另两份旧坐站记录为 3/6 次。由于没有逐次人工标注，这只证明旧输入已能形成完整周期，不能当作准确率或现场验收。新增检查覆盖站立准备不计数、回坐起点、短调度间隔、长间隔/遮挡/人员变化清零、其他动作门槛不变，以及单视图 batch 的因果性、续接和重置。桌面和手机宽度均核对了站立提示与坐稳后提示，无误报红色状态。
-
-## 2026-10-23：最新现场复测与 main 交付
-
-用户对上述坐站优化完成新一轮现场测试后反馈“我测试了效果不错”，并授权将当前项目整体更新到 GitHub main。本次记为用户现场复测通过；未提供这轮逐次人工标注及准确次数，不据此宣称普遍准确率。交付包括共享摄像头交接修复、坐站 v2、直腿前抬 v1、准备姿态提示、诊断版本信息及相关回归测试。
-
-发布核验同时修正 Windows 测试子进程的 UTF-8 解码与 CSV 输出换行兼容问题；产品 CSV 输出不变。仅上传项目代码、测试、文档及原有模型和素材，不包含本地虚拟环境、运行数据库、摄像头骨架诊断或录像。
+Open limits: no per-repetition manual timing exists for the field tests, the leg exercises still show some cross-exercise confusion on recorded inputs, and none of the extensions has been validated on a larger group of older adults. Each change is a deployment adaptation for the camera domain, not a retrained or re-evaluated model.

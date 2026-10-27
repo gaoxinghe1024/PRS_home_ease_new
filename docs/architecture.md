@@ -1,46 +1,56 @@
-# 架构与算法集成
+# Architecture and Algorithm Integration
 
-## 调用边界
+## Call boundaries
 
 ```mermaid
 flowchart LR
-    HTML[HTML / JavaScript] --> API[FastAPI]
-    API --> Service[调度与事件服务]
+    UI[frontend: HTML / JavaScript] --> API[backend: FastAPI]
+    API --> Service[scheduling and event services]
     Service --> DB[(SQLite)]
-    Service --> IPC[JSON / 本地管道]
-    IPC --> Video[算法一视频进程]
-    IPC --> Accel[算法一信号进程]
-    IPC --> Exercise[算法二进程]
-    IPC --> Audio[算法三进程]
+    Service --> IPC[JSON over local pipes]
+    IPC --> Video[Algorithm 1 video process]
+    IPC --> Accel[Algorithm 1 accelerometer process]
+    IPC --> Exercise[Algorithm 2 process]
+    IPC --> Audio[Algorithm 3 process]
 ```
 
-`care/main.py` 负责 HTTP/WebSocket、输入边界与访问控制；`services.py` 负责流程调度；`events.py` 负责处置与通知；`storage.py` 负责事务和持久化；`adapters/process.py` 负责隔离进程、超时和回收；`workers.py` 仅适配原 SDK 的调用入口。前端位于 `web/templates` 和 `web/static`。
+| Layer | Location | Responsibility |
+| --- | --- | --- |
+| Frontend | `frontend/templates`, `frontend/static` | caregiver workbench, household entry, older adult page, sensor page, printable reports |
+| HTTP / WebSocket | `backend/main.py` | routes, input limits, access control |
+| Scheduling | `backend/services.py` | module lifecycle, background channels, sessions, reports |
+| Events | `backend/events.py`, `backend/inquiry.py` | event handling, notifications, voice-inquiry conclusions |
+| Storage | `backend/storage.py`, `backend/records.py` | transactions, persistence, record deletion |
+| Camera | `backend/camera.py` | one capture per device, shared memory for raw BGR frames |
+| Process isolation | `backend/adapters/process.py` | worker processes, timeouts, recovery |
+| Algorithm adapters | `backend/workers.py` | thin adapters to the original algorithm entry points |
+| Algorithms | `algorithms/*` | the delivered algorithm code, weights and samples |
 
-各模块可以通过 `AlgorithmProcess("video" | "signal" | "exercise" | "audio")` 独立初始化、调用与关闭；`scripts/verify_integrations.py --module NAME` 独立验证。算法2与算法3都包含 `homeease` 包，独立进程避免 import 冲突，也使单个算法故障与报告、其他算法隔离。
+Each module can be initialized, called and shut down independently through `AlgorithmProcess("video" | "signal" | "exercise" | "audio")`. Algorithms 2 and 3 both contain a package named `homeease`; separate processes avoid import clashes and also isolate a failing algorithm from the reports and the other algorithms.
 
-## 保持原行为
+## Keeping the original behaviour
 
-视频引擎按交付代码要求在运行目录建立 `systems/` 与相邻 `standalone/`，源文件按字节复制；原算法目录保持原样。使用其 `DetectionEngine`、默认阈值、连续确认、窗口、冷却、采样及片段保存逻辑。H.264 转码仅创建浏览器播放副本，原始证据片段不覆盖。
+**Video (Algorithm 1a).** The delivered engine expects `systems/` next to `standalone/`, so the worker builds that layout in the runtime folder and copies the source files byte for byte. It uses the engine's `DetectionEngine` with its default threshold, consecutive confirmation, window, cool-down, sampling and clip saving. H.264 transcoding only creates a browser playback copy; the original evidence clip is never overwritten.
 
-信号模块使用原 `BestFallModel`、`detect_offline` 与 `StreamingDetector`。交付 CSV 读取器的四列补齐行为与实际读取索引不匹配，故明确单位的四列 CSV 在适配层转换成原生五列格式，再交给原读取器。特征、重采样、模型概率、事件规则均由原代码执行。
+**Accelerometer (Algorithm 1b).** The worker uses the original `BestFallModel`, `detect_offline` and `StreamingDetector`. The delivered CSV reader's four-column padding does not match the indices it actually reads, so a four-column CSV with explicit units is converted to the native five-column format in the adapter before the original reader runs. Features, resampling, model probabilities and event rules are all executed by the original code.
 
-运动模块在隔离进程中调用原 FastAPI app 的契约，包括批次幂等、参数校验、会话状态、计数与中断处理。摄像头及上传视频交给原 `PoseEstimator` 后使用原 `/v1/sessions/{id}/frames`，不重写周期计算。`care/camera.py` 按设备序号只打开一次摄像头，通过带序号一致性检查的共享内存传递原始 BGR 像素。视频仅适配 `FrameSource` 的摄像头入口，文件与回放仍用原入口。运动使用采集的单调时钟、单个在途推理；暂停和结束与帧提交共用会话锁。最后一个算法使用者退出后关闭摄像头，浏览器预览不拥有设备。
+**Exercise (Algorithm 2).** The worker calls the original FastAPI app contract inside its process, including batch idempotency, parameter validation, session state, counting and interruption handling. Camera and uploaded video go through the original `PoseEstimator` and then the original `/v1/sessions/{id}/frames`; the cycle logic is not rewritten. `backend/camera.py` opens each camera index once and passes raw BGR pixels through shared memory with a sequence-number consistency check. For video only the camera entry of `FrameSource` is adapted; files and replays use the original entry. Exercise sessions use the capture's monotonic clock with a single inference in flight, and pause / end share the session lock with frame submission. The camera closes when its last algorithm user leaves; browser previews never own the device. Deployment-only counting extensions are documented in [exercise-integration.md](exercise-integration.md).
 
-视频预览以 MJPEG 连续传输，与每 2.5 秒的界面状态轮询分开。视频进程默认 OpenCV 4 线程，保留原检测步长、A4 判定步长、15 FPS 采样目标和全部模型参数。不能通过重复显示缓存帧声称提高推理帧率，页面显示原引擎实测推理 FPS。
+**Audio (Algorithm 3).** The worker initializes the original Silero VAD strictly and never silently falls back to the energy VAD. Offline joint analysis passes one decoding to the original `label_sounds` and `detect_spoken_help`; continuous PCM uses the original `Function3Pipeline`, `SoundMonitor` and `HelpListener`, running all sound classes and help listening at once. Inquiry conclusions and channel tags call the original policy functions. Sound classes never become a fall decision on their own; video and accelerometer run in parallel and decide independently, and they are never merged into a new fall model.
 
-声音模块严格初始化原 Silero，不静默换用 Energy VAD。离线联合分析把同一次解码结果依次交给原 `label_sounds` 和 `detect_spoken_help`；连续 PCM 使用原 `Function3Pipeline`、`SoundMonitor` 和 `HelpListener`，同时执行全部类别识别与求助监听。询问结论及通道标记直接调用原 policy。声音类别不自行转为跌倒结论；视频与信号同时运行、独立判定，不合成为新的跌倒模型。
+**Video stream.** The preview is delivered as continuous MJPEG, separate from the 2.5 s status polling. The video process uses 4 OpenCV threads by default and keeps the original detection step, A4 decision step, 15 FPS sampling target and all model parameters. The page shows the engine's measured inference FPS rather than inflating it by repeating cached frames.
 
-## 状态与恢复
+## State and recovery
 
-- 原疑似跌倒建立 PENDING 事件，主动求助建立 EMERGENCY 事件。语音求助按原 policy 升级；表示安全仅作为待核实信息。只有照护者明确记录结果才关闭事件。
-- 问询记录播放成功、监听、识别、不可用、完成状态。未播放与音频故障不视作安全。录音 10 秒，网络传输另有短暂余量，识别使用独立有界等待。
-- 事件写入有去重键与修订号；重复输入不重复创建同一次事件，过期的处置更新返回冲突。回放与实时在数据库、通知和报告中均区分。
-- 模块错误与调用耗时进入日志。超时回收该模块进程；可在设置页重新初始化。Windows 同时追踪 venv 启动器与其真实工作进程，回收自身子进程，不按进程名称结束其他程序。
-- 实时输入超时、未检测到人、传感器断开、音频流水线降级分别记录覆盖状态。浏览器训练数据超过 10 秒未到达时暂停原会话。重启把未结束训练标为中断，依据心跳恢复离线区间。
-- 共享摄像头训练由页面定期查询维持会话心跳；浏览器离开时请求结束，心跳超过 15 秒仍未恢复时结束训练并释放该使用者，不停止独立的视频跌倒检测。
-- WebSocket 显式停止确认在原流水线关闭和锁释放后发送。关闭摄像头、音频流及传感器时释放浏览器设备；传感器断开前排空已排队的数据。
-- SQLite 使用 WAL、外键和事务。配置默认未授权音频，录音与识别文字不持久化。音频结果在授权撤回后丢弃。
+- A suspected fall from an original detector creates a PENDING event; a help request creates an EMERGENCY event. A spoken call for help escalates according to the original policy; "I'm safe" is only recorded for verification. Only a caregiver's explicit resolution closes an event.
+- The inquiry records whether the question was played and the listening, recognizing, unavailable and completed states. A question that was not played and audio failures are never treated as safe. Answers are recorded for 10 s with a short network margin, and recognition has its own bounded wait.
+- Event writes carry a deduplication key and a revision number: repeated input does not create the same event twice, and outdated updates return a conflict. Replays and live data are kept apart in the database, notifications and reports.
+- Module errors and call durations are logged. A timeout recycles that module's process, and it can be re-initialized from Settings. On Windows both the venv launcher and its real worker process are tracked; only the system's own child processes are terminated, never other programs by name.
+- Live input timeouts, no person detected, a disconnected sensor and a degraded audio pipeline are each recorded as coverage states. Browser exercise data missing for more than 10 s pauses the session. After a restart, unfinished sessions are marked interrupted and offline periods are reconstructed from heartbeats.
+- Shared-camera exercise sessions are kept alive by the page's polling. When the browser leaves, the session is ended; a heartbeat missing for more than 15 s ends it and releases that user without stopping independent video fall detection.
+- The explicit stop acknowledgement of a WebSocket is sent after the original pipeline has shut down and its lock is released. Closing camera, audio and sensor streams releases the browser devices, and the sensor queue is drained before disconnecting.
+- SQLite runs with WAL, foreign keys and transactions. Audio consent is off by default, and recordings and transcripts are never stored. Audio results are discarded once consent is withdrawn.
 
-## Proposal 对应
+## Mapping to the proposal
 
-实现了照护者工作台与简化长者页，当前覆盖、事件证据、通知与联系人、回应及人工处置、运动记录、7/30/90 天统计及导出。未生成没有原算法依据的姿势分、平衡分、临床风险分或识别准确率。Proposal 的性能和持续运行目标属于待评测指标，界面不把它们当成已达成结果。
+Implemented: the caregiver workbench and the simplified older adult page, current coverage, event evidence, notifications and contacts, responses and manual resolution, exercise records, 7 / 30 / 90-day statistics and exports. The system produces no posture score, balance score, clinical risk score or recognition accuracy without a basis in the original algorithms. The proposal's performance and long-running targets are metrics still to be evaluated, and the interface does not present them as achieved.

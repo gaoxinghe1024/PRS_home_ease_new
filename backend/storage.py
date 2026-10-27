@@ -7,8 +7,8 @@ from datetime import datetime, timezone
 
 from backend.config import DB_PATH
 
-# 首次运行时的开关默认值。后台常驻默认关闭，避免升级后立刻打开摄像头；
-# 已部署的库若在家守护里已开启，会由 services 在启动时对齐为开启。
+# Switch defaults for the first run. Always-on mode starts off so that an upgrade does not open the camera right away;
+# an existing database where home monitoring is on is aligned to on by services at startup.
 ALGORITHM_DEFAULTS = {
     "resident": False,
     "vision": True,
@@ -92,12 +92,12 @@ class Store:
                 "escalation_seconds": 60, "webhook_url": "", "notification_test_at": None,
             }
             conn.execute("INSERT OR IGNORE INTO settings VALUES (1,?)", (encode(defaults),))
-            # 既有部署升级时补齐新表；未被写入过的开关取这里的默认值（后台常驻默认关闭）。
+            # Upgrading an existing deployment adds the new table; switches never written take the defaults here (always-on starts off).
             for key, enabled in ALGORITHM_DEFAULTS.items():
                 conn.execute("INSERT OR IGNORE INTO algorithms VALUES (?,?,?)", (key, int(enabled), now()))
 
     def algorithms(self):
-        """返回全部算法开关；新增的键在此处按默认值补齐，旧库无需手工迁移。"""
+        """Return every algorithm switch; keys added later get their defaults here, so old databases need no manual migration."""
         with self.connection() as conn:
             rows = conn.execute("SELECT key,enabled,updated_at FROM algorithms").fetchall()
         saved = {row["key"]: row for row in rows}

@@ -81,9 +81,9 @@ class VideoWorker:
 
         self.module.FrameSource = SharedSource
         cpu_only = _map_cuda_pickles_to_cpu()
-        # 画面叠加交给工作台前端（检测框与骨架可各自开关），因此让原引擎输出干净画面；
-        # 这只是给原引擎构造函数传显示参数，不涉及任何检测逻辑或阈值。
-        # 「录像叠加」开关可随时用原引擎的 set_config 把框线烙回画面与录像。
+        # The workbench frontend draws the overlays (detection box and skeleton, each with its own switch), so the original
+        # engine outputs a clean image. This only passes a display argument to its constructor; no detection logic or threshold changes.
+        # The "burn overlays into recordings" switch can put the boxes back into the image and clips at any time via the engine's set_config.
         self.engine = self.module.DetectionEngine(show_skeleton=False)
         if not self.engine.models_ready:
             raise RuntimeError(self.engine._load_error)
@@ -115,12 +115,12 @@ class VideoWorker:
         self.engine._pose.extract(warm_frame, [0, 0, 640, 480])
         with self.module.a4_fast_context():
             self.engine._alg.predict(np.zeros((30, 17, 3), dtype=np.float32))
-        # 画面叠加层用的只读缓存：按引擎帧号缓存当前画面尺寸，避免每次调用都解码 JPEG。
+        # Read-only cache for the overlay: the frame size is cached per engine frame number, so the JPEG is not decoded on every call.
         self._pose_frames = -1
         self._pose_shape = (0, 0)
 
     def frame_shape(self):
-        """当前画面尺寸（宽, 高）；只在引擎帧号变化时解码一次最新 JPEG。"""
+        """Current frame size (width, height); the latest JPEG is decoded only when the engine frame number changes."""
         import cv2
         import numpy as np
         frames = int(getattr(self.engine, "_frames", 0))
@@ -134,10 +134,10 @@ class VideoWorker:
         return self._pose_shape
 
     def pose(self):
-        """只读快照：原引擎最后一帧的人体框与 17 个关键点（均归一化到 0–1）。
+        """Read-only snapshot: the person box and 17 keypoints of the engine's last frame (normalized to 0-1).
 
-        供前端在自己的画布上叠加显示（检测框 / 骨架各自独立开关）。这里只读取原引擎
-        已经算好的结果，不参与检测判定，也不改变送进模型的任何输入。
+        Used by the frontend to draw on its own canvas (detection box and skeleton switch independently). It only reads
+        results the original engine already computed; it takes no part in detection and changes no model input.
         """
         width, height = self.frame_shape()
         window = list(getattr(self.engine, "_kpts", ()) or ())

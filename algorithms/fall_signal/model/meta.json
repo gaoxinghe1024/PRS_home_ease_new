@@ -83,7 +83,7 @@
   "n_fall_seq": 30,
   "n_adl_seq": 40,
   "reference_metrics": {
-    "note": "来自 algorithms/experiments/exp03_alg.py 的 3 seed × 分层 5 折 CV",
+    "note": "from the 3-seed x stratified 5-fold CV of algorithms/experiments/exp03_alg.py",
     "auroc_seq_mean": 0.9852777777777777,
     "auroc_seq_std": 0.0010393492741038967,
     "event_accuracy": 0.8261904761904763,
