@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "algorithm2"))
 from homeease.features import stable_features
-from scripts.prepare_data import project
+from pipeline.data import project
 
 EDGES = [(0, 1), (0, 2), (2, 4), (1, 3), (3, 5), (0, 6), (1, 7),
          (6, 7), (6, 8), (8, 10), (7, 9), (9, 11)]

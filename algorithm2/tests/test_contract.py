@@ -115,8 +115,8 @@ def test_stable_features_are_translation_and_scale_invariant():
 
 
 def test_lazy_training_windows_match_causal_reference():
-    from scripts.optimize_top import CausalWindowDataset
-    from scripts.train_compare import windows
+    from pipeline.optimize import CausalWindowDataset
+    from pipeline.metrics import windows
     x = np.arange(20 * 3, dtype=np.float32).reshape(20, 3)
     y = np.arange(20, dtype=np.int64) % 17
     mean, std = x.mean(0), np.maximum(x.std(0), .1)

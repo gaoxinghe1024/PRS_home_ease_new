@@ -16,12 +16,12 @@ def decode(probabilities, exercise, action_scope="open"):
     action = int(action_probabilities.argmax())
     target = EXERCISE_NAMES.index(exercise)
     phase = int(p[target * 4:target * 4 + 4].argmax())
-    # Rest poses overlap across exercises. Condition phases on the user-selected
-    # exercise; require supporting action evidence during the moving phases.
+    # Rest poses look alike across exercises, so phases are conditioned on the
+    # exercise the user picked and need supporting action evidence once moving.
     support = action_probabilities[target]
     if action_scope == "training":
-        # The training UI supplies a known four-action context. Keep competition
-        # between those actions without letting the open-set prior erase it.
+        # The training screen already knows the four candidate actions; score
+        # against those instead of letting the open-set prior wipe them out.
         support /= max(action_probabilities[:4].sum(), 1e-8)
     if phase != 0 and support < .15:
         phase = 4

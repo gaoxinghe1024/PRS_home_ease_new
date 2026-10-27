@@ -13,8 +13,8 @@ from homeease.counter import CycleCounter
 from homeease.engine import ExerciseSession, Predictor
 from homeease.exercises import decode
 from homeease.features import extract_sequence
-from scripts.optimize_top import predict, sessions_for
-from scripts.prepare_data import project
+from pipeline.optimize import predict, sessions_for
+from pipeline.data import project
 
 TARGETS = ("standing_leg_raise", "hurdle_step")
 SWAP = [1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]
