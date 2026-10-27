@@ -1,21 +1,18 @@
-"""Compare pretrained pose CNNs on a deterministic real COCO validation subset."""
-import argparse
+"""Compare the pretrained pose CNNs on a fixed COCO validation subset."""
 import hashlib
 import json
-import sys
 import time
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
 
 import cv2
 import numpy as np
 import requests
 import torch
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-from scripts.download_data import fetch
+from .common import ROOT
+from .config import POSE_CANDIDATES
+from .data import fetch
 
 
 def iou(a, b):
@@ -24,10 +21,7 @@ def iou(a, b):
     return area / max(np.maximum(a[2:] - a[:2], 0).prod() + np.maximum(b[2:] - b[:2], 0).prod() - area, 1)
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--images", type=int, default=100)
-    args = parser.parse_args()
+def benchmark(images=100):
     data = ROOT / "data/coco"
     data.mkdir(parents=True, exist_ok=True)
     annotation_path = data / "person_keypoints_val2017.json"
@@ -47,7 +41,7 @@ def main():
     for ann in annotations["annotations"]:
         if ann["num_keypoints"] >= 6 and not ann["iscrowd"] and ann["area"] > 4096:
             by_image.setdefault(ann["image_id"], []).append(ann)
-    selected = [im for im in sorted(annotations["images"], key=lambda im: im["id"]) if im["id"] in by_image][:args.images]
+    selected = [im for im in sorted(annotations["images"], key=lambda im: im["id"]) if im["id"] in by_image][:images]
 
     def download(im):
         path = data / im["file_name"]
@@ -61,22 +55,22 @@ def main():
     from ultralytics import YOLO
     output = ROOT / "artifacts"
     output.mkdir(exist_ok=True)
-    images = [cv2.imread(str(data / im["file_name"])) for im in selected]
+    pixels = [cv2.imread(str(data / im["file_name"])) for im in selected]
     device = 0 if torch.cuda.is_available() else "cpu"
     results = []
-    for filename, size in [("yolo11n-pose.pt", 320), ("yolo11n-pose.pt", 640), ("yolo11s-pose.pt", 640), ("yolo11m-pose.pt", 640)]:
+    for filename, size in POSE_CANDIDATES:
         weights = output / filename
         if not weights.exists():
             weights.write_bytes(fetch(f"https://github.com/ultralytics/assets/releases/download/v8.3.0/{filename}"))
         model = YOLO(str(weights))
         for _ in range(8):
-            model.predict(images[0], imgsz=size, device=device, verbose=False)
+            model.predict(pixels[0], imgsz=size, device=device, verbose=False)
         latencies, correct, total, oks, matched, persons = [], 0, 0, [], 0, 0
-        for im, pixels in zip(selected, images):
+        for im, image in zip(selected, pixels):
             if device != "cpu":
                 torch.cuda.synchronize()
             start = time.perf_counter()
-            result = model.predict(pixels, imgsz=size, device=device, verbose=False, conf=.25)[0]
+            result = model.predict(image, imgsz=size, device=device, verbose=False, conf=.25)[0]
             if device != "cpu":
                 torch.cuda.synchronize()
             latencies.append((time.perf_counter() - start) * 1000)
@@ -101,7 +95,7 @@ def main():
                 correct += (distance[visible] <= .2 * max(w, h)).sum()
                 sigmas = np.asarray([.26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07, .87, .87, .89, .89]) / 10
                 oks.append(np.exp(-distance[visible] ** 2 / (2 * (2 * sigmas[visible]) ** 2 * ann["area"])).mean())
-        results.append({"model": filename, "imgsz": size, "images": len(images), "persons": persons,
+        results.append({"model": filename, "imgsz": size, "images": len(pixels), "persons": persons,
                         "matched_persons": matched, "visible_keypoints": int(total), "pck_bbox_02": correct / total,
                         "mean_oks_including_misses": float(np.mean(oks)), "device": str(device),
                         "latency_p50_ms": float(np.median(latencies)), "latency_p95_ms": float(np.quantile(latencies, .95)),
@@ -115,7 +109,3 @@ def main():
     (output / "selected_pose.json").write_text(json.dumps({"model": chosen["model"], "imgsz": chosen["imgsz"],
         "selection_rule": "maximum PCK minus at most 3 percentage points, minimum observed GPU p50"}, indent=2))
     print("SELECTED POSE", chosen["model"], chosen["imgsz"], flush=True)
-
-
-if __name__ == "__main__":
-    main()

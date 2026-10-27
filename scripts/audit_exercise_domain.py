@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "algorithm2"))
 from homeease.exercises import EXERCISES
 from homeease.features import stable_features
-from scripts.prepare_data import project
+from pipeline.data import project
 
 REQUIRED = [0, 1, 6, 7, 8, 9, 10, 11]
 

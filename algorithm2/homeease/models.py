@@ -78,7 +78,7 @@ class NormalizedResidualBlock(nn.Module):
 
 
 class HierarchicalPhaseModel(nn.Module):
-    """Independent action and conditional phase heads with shared causal context."""
+    """One action head and four conditional phase heads over shared causal context."""
     def __init__(self, input_dim, kind="tcn", width=48, blocks=4, dropout=.15):
         super().__init__()
         self.kind = kind

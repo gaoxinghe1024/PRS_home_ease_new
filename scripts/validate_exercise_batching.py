@@ -11,8 +11,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "algorithm2"))
 from homeease.engine import ExerciseSession, MirroredPhaseStream, Predictor
-from scripts.optimize_top import sessions_for
-from scripts.prepare_data import project
+from pipeline.optimize import sessions_for
+from pipeline.data import project
 
 TARGETS = ("standing_leg_raise", "hurdle_step")
 BEHAVIOR = ("count", "counter_stage", "phase", "recognized_exercise", "quality", "cycles", "interruptions",

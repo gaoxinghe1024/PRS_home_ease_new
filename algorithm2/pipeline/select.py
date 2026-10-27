@@ -1,63 +1,36 @@
-"""Final consistent decoder evaluation and validation-only calibration."""
-import copy
+"""Consistent decoder evaluation over every first-round checkpoint, validation-calibrated."""
 import csv
 import json
-import sys
-from pathlib import Path
 
 import numpy as np
 import torch
-from sklearn.metrics import classification_report, confusion_matrix, f1_score
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-from homeease.exercises import EXERCISES, EXERCISE_NAMES, decode
 from homeease.features import extract_sequence
 from homeease.models import build_model
-from scripts.prepare_data import project
-from scripts.train_compare import CONFIGS, benchmark, count_metrics, infer, replay
+
+from .common import ROOT
+from .config import CONFIGS, MOVEMENTS
+from .data import project
+from .metrics import benchmark, count_metrics, evaluate, infer, replay
 
 
-def action_predictions(p):
-    return np.column_stack([p[:, i * 4:i * 4 + 4].sum(1) for i in range(4)] + [p[:, 16]]).argmax(1)
-
-
-def evaluate(probs, truth, session_probs, sessions, dwell, strategy="argmax", threshold=.35):
-    per_exercise = {}
-    for exercise in EXERCISE_NAMES:
-        selected = [(p, s) for p, s in zip(session_probs, sessions) if s["exercise"] == exercise]
-        per_exercise[exercise] = count_metrics([p for p, _ in selected], [s for _, s in selected], dwell, strategy=strategy, threshold=threshold)
-    negative = [int(s["exercise"] == "other") for s in sessions]
-    phase_names = [f"{e}/{phase}" for e, cfg in EXERCISES.items() for phase in cfg["phases"]] + ["other"]
-    return {"phase_macro_f1": f1_score(truth, probs.argmax(1), average="macro", labels=range(17), zero_division=0),
-            "action_macro_f1": f1_score(truth // 4, action_predictions(probs), average="macro"),
-            "phase_report": classification_report(truth, probs.argmax(1), labels=range(17), target_names=phase_names, output_dict=True, zero_division=0),
-            "action_confusion_matrix": confusion_matrix(truth // 4, action_predictions(probs), labels=range(5)).tolist(),
-            "confusion_matrix": confusion_matrix(truth, probs.argmax(1), labels=range(17)).tolist(),
-            **count_metrics(session_probs, sessions, dwell, strategy=strategy, threshold=threshold), "per_exercise": per_exercise}
-
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--preview", action="store_true")
-    args = parser.parse_args()
+def select(preview=False):
     torch.set_num_threads(4)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     records = json.loads((ROOT / "data/processed/records.json").read_text())
     skeletons = np.load(ROOT / "data/processed/skeletons.npz")
-    sessions = {s: sum([replay(skeletons, records, s, m) for m in ["m05", "m01", "m06", "m02", "m07"]], []) for s in ["validation", "test"]}
+    sessions = {s: sum([replay(skeletons, records, s, m) for m in MOVEMENTS], []) for s in ["validation", "test"]}
     history = {r["model"]: r for r in json.loads((ROOT / "reports/experiments.json").read_text())}
     results, predictions = [], {}
     for cfg in CONFIGS:
         path = ROOT / "artifacts" / f"{cfg['name']}.pt"
         if not path.exists():
-            if args.preview:
+            if preview:
                 continue
             raise FileNotFoundError(path)
         package = torch.load(path, weights_only=True, map_location="cpu")
         if package.get("num_classes") != 17:
-            if args.preview:
+            if preview:
                 continue
             raise ValueError(f"Incomplete 4-exercise checkpoint: {path}")
         model = build_model(package["config"], package["input_dim"]).to(device).eval()
@@ -74,7 +47,7 @@ def main():
                     truth.append(skeletons[f"{r['id']}_labels"])
             session_probs = [infer(model, extract_sequence(project(s["skel"]), mode=mode), mean, std, device) for s in sessions[split]]
             predictions[name][split] = {"phase": np.concatenate(probs), "truth": np.concatenate(truth), "sessions": session_probs}
-        # Decoder dwell is calibrated once per model on validation recordings.
+        # Decoder dwell is calibrated once per model on the validation recordings.
         options = []
         for strategy, threshold in [("argmax", .35)] + [(strategy, t) for strategy in ["ordered_posterior", "ordered_transition"] for t in [.25, .35, .5]]:
             for dwell in [0, .033, .067, .1]:
@@ -89,7 +62,7 @@ def main():
             row[split] = evaluate(p["phase"], p["truth"], p["sessions"], sessions[split], choice["dwell_s"], choice["strategy"], choice["threshold"])
         results.append(row)
         print(f"{name}: val MAE={row['validation']['count_mae']:.2f}, test MAE={row['test']['count_mae']:.2f}, action F1={row['test']['action_macro_f1']:.3f}, dwell={choice['dwell_s']}", flush=True)
-    if args.preview:
+    if preview:
         (ROOT / "reports/decoder_preview.json").write_text(json.dumps(results, indent=2))
         return
     ranking = sorted(results, key=lambda r: (r["validation"]["count_mae"], -r["validation"]["phase_macro_f1"]))
@@ -130,11 +103,7 @@ def main():
             writer.writerow({**{k: r[k] for k in fields[:5]}, "val_phase_f1": r["validation"]["phase_macro_f1"], "val_mae": r["validation"]["count_mae"],
                              "test_action_f1": r["test"]["action_macro_f1"], "test_phase_f1": r["test"]["phase_macro_f1"],
                              "test_mae": r["test"]["count_mae"], "test_mape_pct": r["test"]["count_mape_pct"], "test_cycle_recall": r["test"]["cycle_recall"]})
-    # Keep cached probability sequences for reproducible decoder audits.
+    # Cached probability sequences keep the decoder audits reproducible.
     cached = {f"{r['model']}_{split}_{i}": p for r in results[:-1] for split in ["validation", "test"] for i, p in enumerate(predictions[r['model']][split]["sessions"])}
     np.savez_compressed(ROOT / "reports/session_probabilities.npz", **cached)
     print("SELECTED", selected["model"], "dwell", selected["decoder_dwell_s"], flush=True)
-
-
-if __name__ == "__main__":
-    main()

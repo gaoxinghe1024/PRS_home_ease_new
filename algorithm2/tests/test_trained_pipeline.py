@@ -14,9 +14,9 @@ from homeease.api import create_app
 from homeease.engine import ExerciseSession, Predictor
 from homeease.exercises import EXERCISES
 from homeease.features import extract_sequence
-from scripts.prepare_data import project
-from scripts.replay_demo import coco_points
-from scripts.train_compare import infer
+from pipeline.data import project
+from pipeline.replay import coco_points
+from pipeline.metrics import infer
 
 pytestmark = pytest.mark.skipif(not (ROOT / "artifacts/selected.json").exists(), reason="Training must finish first")
 
