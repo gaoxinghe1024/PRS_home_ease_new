@@ -140,7 +140,7 @@ class CameraHub:
             return capture.descriptor()
 
     def descriptor(self, owner):
-        """``owner`` 当前使用的那一路画面描述（供交接时直接复用）。"""
+        """The frame description ``owner`` is currently using (reused directly on a handover)."""
         with self.lock:
             capture = next((c for c in self.devices.values() if owner in c.users), None)
             return capture.descriptor() if capture else None
@@ -151,14 +151,14 @@ class CameraHub:
             return set(capture.users) if capture else set()
 
     def busy(self, owner):
-        """占用这一路画面的其它用户（布尔判断可直接用，也便于看出是谁在用）。"""
+        """Other users of this stream (usable as a boolean, and shows who is using it)."""
         return self.users(owner) - {owner, "exercise-opening"}
 
     def release(self, owner, accept=()):
-        """释放一个使用者；``accept`` 里的编号视为同一任务的延续，接手这一路画面。
+        """Release one user; an id in ``accept`` continues the same task and takes over this stream.
 
-        后台常驻会把视频占用的画面交给运动检测：两者共用一路物理摄像头时，
-        只需要重新绑定编号，不必拆机重开，画面也就不会中断。
+        Always-on mode hands the camera from video detection to exercise detection: when both use
+        the same physical camera only the owner id is rebound, so the device is not reopened and the image never stops.
         """
         with self.lock:
             keep = set(accept)
@@ -177,11 +177,11 @@ class CameraHub:
                     del self.devices[index]
 
     def release_except(self, owners):
-        """释放除 ``owners`` 之外的其它占用者，设备与像素管道保持不动。
+        """Release every user except ``owners``; the device and the pixel pipeline keep running.
 
-        只摘掉占用者编号 —— 交接时这里要是关了机，新的使用者拿到的就是一个
-        已经停采样的管道，第一帧就会报画面中断。真正没人用的那一路由
-        ``release`` 负责关闭。
+        Only the owner ids are removed. Closing the device during a handover would give the new user
+        a pipeline that has stopped sampling, and its first frame would report an interruption. A stream
+        nobody uses any more is closed by ``release``.
         """
         keep = set(owners)
         with self.lock:

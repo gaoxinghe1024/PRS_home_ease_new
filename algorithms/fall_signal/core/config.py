@@ -1,79 +1,79 @@
 # -*- coding: utf-8 -*-
-"""最优算法组合的**唯一超参真源**。
+"""The **single source of truth** for the hyper-parameters of the best combination.
 
-本文件固化了 `Fall_Acc_Single` 五个分层实验判定的**最优识别流**（A2 =
-手工特征 + RF/XGB 概率平均），实验依据见 `../report/研究报告.md` §7：
+This file fixes the **best recognition pipeline** selected by the five staged `Fall_Acc_Single` experiments (A2 =
+hand-crafted features + RF/XGB probability averaging); the evidence is in section 7 of the research report:
 
-  产物 = 三轴加速度 (~62.5 Hz 不规则)
-       → 重采样 60 Hz
-       → Butterworth 4 阶低通 5 Hz（零相位、保重力）
-       → 2.0 s / 0.25 s 滑窗
-       → 39 维统计特征（motion / impact / orient / freq / calm）
-       → RF(400) + XGB(400) 概率平均
-       → 事件聚合（相邻命中间隔 ≤ 2 窗合并；报警时刻 = 最早命窗结束）
+  input = three-axis acceleration (~62.5 Hz, irregular)
+       -> resample to 60 Hz
+       -> 4th-order Butterworth low-pass at 5 Hz (zero phase, gravity kept)
+       -> 2.0 s / 0.25 s sliding windows
+       -> 39 statistical features (motion / impact / orient / freq / calm)
+       -> RF(400) + XGB(400) probability average
+       -> event aggregation (hits at most 2 windows apart are merged; alarm time = end of the earliest hit window)
 
-实验三（3 seed × 分层 5 折）结果：序列级 AUROC 0.9853 ± 0.0010，
-事件准确率 0.826 —— 在 A1 规则 / A3 时序网络 / A4 Stacking 中综合最优。
+Experiment 3 (3 seeds x stratified 5-fold): sequence-level AUROC 0.9853 +/- 0.0010,
+event accuracy 0.826 - the best overall among the A1 rules / A3 temporal network / A4 stacking.
 """
 
 # --------------------------------------------------------------------------
-# 预处理
+# Preprocessing
 # --------------------------------------------------------------------------
-RESAMPLE_FS = 60.0          # 重采样目标频率 (Hz)
-FILTER_METHOD = "butter5"   # Butterworth 4 阶低通 5 Hz，零相位（保重力）
+RESAMPLE_FS = 60.0          # resampling target rate (Hz)
+FILTER_METHOD = "butter5"   # 4th-order Butterworth low-pass at 5 Hz, zero phase (gravity kept)
 BUTTER_ORDER = 4
 BUTTER_CUTOFF = 5.0         # Hz
-RAW_FS_NOMINAL = 62.5       # URFD 名义采样率（仅作参考）
+RAW_FS_NOMINAL = 62.5       # nominal URFD sampling rate (reference only)
 
 # --------------------------------------------------------------------------
-# 滑窗与事件聚合
+# Sliding windows and event aggregation
 # --------------------------------------------------------------------------
-WIN_S = 2.0                 # 窗长（秒）
-STEP_S = 0.25               # 步长（秒）
-MERGE_GAP_WIN = 2           # 相邻命中间隔 ≤ 2 窗（0.5 s）视为同一跌倒事件
+WIN_S = 2.0                 # window length (s)
+STEP_S = 0.25               # step (s)
+MERGE_GAP_WIN = 2           # hits at most 2 windows (0.5 s) apart belong to the same fall event
 
 # --------------------------------------------------------------------------
-# 特征
+# Features
 # --------------------------------------------------------------------------
 FEATURE_GROUPS = ("motion", "impact", "orient", "freq", "calm")
 N_FEATURES = 39             # 13 + 8 + 8 + 7 + 3
 
 # --------------------------------------------------------------------------
-# 分类器（与 04_alg_ml/src/ml_algorithm.py 完全一致）
+# Classifier (identical to 04_alg_ml/src/ml_algorithm.py)
 # --------------------------------------------------------------------------
 RF_PARAMS = dict(n_estimators=400, max_depth=10, min_samples_leaf=2,
                  class_weight="balanced")
 XGB_PARAMS = dict(n_estimators=400, max_depth=5, learning_rate=0.06,
                   subsample=0.9, colsample_bytree=0.9, reg_lambda=1.0)
-TRAIN_SEED = 2026           # 复现实验报告所用种子
+TRAIN_SEED = 2026           # seed used to reproduce the experiment report
 
 # --------------------------------------------------------------------------
-# 推理 / 报警
+# Inference / alarm
 # --------------------------------------------------------------------------
-ALARM_THRESHOLD = 0.5       # 窗口报警阈值（事件级主口径 = 固定 0.5，零校准）
+ALARM_THRESHOLD = 0.5       # window alarm threshold (main event-level setting = fixed 0.5, no calibration)
 
-# 推理期线程数：流式检测每次只评估 1 个窗口，多线程纯属调度开销
-# （实测 n_jobs=-1 单窗 ≈100 ms → 1 线程 ≈23 ms，预测值逐位相同；
-#   其中 RF(400 树) ≈22 ms、XGB(400 树) ≈0.4 ms、特征提取 ≈0.5 ms）。
-# 训练仍用满核（RF/XGB 的 n_jobs=-1 在 fit 时生效）。
+# Inference threads: streaming detection evaluates only 1 window at a time, so multithreading is pure scheduling overhead
+# (measured: n_jobs=-1 about 100 ms per window -> 1 thread about 23 ms, with bit-identical predictions;
+#   of which RF (400 trees) about 22 ms, XGB (400 trees) about 0.4 ms, feature extraction about 0.5 ms).
+# Training still uses all cores (n_jobs=-1 of RF/XGB applies during fit).
 INFER_JOBS = 1
 
 # --------------------------------------------------------------------------
-# 报告数据切片
+# Report data slice
 # --------------------------------------------------------------------------
-REPORT_PRE_S = 2.0          # 报警时刻前保留 2.0 s
-REPORT_POST_S = 1.0         # 报警时刻后保留 1.0 s（回看后冲击静止段）
-REPORT_SNIPPET_S = REPORT_PRE_S + REPORT_POST_S   # 合计 3.0 s 加速度曲线
+REPORT_PRE_S = 2.0          # keep 2.0 s before the alarm
+REPORT_POST_S = 1.0         # keep 1.0 s after the alarm (to show the post-impact rest phase)
+REPORT_SNIPPET_S = REPORT_PRE_S + REPORT_POST_S   # 3.0 s acceleration curve in total
 
-# 流式检测的滑动缓冲长度（须 > 窗长，给零相位滤波留上下文）
+# Length of the streaming sliding buffer (must exceed the window length to give the zero-phase filter context)
 STREAM_BUFFER_S = 6.0
 
-# 零相位滤波的上下文/因果延迟（秒）。
-# 最优组合使用 filtfilt（非因果）以保证离线无相位滞后；流式部署时在该样本
-# 之后 0.25 s 才评估窗口，并向前后各取 0.25 s 上下文，使窗口内部与整段滤波
-# 结果几乎一致。系统因此付出 0.25 s 的固定检测延迟（报告 §7 已注明部署代价）。
+# Context / causal delay of the zero-phase filter (seconds).
+# The best combination uses filtfilt (non-causal) so that offline analysis has no phase lag; when streaming, a window is
+# evaluated only 0.25 s after its end and takes 0.25 s of context on both sides, so the window content is almost identical
+# to filtering the whole recording. The system therefore pays a fixed 0.25 s detection delay (noted as the deployment cost in the report).
 FILTER_PAD_S = 0.25
 
-# 重力基线与失重阈值（物理常量，特征/规则共用）
+# Gravity baseline and free-fall threshold (physical constants shared by features and rules)
 G = 1.0
 FREEFALL_TH = 0.6

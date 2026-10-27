@@ -470,7 +470,7 @@ def exercises():
 
 @app.post("/api/sessions", status_code=201)
 def create_session(body: schemas.SessionStart):
-    # 设置页关掉的运动不再接收新的训练请求，避免计了数却没人看。
+    # A movement switched off in Settings accepts no new sessions, so nothing is counted that nobody looks at.
     if not system.exercise_enabled(body.exercise):
         raise ValueError(f"{EXERCISES[body.exercise]} detection is switched off in Settings; turn it on first")
     path = uploaded(body.upload_id) if body.source == "upload" else None
@@ -689,7 +689,7 @@ def event(event_id: str):
 
 @app.post("/api/events/{event_id}/action")
 def event_action(event_id: str, body: schemas.EventAction):
-    # 与其他事件接口保持一致：返回带语音问询结论的事件，前端不必自行推导。
+    # Like the other event endpoints, return the event with its voice-inquiry conclusion so the frontend need not derive it.
     return system.describe(system.events.action(event_id, body.action, body.outcome, body.note, revision=body.revision))
 
 

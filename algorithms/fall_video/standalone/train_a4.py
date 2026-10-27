@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-训练并保存 A4 混合集成权重（一次性脚本）
+Train and save the A4 hybrid ensemble weights (one-off script)
 ==========================================
 
-在完整统一池（URFD + MCF + Le2i = 223 序列）上训练 A4，
-把训练好的基学习器 + 元学习器 pickle 保存到 standalone/a4_weights.pkl。
-之后 main.py 直接加载 a4_weights.pkl，无需每次重新训练。
+Trains A4 on the complete unified pool (URFD + MCF + Le2i = 223 sequences)
+and pickles the trained base learners + meta-learner to standalone/a4_weights.pkl.
+main.py then loads a4_weights.pkl directly, with no retraining each time.
 
-用法:
-  E:/anaconda3/python.exe train_a4.py
+Usage:
+  python train_a4.py
 """
 import os
 import sys
@@ -24,11 +24,11 @@ for _p in (os.path.join(ROOT, "00_common"),
 
 import numpy as np
 
-# 关键：import 同目录 a4_core，让 pickle 存的类路径是 a4_core.*，
-# 与 main.py 加载时（也 import a4_core）完全一致。
+# Important: import a4_core from the same folder, so the pickled class paths are a4_core.*,
+# exactly what main.py uses when loading (it imports a4_core too).
 from a4_core import HybridAlgorithm, make_windows
 
-from windowize import make_windows as _mw  # noqa: F401  (仅确保窗口常量一致，实际用 a4_core 的)
+from windowize import make_windows as _mw  # noqa: F401  (only ensures the window constants match; a4_core's are used)
 from splits import unified_pool
 from pose_extract import extract_skeleton_sequence
 
@@ -47,7 +47,7 @@ def _gt_intervals(dataset, seq):
 def build_train_items():
     items = []
     for d, s, *_ in unified_pool():
-        dd = extract_skeleton_sequence(d, s)   # 读骨架缓存（YOLO+P1 真实产出）
+        dd = extract_skeleton_sequence(d, s)   # read the skeleton cache (real YOLO+P1 output)
         kpts = dd["kpts"]
         fidx = dd["frame_idx"]
         fps = SRC_FPS[d]
@@ -61,11 +61,11 @@ def build_train_items():
 
 
 def main():
-    print("[1/2] 构建训练数据（读取骨架缓存）...", flush=True)
+    print("[1/2] building training data (reading the skeleton cache) ...", flush=True)
     items = build_train_items()
-    print(f"      共 {len(items)} 条序列", flush=True)
+    print(f"      {len(items)} sequences", flush=True)
 
-    print("[2/2] 训练 A4 混合集成 ...", flush=True)
+    print("[2/2] training the A4 hybrid ensemble ...", flush=True)
     alg = HybridAlgorithm()
     alg.fit(items)
 
@@ -75,7 +75,7 @@ def main():
             "bases": alg.bases,
             "meta": alg.meta,
         }, f)
-    print(f"[完成] A4 权重已保存 → {out}", flush=True)
+    print(f"[done] A4 weights saved -> {out}", flush=True)
 
 
 if __name__ == "__main__":

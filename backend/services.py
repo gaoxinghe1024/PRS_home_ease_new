@@ -27,7 +27,7 @@ from backend.storage import Store, now, ALGORITHM_DEFAULTS, PLAN_DEFAULTS
 log = logging.getLogger(__name__)
 
 EXERCISE_KEYS = tuple(EXERCISES)
-# 摄像头打不开（没插、被别的软件占用）时的统一标记，用来区分「设备问题」和「暂时失败」。
+# Marker for a camera that cannot be opened (not plugged in, or held by other software): tells a device problem apart from a passing failure.
 FAILED = "Camera unavailable"
 
 
@@ -67,14 +67,14 @@ def canonical_csv(data):
 
 
 def _camera_partners(sid):
-    """与本会话共用同一物理摄像头的其它会话；独占前需要它们先释放。"""
+    """Other sessions sharing this session's physical camera; they must release it before exclusive use."""
     if sid == "video":
         return {"exercise-opening"}
     return {"video", "exercise-opening"}
 
 
 def _launcher():
-    """重启时用的解释器：Windows 下优先 pythonw.exe，避免弹出控制台窗口。"""
+    """Interpreter used for a restart: on Windows prefer pythonw.exe, so no console window pops up."""
     if os.name != "nt":
         return sys.executable
     candidate = Path(sys.executable).with_name("pythonw.exe")
@@ -117,12 +117,12 @@ class System:
         self.audio_quality = {"state": "active", "reason": "Microphone input is valid"}
         self.jobs = set()
         self.jobs_lock = threading.RLock()
-        # 后台算法开关：只记录开关状态与调度结果，不参与原算法的判定。
+        # Background algorithm switches: only the switch states and scheduling results are kept; they take no part in algorithm decisions.
         self.algorithms_lock = threading.RLock()
         self.algorithms = {key: item["enabled"] for key, item in self.store.algorithms().items()}
         self.remote_access = False
-        # 后台常驻时自动运行的两条通道。``stop`` 指向各自的收尾函数，
-        # 关闭开关时只需调用它，不必在路由层判断当前是哪种模式。
+        # The two channels that run automatically in always-on mode. ``stop`` points to each channel's shutdown function,
+        # so switching off only calls it and the routes need not know which mode is running.
         self.exercises_lock = threading.RLock()
         self.sensor_session = {"active": False, "sid": None, "error": None, "stop": lambda reason: None}
         self.exercise_session = {"active": False, "sid": None, "key": None, "last_key": None, "error": None,
@@ -138,8 +138,8 @@ class System:
             if old["status"] in {"running", "paused"}:
                 old.update(status="interrupted", quality="service_restarted", ended_at=now())
                 self.store.save_session(old)
-        # 老版本只有「家庭守护」开关：升级后把它对齐到「视频跌倒检测」，
-        # 保持既有的监测行为不变，不因为新增开关而默默关闭正在用的守护。
+        # Older versions only had the "home monitoring" switch: after an upgrade it is aligned with "video fall detection",
+        # so existing monitoring keeps running instead of being switched off silently by the new switch.
         legacy = self.store.home_monitoring()
         if legacy["enabled"] and not self.algorithms.get("vision", True):
             self.algorithms["vision"] = True
@@ -186,17 +186,17 @@ class System:
                 except Exception as exc:
                     log.exception("%s scheduler operation failed", name)
 
-    # ------------------------------------------------------------------ 后台算法开关
+    # ------------------------------------------------------------------ background algorithm switches
     def algorithm_channel(self, key):
-        """读取一个开关；未知键返回 None，由路由层报 404。"""
+        """Read one switch; an unknown key returns None and the route answers 404."""
         with self.algorithms_lock:
             return self.algorithms.get(key)
 
     def set_algorithms(self, changes):
-        """只改被提交的开关，并立即生效（不必等调度下一轮）。
+        """Change only the submitted switches; they take effect immediately (no need to wait for the next scheduling round).
 
-        开启「后台常驻」时只打开常驻本身，视频/加速度仍按各自的开关决定；
-        关闭常驻等价于「自己开着的通道全部停掉」，但开关本身保留，下次再开还在。
+        Switching on always-on mode only enables the mode itself; video and acceleration still follow their own switches.
+        Switching it off stops every channel it started, but the switches are kept for the next time it is switched on.
         """
         changes = {key: bool(value) for key, value in changes.items() if value is not None}
         previous = {}
@@ -234,10 +234,10 @@ class System:
         return self.algorithm_status()
 
     def sync_home_monitoring(self):
-        """后台常驻与「家庭守护」是同一个视频跌倒监测，保持两边一致。
+        """Always-on video and "home monitoring" are the same video fall monitoring; keep both in step.
 
-        家庭页的暂停按钮、工作台的停止检测按钮都走这里，避免出现
-        「开关显示开启、实际已暂停」或反之的矛盾状态。
+        The pause button of the home page and the stop button of the workbench both go through here, so the switch never
+        shows "on" while monitoring is actually paused, or the other way round.
         """
         with self.algorithms_lock:
             vision = self.algorithms.get("vision", True)
@@ -248,25 +248,25 @@ class System:
         return dict(self.home_monitoring)
 
     def stop_vision(self, reason, switch=False):
-        """停下视频检测。
+        """Stop video detection.
 
-        ``switch=False`` 用于后台轮播这类内部让位：只停运行状态，绝不能顺手把
-        「视频跌倒检测」开关也关掉 —— 否则镜头交出去之后，就没谁再把它拉回来了。
-        只有照护者主动关开关时才传 ``switch=True``。
+        ``switch=False`` is for internal hand-overs such as background rotation: only the running state stops, and the
+        "video fall detection" switch must not be turned off with it; otherwise nobody would take the camera back afterwards.
+        Only a caregiver switching it off passes ``switch=True``.
         """
         if self.video.get("state") != "running" and not self.home_monitoring["enabled"]:
             return
-        # 注意 set_home_monitoring(False) 不会反向改 vision 开关，
-        # 「关掉开关」这件事由调用方（set_algorithms）自己写库。
+        # Note that set_home_monitoring(False) does not turn the vision switch off;
+        # turning the switch off is written to the database by the caller (set_algorithms).
         self.set_home_monitoring(False, self.home_monitoring.get("camera_index", 0))
         self.store.audit("video", "stopped_by_switch", {"reason": reason, "switch": switch})
 
     @staticmethod
     def stop_session_channel(state, reason):
-        """关掉一个后台通道：有会话就先结束它，没有就只清掉「已开启」标记。
+        """Switch off one background channel: end its session if there is one, otherwise just clear the "on" marker.
 
-        状态先标为不再活跃，避免调度在同一秒里又把它拉起来；真正的收尾
-        （结束会话、释放摄像头）交给通道自己的 ``stop``。
+        The state is marked inactive first, so scheduling does not restart it within the same second; the actual
+        shutdown (ending the session, releasing the camera) is left to the channel's own ``stop``.
         """
         stop = state.get("stop")
         state["active"] = False
@@ -279,10 +279,10 @@ class System:
         state["sid"] = None
 
     def ensure_algorithms(self):
-        """调度：把开了开关、但当前没在运行的通道都交给原算法跑起来。
+        """Scheduling: hand every channel that is switched on but not running to the original algorithm.
 
-        所有启动都经过既有的 video_start / start_camera_session，输入来源、
-        采样与判定完全沿用原算法；这里只决定「启不启动、什么时候启动」。
+        Every start goes through the existing video_start / start_camera_session, so input source, sampling
+        and decisions are exactly those of the original algorithm; this only decides whether and when to start.
         """
         if self.stop_event.is_set():
             return
@@ -307,8 +307,8 @@ class System:
             return
         self.resident_retry_at = now_mono + 30
         if self.resident.get("error") == FAILED:
-            self.resident.update(error=None)  # 给一次重试机会：设备可能刚插回来
-        # 已经能读到本机状态就只做自检，不重复拉起进程。
+            self.resident.update(error=None)  # one more try: the device may have just been plugged back in
+        # When the local state can already be read, only run the self-check; do not start the process again.
         self.store.heartbeat()
         self.resident.update(state="running", error=None, started_at=self.resident.get("started_at") or now())
         self.store.audit("resident", "alive", {"pid": os.getpid()})
@@ -322,12 +322,12 @@ class System:
             if self.video.get("state") == "running":
                 return
             if self.exercise_session.get("active"):
-                return  # 摄像头正被运动训练独占，训练结束后再接管
+                return  # the camera is held by an exercise session; take over after the session ends
             if time.monotonic() < self.vision_retry_at:
                 return
             if self.resident.get("error") == FAILED:
-                self.resident.update(error=None)  # 先解除失联标记，让下一轮真正去试一次
-            # 复用既有的守护启动路径：同样的输入、同样的限速重试与错误上报。
+                self.resident.update(error=None)  # clear the lost marker first so the next round really tries again
+            # Reuse the existing monitoring start path: same input, same rate-limited retries and error reporting.
             if self.home_monitoring["enabled"]:
                 self.ensure_home_monitoring()
                 return
@@ -344,10 +344,10 @@ class System:
                 self.store.audit("resident", "vision_retry", {"error": str(exc)})
 
     def ensure_sensor(self, switches):
-        """加速度通道没有本机采集设备：后台常驻时只确认「谁在提供数据」。
+        """The acceleration channel has no local capture device: in always-on mode only confirm who provides the data.
 
-        真实的三轴数据来自手机端 /sensor（浏览器把加速度推到 /ws/sensor），
-        或用 CSV 回放。这里不伪造数据，只把状态与原因如实报给设置页。
+        Real three-axis data comes from the phone page /sensor (the browser pushes acceleration to /ws/sensor),
+        or from a CSV replay. No data is faked here; the state and the reason are reported to Settings as they are.
         """
         state = self.sensor_session
         wanted = bool(switches.get("resident") and switches.get("accel", True))
@@ -365,14 +365,14 @@ class System:
             state["stop"] = lambda reason: None
 
     def _stop_sensor_channel(self, reason):
-        """关闭加速度检测不打断已连上的设备，只停止把它算作「后台通过」的依据。"""
+        """Switching acceleration detection off does not disconnect a connected device; it only stops counting it as the background source."""
         with self.exercises_lock:
             self.sensor_session.update(active=False, sid=None, stop=lambda value: None)
         self.store.audit("resident", "accel_stopped", {"reason": reason})
 
     def ensure_exercises(self, switches):
         if self.exercise_session.get("error") == FAILED:
-            return  # 本机没有可用摄像头，后台轮播只会反复开机关机，等设备恢复再说
+            return  # no usable camera here; background rotation would only open and close it repeatedly, wait for the device
         state = self.exercise_session
         wanted = [key for key in EXERCISE_KEYS if switches.get(key, True)]
         if not switches.get("resident"):
@@ -386,18 +386,18 @@ class System:
             return
         if not wanted or self.modules["exercise"].state != "ready":
             return
-        # 运动检测只接管「后台自己开着的」那路画面。若照护者正在监测工作台看实时画面，
-        # 就把摄像头留给它，等视频停下后再接上，而不是抢占正在被观看的画面。
+        # Exercise detection only takes over the stream the background opened itself. If a caregiver is watching the live
+        # image on the monitoring workbench, the camera stays there and is taken over after video stops, instead of grabbing a watched image.
         handover = None
         if self.resident.get("error") == FAILED:
-            return  # 摄像头打不开，视频和训练都别每轮重试
+            return  # the camera cannot be opened; neither video nor exercise should retry every round
         if self.video.get("state") == "running" and self.video_mode == "live" and switches.get("vision", True):
             busy = self.cameras.busy("video")
             live = {sid for sid, meta in self.session_metadata.items() if meta.get("active")}
             if busy & live:
-                return  # 真人正在用工作台做训练，别把他手上的会话换成后台轮播
+                return  # a person is exercising from the workbench; do not replace that session with background rotation
             if not busy:
-                handover = "video"  # 只有后台视频在占用，可以直接把镜头转过来
+                handover = "video"  # only background video holds the camera, so it can be handed over directly
         target = self._next_exercise(wanted)
         if target is None:
             return
@@ -415,13 +415,13 @@ class System:
         self.store.audit("resident", "exercise_started", {"session_id": sid, "exercise": target,
                                                           "handover": bool(handover)})
         if handover:
-            # 画面已交给训练会话，视频通道腾出镜头；训练结束后下一轮调度再接管。
-            # keep_camera: 采集线程此刻正被训练会话使用，不能拆机。
+            # The image now belongs to the exercise session and the video channel gives up the camera; the next round takes it back after the session.
+            # keep_camera: the capture thread is in use by the exercise session right now and must not be closed.
             with self.video_lock:
                 self.stop_vision("Camera handed over to background movement detection")
 
     def _next_exercise(self, wanted):
-        """按计划顺序轮转；某动作本轮已完成，就让给下一个，让长者不用等。"""
+        """Rotate in plan order; a movement already completed this round makes way for the next, so the older adult does not wait."""
         with self.exercises_lock:
             last = self.exercise_session.get("last_key")
         plan = self.store.exercise_plan()
@@ -432,10 +432,10 @@ class System:
         return order[0]
 
     def clear_stale_sessions(self):
-        """清理没有活动训练、却还标着 running 的旧会话。
+        """Clean up old sessions still marked running without an active session.
 
-        这类残留来自上一次进程异常退出或调度竞态：它们没有对应的内存状态，
-        既不会自己结束，又会一直挡着「开始新的训练」。
+        They are left over from an earlier crash or a scheduling race: they have no in-memory state,
+        never end by themselves, and would block "start a new session" forever.
         """
         for item in self.store.sessions(mode="live"):
             sid = item["session_id"]
@@ -448,8 +448,8 @@ class System:
     def end_background_exercise(self, sid, reason):
         if sid not in self.session_metadata:
             return None
-        # 先结束会话，再释放通道标记：反过来的话，会话万一结束失败
-        # 就没有人记得它还在跑，会把摄像头一直占着。
+        # End the session first, then clear the channel marker: the other way round, a session that failed to end
+        # would be forgotten while still running and would hold the camera indefinitely.
         try:
             result = self.session_control(sid, "end")
         except Exception as exc:
@@ -465,7 +465,7 @@ class System:
         return result
 
     def algorithm_status(self):
-        """给设置页用的完整状态：开关 + 后台此刻实际在跑什么 + 做不到的原因。"""
+        """Complete state for Settings: switches, what actually runs in the background now, and why something cannot run."""
         with self.algorithms_lock:
             switches = dict(self.algorithms)
         vision_on = self.video.get("state") == "running" and self.video_mode == "live"
@@ -494,11 +494,11 @@ class System:
         return _script().is_file()
 
     def sensors_connected(self):
-        """加速度通道的数据来自三轴设备（手机端 /sensor），本机没有第二个采集源。"""
+        """The acceleration channel's data comes from a three-axis device (the phone page /sensor); this machine has no second source."""
         return self.sensor["state"] == "connected"
 
     def plan_progress(self, plan=None):
-        """今天各动作的完成情况；完成判定沿用既有训练记录（status=ended, mode=live）。"""
+        """Today's completion per movement; completion uses the existing session records (status=ended, mode=live)."""
         plan = plan or self.store.exercise_plan()
         tz = ZoneInfo("Asia/Shanghai")
         today = datetime.now(tz).date()
@@ -524,10 +524,10 @@ class System:
         return {**plan, "progress": self.plan_progress(plan)}
 
     def shift_plan(self, delta):
-        """长者端「今天不做了」：只把这次跳过记到今天为止，不动计划内容。
+        """"Not today" on the older adult's page: only record that today is skipped, without changing the plan.
 
-        不把计划本身挪到明天 —— 计划是照护者安排的每日日程，需要顺延的是
-        「今天这一份」。跳过日期落库后，今天的长者端就不再显示，明天照常出现。
+        The plan itself is not moved to tomorrow: it is the caregiver's daily schedule, and only today's share is
+        deferred. Once the skip date is stored, today's card disappears from the older adult's page and returns tomorrow.
         """
         plan = self.store.exercise_plan()
         tz = ZoneInfo("Asia/Shanghai")
@@ -567,10 +567,10 @@ class System:
             self.store.audit("resident", "remote_access_reported", {"pid": os.getpid()})
 
     def video_pose(self):
-        """当前帧的人体框与 17 个关键点（归一化 0–1），供前端叠加层使用。
+        """Person box and 17 keypoints of the current frame (normalized to 0-1) for the frontend overlay.
 
-        检测框与骨架由工作台前端在自己的画布上绘制并各自开关；这里只读原引擎
-        已经算好的结果，不参与判定，也无需向算法目录暴露任何检测参数。
+        The workbench frontend draws the detection box and skeleton on its own canvas, each with its own switch; this only
+        reads results the original engine already computed, takes no part in decisions and exposes no detection parameter.
         """
         if self.modules["video"].state != "ready":
             raise ModuleError("The video module is not ready yet", 503)
@@ -589,8 +589,8 @@ class System:
             self.video_finalized = False
             self.video_event_keys = {}
             if source.get("type") == "camera":
-                # 先占位再开机：acquire 返回时采集线程已经在出帧，交接时就能直接复用，
-                # 万一视频模块启动失败也不会留下一路没人认领的摄像头。
+                # Claim the camera before starting it: when acquire returns the capture thread already delivers frames, so a
+                # handover can reuse it, and a failed video module start does not leave an unowned camera behind.
                 source = {**source, "shared_camera": self.cameras.acquire(source.get("index", 0), "video")}
                 try:
                     self.video = self.modules["video"].call("start", source=source)
@@ -608,7 +608,7 @@ class System:
             try:
                 self.video = self.modules["video"].call("stop", timeout=20)
             finally:
-                # keep_camera: 这一路画面马上要交给后台运动检测，先不拆机。
+                # keep_camera: this stream is about to be handed to background exercise detection; do not close the device yet.
                 self.cameras.release("video", accept=[keep_camera] if keep_camera else ())
             self.video_finalized = True
             self.video_run = None
@@ -695,10 +695,10 @@ class System:
                                             "error": self.exercise_session.get("error")}}}
 
     def set_home_monitoring(self, enabled, camera_index=0):
-        """开启/停止「家庭守护」。它与设置页的「视频跌倒检测」是同一个开关。"""
+        """Start or stop "home monitoring". It is the same switch as "video fall detection" in Settings."""
         if not enabled:
-            # 停下来时只写运行状态，不反向关闭 vision 开关：交门给运动检测属于
-            # 内部让位，关掉开关会导致训练结束后再没人把视频拉回来。
+            # Stopping only writes the running state and does not switch vision off: handing the camera to exercise detection
+            # is an internal hand-over, and switching it off would leave nobody to restart video after the session.
             self.store.save_home_monitoring(False, camera_index)
             with self.video_lock:
                 self.home_monitoring.update(enabled=False, camera_index=camera_index, error=None)
@@ -715,7 +715,7 @@ class System:
             if self.video.get("state") == "running" and (not enabled or changed_camera or self.video_mode != "live"):
                 self.video_stop()
             self.store.audit("home", "monitoring_enabled" if enabled else "monitoring_disabled", {"camera_index": camera_index})
-        # 「家庭守护」与设置页的「视频跌倒检测」是同一件事，开关保持同步。
+        # "Home monitoring" and "video fall detection" in Settings are the same thing; keep the switches in step.
         if self.algorithms.get("vision", True) != bool(enabled):
             with self.algorithms_lock:
                 self.algorithms["vision"] = bool(enabled)
@@ -750,7 +750,7 @@ class System:
 
     @staticmethod
     def describe(event):
-        """事件 + 语音问询结论。结论是只读推导，不写回数据库。"""
+        """Event plus its voice-inquiry conclusion. The conclusion is derived read-only and not written back."""
         return {**event, "voice": voice_inquiry(event), "withdrawn": is_withdrawn(event), **withdraw_status(event)}
 
     def describe_all(self, **filters):
@@ -865,11 +865,11 @@ class System:
                 self.cameras.release(owner)
 
     def handover_camera(self, owner, sid, index):
-        """把一路正在采样的画面从 ``owner`` 直接交给训练会话，不关设备、不丢帧。
+        """Hand a sampling stream from ``owner`` directly to an exercise session without closing the device or dropping frames.
 
-        后台常驻在视频跌倒与运动检测之间轮换，两者用的是同一个摄像头；
-        原来的 ``acquire/release`` 会拆机重开，画面要重新协商（约一秒黑屏），
-        这里改为只替换占用者编号，像素管道保持不动。
+        Always-on mode alternates between video fall detection and exercise detection on the same camera;
+        the plain ``acquire/release`` would close and reopen it and renegotiate the image (about a second of black),
+        so only the owner id is replaced and the pixel pipeline keeps running.
         """
         previous = self.cameras.descriptor(owner)
         descriptor = self.cameras.acquire(previous["index"] if previous else index, sid)
@@ -1049,20 +1049,20 @@ class System:
 
     @staticmethod
     def report_start(days=7):
-        """报告窗口起点（本地日界，UTC）。删除范围与报告范围共用同一算法，避免错删。"""
+        """Start of the report window (local day boundary, in UTC). Deletion and reports share this function, so nothing else is deleted."""
         tz = ZoneInfo("Asia/Shanghai")
         today = datetime.now(tz).date()
         return datetime.combine(today - timedelta(days=days-1), datetime.min.time(), tzinfo=tz).astimezone(timezone.utc)
 
     def delete_records(self, event_ids=(), session_ids=()):
-        """删除选中的事件与训练记录，连带通知与录像片段。"""
+        """Delete the selected events and exercise sessions with their notifications and video clips."""
         result = self.records.events(event_ids)
         result.update(self.records.sessions(session_ids))
         self.store.audit("records", "deleted", {key: value for key, value in result.items() if value})
         return result
 
     def clear_report_scope(self, mode, days, events=True, sessions=True):
-        """清空当前报告范围内的记录；范围与 ``report()`` 完全一致。"""
+        """Clear the records inside the current report range; the range is exactly that of ``report()``."""
         result = self.records.scope(mode, self.report_start(days).isoformat(), events, sessions)
         self.store.audit("records", "scope_cleared", {"mode": mode, "days": days,
                                                       **{key: value for key, value in result.items() if value}})

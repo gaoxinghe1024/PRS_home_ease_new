@@ -16,14 +16,14 @@ EXERCISES = {
     "standing_leg_raise": "Standing leg raise",
     "hurdle_step": "Hurdle step",
 }
-# 后台常驻时自动运行的算法通道。只决定「是否交给原算法运行」，不涉及任何
-# 模型、阈值或判定条件；未开启的通道算法完全不会收到输入。
+# Algorithm channels that run automatically in always-on mode. A switch only decides whether input is handed to the
+# original algorithm; no model, threshold or decision rule is involved, and a channel that is off receives no input at all.
 ALGORITHM_CHANNELS = {
     "resident": "Always on in background",
     "vision": "Video fall detection",
     "accel": "Accelerometer fall detection",
 }
-# 运动检测通道的键名沿用原算法2的动作编号，便于前端与 EXERCISES 对齐。
+# Exercise channel keys reuse the original Algorithm 2 movement ids, so the frontend and EXERCISES line up.
 ALGORITHM_KEYS = tuple(ALGORITHM_CHANNELS) + tuple(EXERCISES)
 
 

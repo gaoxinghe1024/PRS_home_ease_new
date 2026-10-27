@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-store.py —— 跌倒记录的持久化存储（SQLite）
+store.py - persistent storage of fall records (SQLite)
 ================================================================
-记录与报告数据统一存在 SQLite 里（systems/records/falls.db），
-用 Python 标准库 sqlite3，无需额外依赖。
+Records and report data are stored in SQLite (systems/records/falls.db)
+with the standard library sqlite3; no extra dependency.
 
-表结构 falls：
-  id          INTEGER  主键（自增）
-  fall_time   TEXT     跌倒时间（系统本地时间，YYYY-MM-DD HH:MM:SS）
-  epoch       REAL     同一时间的时间戳（便于排序/筛选）
-  prob        REAL     触发时的概率
-  peak        REAL     该次事件峰值概率
-  clip        TEXT     录像文件名（3 秒，位于 records/clips/）
-  duration_s  REAL     录像时长（秒）
-  frames      INTEGER  录像帧数
-  fps         REAL     录像标称帧率
-  threshold   REAL     触发时的判定阈值
-  source      TEXT     输入源（摄像头 0 / urfd/fall-01 ...）
-  alarm       INTEGER  报警标记（1 = 报警）
-  created_at  TEXT     入库时间
+Table falls:
+  id          INTEGER  primary key (auto-increment)
+  fall_time   TEXT     fall time (local system time, YYYY-MM-DD HH:MM:SS)
+  epoch       REAL     timestamp of the same moment (for sorting / filtering)
+  prob        REAL     probability at the trigger
+  peak        REAL     peak probability of the event
+  clip        TEXT     clip file name (3 seconds, in records/clips/)
+  duration_s  REAL     clip duration (seconds)
+  frames      INTEGER  number of frames in the clip
+  fps         REAL     nominal clip frame rate
+  threshold   REAL     decision threshold at the trigger
+  source      TEXT     input source (camera 0 / urfd/fall-01 ...)
+  alarm       INTEGER  alarm flag (1 = alarm)
+  created_at  TEXT     time the record was stored
 
-线程安全：每次操作单独开连接 + 进程内 RLock，SQLite 自身也做文件级加锁。
+Thread safety: one connection per operation + an in-process RLock; SQLite also locks the file.
 """
 from __future__ import annotations
 
@@ -62,7 +62,7 @@ class RecordStore:
         self._lock = threading.RLock()
         self._init_db()
 
-    # ------------------------------------------------------------ 基础
+    # ------------------------------------------------------------ basics
     def _conn(self) -> sqlite3.Connection:
         c = sqlite3.connect(self.db_path, timeout=15)
         c.row_factory = sqlite3.Row
@@ -91,9 +91,9 @@ class RecordStore:
             "created_at": row["created_at"] or "",
         }
 
-    # ------------------------------------------------------------ 增查删
+    # ------------------------------------------------------------ add / query / delete
     def add(self, entry: dict) -> dict:
-        """写入一条跌倒记录，返回带数据库 id 的完整记录。"""
+        """Store one fall record and return the complete record with its database id."""
         with self._lock, self._conn() as c:
             cur = c.execute(
                 f"INSERT INTO falls ({','.join(_COLUMNS)}) "
@@ -125,7 +125,7 @@ class RecordStore:
             return int(c.execute("SELECT COUNT(*) FROM falls").fetchone()[0])
 
     def delete(self, rid) -> dict | None:
-        """删除一条，返回被删记录（用于同时删录像文件）；不存在返回 None。"""
+        """Delete one record and return it (so its clip file can be deleted too); None if it does not exist."""
         with self._lock, self._conn() as c:
             row = c.execute("SELECT * FROM falls WHERE id = ?", (rid,)).fetchone()
             if row is None:
@@ -134,7 +134,7 @@ class RecordStore:
         return self._row_to_dict(row)
 
     def clear(self) -> list[dict]:
-        """清空全部，返回被删记录列表（用于同时删录像文件）。"""
+        """Delete everything and return the deleted records (so their clip files can be deleted too)."""
         with self._lock:
             old = self.list(newest_first=False)
             with self._conn() as c:
@@ -155,9 +155,9 @@ class RecordStore:
                 "first_epoch": row["first_epoch"],
                 "last_epoch": row["last_epoch"]}
 
-    # ------------------------------------------------------------ 迁移
+    # ------------------------------------------------------------ migration
     def migrate_from_json(self, json_path: str) -> int:
-        """把旧的 falls.json 一次性导入 SQLite（导入后重命名为 .bak）。"""
+        """Import the old falls.json into SQLite once (renamed to .bak afterwards)."""
         if not os.path.isfile(json_path):
             return 0
         try:

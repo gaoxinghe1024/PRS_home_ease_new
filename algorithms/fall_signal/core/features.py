@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""39 维统计特征（5 族）—— 与 `00_common/features.py` 数值逐一等价的精简版。
+"""39 statistical features (5 groups) - a compact version numerically identical to `00_common/features.py`.
 
-输入：单窗口 [win_n, 4] = (ax, ay, az, mag)，等间隔、已滤波。
-族划分与维度：
-  motion 13：模长统计(6) + SMA(1) + 三轴标准差(3) + 轴间相关(3)
-  impact  8：峰值偏离 / 最小模长 / 失重占比 / 加加速度 / 冲击上升斜率 + 三轴绝对峰(3)
-  orient  8：前/后半窗重力方向单位向量(6) + 半窗方向余弦 + 翻转角(度)
-  freq    7：主频 / 谱质心 / 谱熵 / 谱带宽 + 三段能量占比
-  calm    3：后半窗/全窗 的 标准差比、能量比、SMA 比（后冲击静止）
+Input: one window [win_n, 4] = (ax, ay, az, mag), evenly spaced and filtered.
+Groups and sizes:
+  motion 13: magnitude statistics (6) + SMA (1) + per-axis standard deviation (3) + inter-axis correlation (3)
+  impact  8: peak deviation / minimum magnitude / free-fall ratio / jerk / impact rise slope + per-axis absolute peak (3)
+  orient  8: gravity direction unit vectors of the first/second half window (6) + half-window direction cosine + flip angle (degrees)
+  freq    7: dominant frequency / spectral centroid / spectral entropy / spectral bandwidth + energy share of three bands
+  calm    3: second-half / whole-window ratios of standard deviation, energy and SMA (post-impact rest)
 """
 import numpy as np
 
@@ -18,11 +18,11 @@ FREEFALL_TH = C.FREEFALL_TH
 
 GROUPS = C.FEATURE_GROUPS
 GROUP_DESC = {
-    "motion": "运动强度族（模长统计/三轴活动度/轴间相关）",
-    "impact": "冲击·失重族（峰值偏离/自由落体/加加速度/上升斜率）",
-    "orient": "姿态方向族（重力方向/窗内方向翻转角）",
-    "freq": "频域族（主频/谱质心/谱熵/分频段能量）",
-    "calm": "后冲击静止族（后半窗活动度占比）",
+    "motion": "Motion intensity (magnitude statistics / per-axis activity / inter-axis correlation)",
+    "impact": "Impact and free fall (peak deviation / free fall / jerk / rise slope)",
+    "orient": "Posture orientation (gravity direction / in-window flip angle)",
+    "freq": "Frequency domain (dominant frequency / spectral centroid / spectral entropy / band energy)",
+    "calm": "Post-impact rest (activity share of the second half window)",
 }
 
 
@@ -50,7 +50,7 @@ def _impact(w, fs):
     free_ratio = float(np.mean(mag < FREEFALL_TH))
     jerk_max = float(np.max(np.abs(d))) if len(d) else 0.0
     i_pk = int(np.argmax(np.abs(mag - G)))
-    rise = float((mag[i_pk] - mag[0]) / max(i_pk * dt, dt))    # 冲击上升斜率 (g/s)
+    rise = float((mag[i_pk] - mag[0]) / max(i_pk * dt, dt))    # impact rise slope (g/s)
     return [peak_dev, min_mag, free_ratio, jerk_max, rise,
             float(np.max(np.abs(w[:, 0]))), float(np.max(np.abs(w[:, 1]))),
             float(np.max(np.abs(w[:, 2])))]
@@ -128,7 +128,7 @@ def feature_names(groups=GROUPS):
 
 
 def window_feature(w, fs, groups=GROUPS):
-    """单窗口 [win_n,4] → 特征向量 [D]。"""
+    """One window [win_n,4] -> feature vector [D]."""
     out = []
     for g in groups:
         out += _FUNCS[g](w, fs)
@@ -136,7 +136,7 @@ def window_feature(w, fs, groups=GROUPS):
 
 
 def extract(windows, fs, groups=GROUPS):
-    """[N,win_n,4] → X [N,D]（nan/inf 置 0）。"""
+    """[N,win_n,4] -> X [N,D] (nan/inf set to 0)."""
     if len(windows) == 0:
         return np.zeros((0, len(feature_names(groups))), np.float64)
     X = np.stack([window_feature(w, fs, groups) for w in windows])

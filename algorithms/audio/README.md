@@ -10,17 +10,9 @@ Algorithm 3 does three things. Everything runs on the local machine, nothing goe
 
 A fixed 10 second window adds one rule: when 1, 2 or 3 of the channels accelerometer, vision and audio give an alarm marker inside the window, the event tag is `single_channel`, `dual_channel` or `triple_channel`.
 
-## Running the standalone demo
+## How HomeEase uses it
 
-The package has its own small web page with four cards (sounds, replies, spoken help, alarm decision). Each card has sample recordings, accepts an uploaded file and can record 8 seconds in the browser.
-
-```
-start.bat                              # Windows, needs Python 3.12; the first start installs the requirements
-set PYTHONPATH=src
-python -m algorithm3                   # demo page, port 8730 by default
-python -m algorithm3 --vad energy      # without torch: energy VAD instead of Silero
-python -m pytest -q                    # package tests (requirements-dev.txt)
-```
+The integrated system ([`backend/workers.py`](../../backend/workers.py), `AudioWorker`) loads the `Algorithm3` facade below in its own process with strict Silero VAD. Offline analysis passes one decoding to `label_sounds` and `detect_spoken_help`; the continuous microphone stream from the browser goes through the original `Function3Pipeline`, `SoundMonitor` and `HelpListener`, and inquiry results are judged with the original policy functions.
 
 Using it from code:
 
@@ -46,11 +38,10 @@ src/homeease/              trimmed copy of the HomeEase audio code (package path
   ml/audio/                pipeline, VAD, sound monitor, ASR, reply rules, help listener, voiceprint gate
   backend/services/alarm_tags.py    the 10 s tag rule
 src/algorithm3/            api.py (the Algorithm3 class), policy.py (inquiry outcome and tags as pure functions),
-                           decode.py (any audio file -> 16 kHz mono), webdemo.py + static/index.html (demo page)
+                           decode.py (any audio file -> 16 kHz mono)
 config/default.yaml        default configuration; Algorithm 3 reads the audio and privacy sections
 models/                    weights (see Models)
 samples/                   6 scenes and 10 short replies, described in samples/index.json
-tests/                     package tests
 docs/DATA_CARD.md          data sources and splits
 THIRD_PARTY_NOTICES.md     licences of the pretrained models and data
 ```

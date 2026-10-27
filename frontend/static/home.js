@@ -73,8 +73,8 @@
     connectAudio();
     renderPlan();
   }
-  /* 照护者安排的运动计划：长者端首页展示，点一项直接带着这个动作开始训练。
-     完成与否只看当天有该动作的已结束训练，不做额外判定。 */
+  /* The movement plan set by the caregiver: shown on the older adult's home page; tapping an item starts that movement.
+     An item counts as done only if a finished session of that movement exists today; nothing else is judged. */
   let planBusy = false;
   function planSignature(plan) {
     return JSON.stringify([plan?.enabled, plan?.title, plan?.note, plan?.updated_at, (plan?.items || []).map(i => [i.exercise, i.target_reps, i.enabled]),
@@ -89,7 +89,7 @@
     planPaint = signature;
     const progress = plan.progress || {items: [], completed: 0, total: 0};
     const rows = (progress.items || []).filter(item => item.enabled);
-    // 长者点过「今天先不做」，当天就不再显示这张卡片，明天照常出现。
+    // After the older adult taps "not today", the card is hidden for the rest of the day and returns tomorrow.
     $("homePlan").hidden = !plan.enabled || !rows.length || !!progress.skipped;
     if ($("homePlan").hidden) return;
     $("homePlanTitle").textContent = plan.title || "Today's movement plan";
@@ -121,8 +121,8 @@
     });
   }
   function startFromPlan(key) {
-    // 先把动作选好再切页：hashchange 之后 app.js 才渲染运动页，
-    // 那时再塞标记就晚了，长者会看到默认的第一个动作。
+    // Choose the movement before switching pages: app.js renders the exercise page after hashchange,
+    // and setting the marker then would be too late; the older adult would see the default first movement.
     sessionStorage.setItem("homeease.plan", key);
     if (typeof chooseExercise === "function") chooseExercise(key);
     location.hash = "#exercise";
@@ -130,7 +130,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     $("homePlanDefer").onclick = async () => {
       if (planBusy) return;
-      // 顺延几天交给长者自己定，别替他猜「明天一定有空」。
+      // How many days to defer is the older adult's choice; do not assume they are free tomorrow.
       const days = Number($("homePlanDeferDays")?.value || 1);
       if (days > 1 && !confirm("No training for these days. Are you sure?")) return;
       planBusy = true;

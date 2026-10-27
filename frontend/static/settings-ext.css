@@ -1,7 +1,7 @@
-/* 后台算法开关、运动计划编辑，以及长者端的计划卡片。
-   只补这几块新界面需要的样式，沿用 style.css / home.css 的既有色板与圆角。 */
+/* Background algorithm switches, the movement-plan editor and the plan cards on the older adult's page.
+   Only the styles these new parts need; the palette and corner radii follow style.css / home.css. */
 
-/* ---------- 后台算法：开关卡片 ---------- */
+/* ---------- Background algorithms: switch cards ---------- */
 .switch-list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
 .switch-card{padding:16px 0;border-bottom:1px solid var(--line);transition:opacity .15s}
 .switch-card small{line-height:1.7}
@@ -9,7 +9,7 @@
 .switch-card.is-muted{opacity:.55}
 .switch-card:last-child{border-bottom:0}
 
-/* ---------- 后台算法：此刻运行状态 ---------- */
+/* ---------- Background algorithms: current running state ---------- */
 .channel-status{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .channel-status-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line);background:#fff}
 .channel-status-row:last-child{border-bottom:0}
@@ -22,7 +22,7 @@
 .resident-note{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:13px 14px;background:#f4f7f5;border-radius:5px;font-size:11px;line-height:1.8;color:var(--muted)}
 .resident-note svg{width:15px;height:15px;margin-top:3px;flex-shrink:0}
 
-/* ---------- 运动计划：照护者端编辑器 ---------- */
+/* ---------- Movement plan: caregiver editor ---------- */
 .plan-basics{margin-top:20px}
 .plan-editor{display:flex;flex-direction:column;border-top:1px solid var(--line)}
 .plan-item{display:grid;grid-template-columns:26px 92px minmax(0,1fr) 110px 96px;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
@@ -43,14 +43,14 @@
 .plan-progress-bar{height:5px;background:#e6ece8;border-radius:3px;overflow:hidden}
 .plan-progress-bar span{display:block;height:100%;background:var(--green);border-radius:3px;transition:width .3s}
 
-/* ---------- 工作台：动作被关闭时的标记 ---------- */
+/* ---------- Workbench: marker for a switched-off movement ---------- */
 .exercise-option{position:relative}
 .exercise-option.is-disabled{opacity:.5}
 .exercise-option.is-disabled>img{filter:grayscale(1)}
 .exercise-off-badge{position:absolute;right:9px;top:9px;background:var(--amber-light);color:var(--amber);font-size:10px;line-height:1.4;padding:3px 7px;border-radius:4px}
 .exercise-guide.is-disabled{opacity:.55}
 
-/* ---------- 长者端：首页计划卡片 ---------- */
+/* ---------- Older adult page: plan cards on the home page ---------- */
 .home-plan{background:#fff;border:1px solid #dce6e0;border-radius:6px;padding:26px 28px 22px;margin-bottom:28px}
 .home-plan-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .home-plan-eyebrow{font-size:12px;letter-spacing:.05em;color:#8aa297}
@@ -76,7 +76,7 @@
 .home-plan-foot>div.button-row{margin-left:auto}
 .home-plan-days{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:#6f7d78;width:auto;flex:0 0 auto;white-space:nowrap}
 .home-plan-days select{font:inherit;padding:0 6px;height:34px;border:1px solid #d7e2dc;border-radius:8px;background:#fff;color:#194c3e}
-/* 窄屏时提示文字独占一行；天数选择器与两个按钮挤在同一行，别让按钮被挤到下一行。 */
+/* On narrow screens the hint takes its own line; the day picker and both buttons share one line so no button wraps. */
 @media(max-width:760px){
   .home-plan-foot{gap:10px}
   .home-plan-foot>#homePlanHint{flex:1 0 100%}
@@ -108,7 +108,7 @@
   .plan-progress-bar{grid-column:1/-1;order:3}
 }
 
-/* 极窄屏（≤380px）省掉「休息」二字、让两个按钮均分行宽，三个控件仍能挤在一行。 */
+/* Very narrow screens (<=380px) drop the word "rest" and split the line evenly between both buttons, keeping all three controls on one line. */
 @media(max-width:380px){
   .home-plan-days>span{display:none}
   .home-plan-foot>div.button-row{gap:6px}

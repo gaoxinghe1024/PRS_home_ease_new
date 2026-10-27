@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-engine.py —— 实时跌倒检测引擎
+engine.py - real-time fall detection engine
 ================================================================
-把 standalone/ 里训练好的三段式算法权重，封装成一个可长时间运行的服务：
+Wraps the trained three-stage algorithm weights in standalone/ into a long-running service:
 
-  环节① 人体检测 : yolov8n-pose.onnx      （YOLOv8n 预训练，只用 box head）
-  环节② 姿态估计 : pose_best.pt           （自研 P1 小型 U-Net，从零训练）
-  环节③ 时序检测 : a4_weights.pkl         （A4 混合集成，OOF Stacking + XGBoost）
+  Stage 1 person detection : yolov8n-pose.onnx      (pre-trained YOLOv8n, box head only)
+  Stage 2 pose estimation  : pose_best.pt           (our own small P1 U-Net, trained from scratch)
+  Stage 3 temporal decision: a4_weights.pkl         (A4 hybrid ensemble, OOF stacking + XGBoost)
 
-工作方式：
-  - 后台线程持续读帧（摄像头 / 视频文件 / 内置示例数据集）
-  - 每帧现场跑 YOLO → P1 姿态 → 维护 30 帧（2s）滑窗 → 喂给 A4 得到 P(fall)
-  - P(fall) 连续 confirm 次超过阈值 → 触发一次跌倒事件：
-      · 记录系统时间
-      · 落盘 3s 录像（1s 前置缓冲 + 2s 后置），供报告回放
-      · 打上报警标记
-  - 记录写入 records/falls.json，录像写入 records/clips/*.mp4
+How it works:
+  - a background thread keeps reading frames (camera / video file / bundled sample datasets)
+  - every frame runs YOLO -> P1 pose -> a 30-frame (2 s) sliding window -> A4, giving P(fall)
+  - P(fall) above the threshold `confirm` times in a row -> one fall event is triggered:
+      - the system time is recorded
+      - a 3 s clip is written to disk (1 s pre-buffer + 2 s after) for report playback
+      - an alarm marker is set
+  - records go to records/falls.json, clips to records/clips/*.mp4
 
-说明：本引擎只做推理与记录，不依赖网络请求；FastAPI 层（app.py）只负责读写它的状态。
+Note: the engine only does inference and recording and needs no network access; the API layer only reads and writes its state.
 """
 from __future__ import annotations
 
@@ -31,8 +31,8 @@ import contextlib
 from collections import deque
 from datetime import datetime
 
-# 性能：见 app.py 顶部说明。单独运行本文件时也套用同一套设置
-# （OMP/joblib 的线程池在首次导入 numpy/sklearn/torch 时初始化，必须在此之前设置）。
+# Performance: the same settings apply when this file runs on its own
+# (the OMP/joblib thread pools are initialized on the first import of numpy/sklearn/torch, so they must be set before that).
 if os.environ.get("FVS_NO_TUNE") != "1":
     os.environ.setdefault("OMP_NUM_THREADS", "1")
     os.environ.setdefault("JOBLIB_MULTIPROCESSING", "0")
@@ -40,13 +40,13 @@ if os.environ.get("FVS_NO_TUNE") != "1":
 import cv2
 import numpy as np
 
-# A4 的 7 个基学习器都很小，sklearn 默认走 joblib 多进程 / OpenMP 多线程，
-# 调度与结果回收的开销远大于计算本身（实测 joblib 的 _retrieve 每 10ms 轮询一次）。
-# 这里用「线程后端 + 单线程」把这些 predict 包起来，不改算法文件本身。
-# 实测（RTX 3050 Ti，urfd/fall-01）：68.5ms/帧 → 37.0ms/帧。
+# The 7 base learners of A4 are tiny; by default sklearn uses joblib processes / OpenMP threads, and scheduling and
+# collecting results costs far more than the computation itself (joblib's _retrieve polls every 10 ms).
+# Wrapping these predict calls in "threading backend + single thread" avoids that without changing the algorithm files.
+# Measured (RTX 3050 Ti, urfd/fall-01): 68.5 ms/frame -> 37.0 ms/frame.
 try:
     from joblib import parallel_backend as _joblib_backend
-except Exception:                                    # 没装 joblib 也不影响运行
+except Exception:                                    # runs fine without joblib as well
     _joblib_backend = None
 try:
     from threadpoolctl import threadpool_limits as _threadpool_limits
@@ -56,7 +56,7 @@ except Exception:
 
 @contextlib.contextmanager
 def a4_fast_context():
-    """A4 推理加速上下文（找不到相关库时静默降级为普通执行）。"""
+    """Speed-up context for A4 inference (silently falls back to plain execution when the libraries are missing)."""
     with contextlib.ExitStack() as stack:
         if _joblib_backend is not None:
             stack.enter_context(_joblib_backend("threading", n_jobs=1))
@@ -64,22 +64,22 @@ def a4_fast_context():
             stack.enter_context(_threadpool_limits(limits=1))
         yield
 
-# 记录持久化（SQLite，同目录模块）
+# Record persistence (SQLite, module in the same folder)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from store import RecordStore
 
 # ---------------------------------------------------------------------------
-# 复用 standalone 的自包含算法实现（同一份权重、同一份前后处理，不做任何复制）
+# Reuse the self-contained algorithm implementation in standalone/ (same weights, same pre/post-processing, nothing copied)
 #
-# 注意：项目根目录下还有一个旧的 main.py，若直接 `import main` 会命中它。
-# 因此这里用 importlib 按【绝对路径】加载 standalone/main.py，并注册一个唯一
-# 模块名，避免任何同名冲突；同时把 standalone/ 放进 sys.path，好让被加载的
-# main.py 内部的 `from a4_core import ...` 能解析。
+# Note: an older main.py may exist next to this file, and a plain `import main` would pick it up.
+# So importlib loads standalone/main.py by ABSOLUTE PATH under a unique module name to avoid any name clash,
+# and standalone/ is put on sys.path so that `from a4_core import ...` inside the loaded
+# main.py resolves.
 # ---------------------------------------------------------------------------
 import importlib.util
 
 HERE = os.path.dirname(os.path.abspath(__file__))              # systems/
-PROJECT = os.path.abspath(os.path.join(HERE, ".."))            # 项目根
+PROJECT = os.path.abspath(os.path.join(HERE, ".."))            # project root
 STANDALONE = os.path.join(PROJECT, "standalone")
 if STANDALONE not in sys.path:
     sys.path.insert(0, STANDALONE)
@@ -103,7 +103,7 @@ _kaggle_dir = _main._kaggle_dir
 _urfd_frames_dir = _main._urfd_frames_dir
 
 # ---------------------------------------------------------------------------
-# 目录
+# Folders
 # ---------------------------------------------------------------------------
 RECORDS_DIR = os.path.join(HERE, "records")
 CLIPS_DIR = os.path.join(RECORDS_DIR, "clips")
@@ -113,14 +113,14 @@ for _d in (RECORDS_DIR, CLIPS_DIR, UPLOADS_DIR):
 RECORDS_JSON = os.path.join(RECORDS_DIR, "falls.json")
 
 # ---------------------------------------------------------------------------
-# 默认参数
+# Default parameters
 # ---------------------------------------------------------------------------
-SAMPLE_FPS = 15.0      # 统一采样帧率（算法按 15fps / 2s 窗口训练）
-CLIP_FPS = 15.0        # 录像标称帧率（与采样一致 → 3s = 45 帧）
+SAMPLE_FPS = 15.0      # common sampling rate (the algorithm was trained at 15 fps / 2 s windows)
+CLIP_FPS = 15.0        # nominal clip frame rate (same as sampling -> 3 s = 45 frames)
 
 
 def placeholder_jpeg(w=640, h=360, text="NO SIGNAL"):
-    """无信号占位图（浅色，配合浅色主题）。"""
+    """No-signal placeholder image (light, matching the light theme)."""
     img = np.full((h, w, 3), 240, np.uint8)
     cv2.rectangle(img, (0, 0), (w - 1, h - 1), (215, 220, 228), 2)
     cv2.line(img, (0, 0), (w, h), (225, 230, 236), 1)
@@ -133,7 +133,7 @@ def placeholder_jpeg(w=640, h=360, text="NO SIGNAL"):
 
 
 # ===========================================================================
-# 帧源：摄像头 / 本地视频 / 内置示例数据集（统一成 read() 接口）
+# Frame sources: camera / local video / bundled sample datasets (all behind one read() interface)
 # ===========================================================================
 class FrameSource:
     def __init__(self, spec: dict):
@@ -145,7 +145,7 @@ class FrameSource:
         self.idx = 0
         self.n_read = 0
         self.stride = 1
-        self.realtime = True          # 是否按 15fps 节流（模拟实时）
+        self.realtime = True          # throttle to 15 fps (simulates real time)
         self.label = "-"
         self.video_fps = None
 
@@ -156,18 +156,18 @@ class FrameSource:
             if not self.cap.isOpened():
                 self.cap = cv2.VideoCapture(index)
             if not self.cap.isOpened():
-                raise RuntimeError(f"无法打开摄像头（index={index}），请检查设备占用或权限")
+                raise RuntimeError(f"Cannot open the camera (index={index}); check whether it is in use or permitted")
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-            self.label = f"摄像头 {index}"
+            self.label = f"Camera {index}"
 
         elif self.kind == "file":
             path = str(self.spec.get("path", "")).strip().strip('"')
             if not path or not os.path.isfile(path):
-                raise RuntimeError(f"视频文件不存在：{path}")
+                raise RuntimeError(f"Video file not found: {path}")
             self.cap = cv2.VideoCapture(path)
             if not self.cap.isOpened():
-                raise RuntimeError(f"无法打开视频：{path}")
+                raise RuntimeError(f"Cannot open the video: {path}")
             fps = self.cap.get(cv2.CAP_PROP_FPS) or 30.0
             self.video_fps = fps
             self.stride = max(1, int(round(fps / SAMPLE_FPS)))
@@ -177,7 +177,7 @@ class FrameSource:
             ds = self.spec.get("dataset")
             seq = self.spec.get("seq")
             if not ds or not seq:
-                raise RuntimeError("示例数据源需要 dataset 与 seq")
+                raise RuntimeError("A sample source needs dataset and seq")
             src, src_fps = _source_of(ds, seq)
             self.label = f"{ds}/{seq}"
             if os.path.isdir(src):
@@ -186,20 +186,20 @@ class FrameSource:
                     if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp")))
                 self.dir = src
                 if not self.files:
-                    raise RuntimeError(f"目录内没有图片帧：{src}")
+                    raise RuntimeError(f"No image frames in the folder: {src}")
                 self.stride = max(1, int(round((src_fps or 30.0) / SAMPLE_FPS)))
             else:
                 self.cap = cv2.VideoCapture(src)
                 if not self.cap.isOpened():
-                    raise RuntimeError(f"无法打开示例视频：{src}")
+                    raise RuntimeError(f"Cannot open the sample video: {src}")
                 fps = self.cap.get(cv2.CAP_PROP_FPS) or (src_fps or 30.0)
                 self.video_fps = fps
                 self.stride = max(1, int(round(fps / SAMPLE_FPS)))
         else:
-            raise RuntimeError(f"未知的输入类型：{self.kind!r}（应为 camera / file / demo）")
+            raise RuntimeError(f"Unknown input type: {self.kind!r} (expected camera / file / demo)")
 
     def read(self):
-        """返回 (ok, frame)。"""
+        """Return (ok, frame)."""
         if self.files is not None:
             while self.idx < len(self.files):
                 i = self.idx
@@ -231,12 +231,12 @@ class FrameSource:
 
 
 # ===========================================================================
-# 可用输入源枚举
+# Available input sources
 # ===========================================================================
 def list_demo_sources():
-    """列出内置示例数据集里可用的序列。"""
+    """List the sequences available in the bundled sample datasets."""
     out = {}
-    # URFD（帧目录）
+    # URFD (frame folders)
     try:
         dirs = glob.glob(os.path.join(os.path.dirname(_urfd_frames_dir("x")), "*-cam0-rgb"))
         seqs = sorted(os.path.basename(d).split("-cam0-rgb")[0] for d in dirs)
@@ -244,14 +244,14 @@ def list_demo_sources():
             out["urfd"] = seqs
     except Exception:
         pass
-    # Le2i（avi 视频）
+    # Le2i (avi videos)
     try:
         seqs = [name for name, _ in _le2i_list_videos()]
         if seqs:
             out["le2i"] = seqs
     except Exception:
         pass
-    # MCF（chute 视频）
+    # MCF (chute videos)
     try:
         root = _kaggle_dir("multiple-cameras-fall-dataset")
         if root:
@@ -267,12 +267,12 @@ def list_demo_sources():
 
 
 # ===========================================================================
-# 检测引擎
+# Detection engine
 # ===========================================================================
 class DetectionEngine:
-    """持续推理 + 跌倒记录。线程安全：所有对外状态读写都在 self._lock 下。"""
+    """Continuous inference + fall records. Thread-safe: all external state is read and written under self._lock."""
 
-    # 单次清空最多删除多少个录像文件（见 clear_records 的说明）
+    # Maximum number of clip files deleted per clear (see clear_records)
     MAX_CLIP_DELETES = 40
 
     def __init__(self, threshold=0.60, cooldown_s=6.0, confirm=2,
@@ -287,20 +287,20 @@ class DetectionEngine:
         self.clip_fps = float(clip_fps)
         self.alarm_hold_s = float(alarm_hold_s)
 
-        # 推理降频（性能优化，见 README「性能与调优」）
-        #   detect_every: 每 N 帧做一次 YOLO 人体检测，其余帧复用上次的框
-        #                 （人体在相邻帧位移很小，框复用不影响姿态裁剪）
-        #   prob_every:   每 N 帧做一次 A4 时序判定，其余帧沿用上次概率
-        #                 （2s 窗内相邻采样高度重叠，无需逐帧计算）
-        #   姿态 P1 始终逐帧推理（GPU 上仅数毫秒）
+        # Reduced inference rate (performance tuning)
+        #   detect_every: run YOLO person detection every N frames and reuse the last box in between
+        #                 (a person moves little between frames, so reusing the box does not affect the pose crop)
+        #   prob_every:   run the A4 temporal decision every N frames and keep the last probability in between
+        #                 (neighbouring samples of a 2 s window overlap heavily, so per-frame evaluation is unnecessary)
+        #   P1 pose always runs on every frame (only a few ms on a GPU)
         self.detect_every = max(1, int(detect_every))
         self.prob_every = max(1, int(prob_every))
 
-        # 画面叠加开关（只影响【显示与录像】的视觉层，与模型输入完全无关）
-        #   show_hud     : 顶部信息条 + "frame N P(fall)=x FALL/ADL" 文字 + 概率条
-        #   show_skeleton: 人体检测框 + 骨架连线
-        # 默认关闭文字类叠加，避免画面上的文字干扰观感/被误当"提示"；
-        # 无论开关如何，送进模型的一律是【原始帧】（叠加发生在三段推理之后）。
+        # Overlay switches (only affect the VISUAL layer of display and clips; unrelated to model input)
+        #   show_hud     : top info bar + "frame N P(fall)=x FALL/ADL" text + probability bar
+        #   show_skeleton: person box + skeleton lines
+        # Text overlays are off by default so that text on the image is not distracting or mistaken for a prompt;
+        # whatever the switches, the model always receives the RAW frame (overlays are drawn after the three stages).
         self.show_hud = bool(show_hud)
         self.show_skeleton = bool(show_skeleton)
 
@@ -329,23 +329,23 @@ class DetectionEngine:
         self._last_det_n = 0
         self._seen = 0
 
-        self._pre = deque(maxlen=180)          # (ts, jpeg_bytes) 前置缓冲，600 帧内约 8~10s
+        self._pre = deque(maxlen=180)          # (ts, jpeg_bytes) pre-buffer, about 8-10 s
         self._kpts = deque(maxlen=WIN_FRAMES)
         self._last_jpeg = placeholder_jpeg()
-        self._n_records = 0                    # 记录条数缓存（status() 只读内存，不查库）
+        self._n_records = 0                    # cached record count (status() reads memory only, never the database)
         self._last_record = None
 
-        # 跌倒记录 / 报告数据统一存 SQLite（records/falls.db）
+        # Fall records and report data are stored in SQLite (records/falls.db)
         self.store = RecordStore(RECORDS_DIR)
-        migrated = self.store.migrate_from_json(RECORDS_JSON)   # 兼容旧 JSON
+        migrated = self.store.migrate_from_json(RECORDS_JSON)   # compatibility with the old JSON
         if migrated:
-            print(f"[store] 已把旧 falls.json 的 {migrated} 条记录迁移进 SQLite")
+            print(f"[store] migrated {migrated} records from the old falls.json into SQLite")
         self._refresh_record_cache()
 
-        # ---- 三个环节的模型权重只加载一次 ----
-        # A4 权重优先用本目录下的 a4_weights.pkl（由 train_weights.py 在【当前环境】
-        # 重新导出，避免 sklearn / xgboost 版本不一致导致反序列化失败）；
-        # 若本目录没有，则回退到 standalone/ 的默认权重。
+        # ---- the weights of all three stages are loaded once ----
+        # A4 prefers a4_weights.pkl in this folder (re-exported by train_weights.py in the CURRENT environment,
+        # so that different sklearn / xgboost versions cannot break deserialization);
+        # without it, fall back to the default weights in standalone/.
         self._det = None
         self._pose = None
         self._alg = None
@@ -365,17 +365,17 @@ class DetectionEngine:
         except Exception as e:
             self._load_error = f"{type(e).__name__}: {e}"
 
-    # ------------------------------------------------------------------ 记录
+    # ------------------------------------------------------------------ records
     def records(self):
-        """全部跌倒记录（新的在前），来自 SQLite。"""
+        """All fall records (newest first), from SQLite."""
         return self.store.list(newest_first=True)
 
     def delete_record(self, rid):
-        """删除一条记录并同时删掉它的录像文件。
+        """Delete one record together with its clip file.
 
-        返回的记录里多一个 ``clip_removed`` 字段，说明录像文件是否真的删掉了
-        （运行环境的批量删除保护可能拦下删除动作，此时记录已删、文件还在，
-        属于孤儿文件，下次走 clear_records 会被一并清掉）。
+        The returned record has an extra ``clip_removed`` field telling whether the clip file was really deleted
+        (a bulk-deletion guard of the environment may block the deletion; the record is then gone but the file stays
+        as an orphan, which the next clear_records removes).
         """
         gone = self.store.delete(rid)
         if gone is None:
@@ -385,14 +385,14 @@ class DetectionEngine:
         return gone
 
     def clear_records(self, delete_clips=True):
-        """清空全部记录；delete_clips=True 时同时删除录像文件。
+        """Clear all records; with delete_clips=True the clip files are deleted as well.
 
-        返回 {"deleted": 记录数, "clips_removed": 已删录像数, "clips_left": 目录剩余录像数}
+        Returns {"deleted": records, "clips_removed": clips deleted, "clips_left": clips left in the folder}
 
-        录像删除【主动分批】：运行环境带一道「一轮内批量删除超过 50 个文件」的保护，
-        触发时会抛 SystemExit（不属于 OSError，所以必须单独接住）。这里单次最多删
-        MAX_CLIP_DELETES 个，剩下的残留录像下次再清一次即可 —— 只损失一点便利，
-        不会让整个请求 500、也不会绕过环境的安全保护。
+        Clips are deleted IN BATCHES on purpose: the environment may guard against deleting more than 50 files in one go
+        and raise SystemExit (not an OSError, so it must be caught separately). At most MAX_CLIP_DELETES are deleted
+        per call and the rest go next time; this costs a little convenience but never fails the whole request
+        and never bypasses the environment's guard.
         """
         gone = self.store.clear()
         removed = 0
@@ -403,7 +403,7 @@ class DetectionEngine:
                 if n and n not in seen:
                     seen.add(n)
                     names.append(n)
-            # 兜底：目录里没有被记录引用的残留录像（含上次被批量删除保护拦下的）
+            # Fallback: leftover clips no record refers to (including those a bulk-deletion guard blocked last time)
             for p in glob.glob(os.path.join(CLIPS_DIR, "*.mp4")):
                 n = os.path.basename(p)
                 if n not in seen:
@@ -419,7 +419,7 @@ class DetectionEngine:
                     fail_streak = 0
                 elif os.path.isfile(os.path.join(CLIPS_DIR, n)):
                     fail_streak += 1
-                    if fail_streak >= 2:      # 连续被拦下，本轮不再白试
+                    if fail_streak >= 2:      # blocked twice in a row, stop trying this round
                         break
 
         self._refresh_record_cache()
@@ -428,10 +428,10 @@ class DetectionEngine:
 
     @staticmethod
     def _remove_clip(name):
-        """删除一个录像文件，返回是否真的删掉了。
+        """Delete one clip file and return whether it was really deleted.
 
-        捕获 SystemExit：运行环境的批量删除保护用它中断删除动作；
-        接住它只是避免整个 HTTP 请求炸掉，并不绕过保护。
+        SystemExit is caught: the environment's bulk-deletion guard uses it to stop deletions;
+        catching it only keeps the whole HTTP request from failing and does not bypass the guard.
         """
         if not name:
             return False
@@ -449,7 +449,7 @@ class DetectionEngine:
             except OSError:
                 pass
 
-    # ------------------------------------------------------------ 启停/配置
+    # ------------------------------------------------------------ start / stop / config
     def set_config(self, threshold=None, cooldown_s=None, confirm=None,
                    pre_s=None, post_s=None, show_hud=None, show_skeleton=None):
         with self._lock:
@@ -490,14 +490,14 @@ class DetectionEngine:
             return self._state == "running"
 
     def start(self, spec: dict):
-        """启动一个新的检测会话。spec 会先被校验（失败抛 RuntimeError）。"""
+        """Start a new detection session. spec is validated first (RuntimeError on failure)."""
         if not self.models_ready:
             raise RuntimeError(
-                "模型未就绪：" + str(self._load_error) +
-                "。若为 A4 权重版本不兼容，请先运行 "
-                "python train_weights.py 在本环境重新导出权重。")
+                "Models not ready: " + str(self._load_error) +
+                ". If the A4 weights are incompatible with this environment, first run "
+                "python train_weights.py to re-export them here.")
         self.stop()
-        src = FrameSource(spec)        # 校验失败在此抛异常
+        src = FrameSource(spec)        # raises here when validation fails
 
         with self._lock:
             self._source_spec = dict(spec)
@@ -546,15 +546,15 @@ class DetectionEngine:
                 self._state = "idle"
         return self.status()
 
-    # ------------------------------------------------------------ 主循环
+    # ------------------------------------------------------------ main loop
     def _run(self, src: FrameSource):
-        # 定拍节流用【高精度单调时钟】perf_counter：Windows 上 time.time() 的分辨率
-        # 只有约 15.6ms，用它算「本帧耗时」会把节流算得忽长忽短、帧率抖动。
-        # 记录时间戳仍用 time.time()（必须是真实系统时间）。
+        # Throttling uses the HIGH-RESOLUTION monotonic clock perf_counter: on Windows time.time() only has about
+        # 15.6 ms resolution, which would make the per-frame timing jitter and the frame rate unstable.
+        # Record timestamps still use time.time() (they must be real system time).
         t_beat = time.perf_counter()
         next_tick = time.perf_counter()
         frame_i = 0
-        marks = deque(maxlen=2000)      # (perf_t, frame_i) 用于算 2 秒滑动窗口 fps
+        marks = deque(maxlen=2000)      # (perf_t, frame_i) for the 2-second sliding-window fps
         try:
             while not self._stop_evt.is_set():
                 ok, frame = src.read()
@@ -565,8 +565,8 @@ class DetectionEngine:
 
                 frame_i += 1
                 self._seen = frame_i
-                # 推理降频：第 1 帧必检（避免开局无框），之后每 detect_every 帧检一次；
-                #            每 prob_every 帧做一次 A4 判定。参数=1 即恢复逐帧。
+                # Reduced inference rate: the first frame is always detected (so there is a box from the start), then every
+                #            detect_every frames; A4 decides every prob_every frames. A value of 1 restores per-frame work.
                 do_detect = ((frame_i - 1) % self.detect_every == 0)
                 do_prob = (frame_i % self.prob_every == 0)
                 vis, prob, triggered = self._process(frame, frame_i, do_detect, do_prob)
@@ -576,30 +576,30 @@ class DetectionEngine:
                     jpeg = buf.tobytes()
                     with self._lock:
                         self._last_jpeg = jpeg
-                    # 前置缓冲 / 跌倒触发 / 录像收集（用同一份 JPEG，不重复编码）
+                    # Pre-buffer / fall trigger / clip collection (the same JPEG is reused, never encoded twice)
                     self._record_flow(time.time(), jpeg, triggered, prob)
 
                 if src.realtime:
-                    # 固定节拍：按绝对时间点累加，避免"每帧睡一次"的误差累积
+                    # Fixed cadence: accumulate absolute time points so per-frame sleeps do not accumulate error
                     next_tick += 1.0 / SAMPLE_FPS
                     delay = next_tick - time.perf_counter()
                     if delay > 0:
                         time.sleep(delay)
                     else:
-                        next_tick = time.perf_counter()   # 跑得比节拍快，重新对齐
+                        next_tick = time.perf_counter()   # running faster than the cadence, realign
 
                 now = time.perf_counter()
                 marks.append((now, frame_i))
                 if now - t_beat >= 0.5:
-                    # fps 用【最近 2 秒滑动窗口】：累计均值会被首帧预热（CUDA/cuDNN 初始化）
-                    # 长期拉低，前端看到的数字会比实际慢很多。
+                    # fps over the LAST 2 SECONDS: a cumulative average is dragged down for a long time by the first-frame
+                    # warm-up (CUDA/cuDNN initialization) and the frontend would show a much lower number.
                     while len(marks) > 1 and now - marks[0][0] > 2.0:
                         marks.popleft()
                     span = now - marks[0][0]
                     with self._lock:
                         self._fps = (frame_i - marks[0][1]) / span if span > 0.2 else 0.0
                     t_beat = now
-        except Exception as e:                      # 保证线程不会静默死掉
+        except Exception as e:                      # make sure the thread never dies silently
             with self._lock:
                 self._state = "error"
                 self._error = f"{type(e).__name__}: {e}"
@@ -609,14 +609,14 @@ class DetectionEngine:
             with self._lock:
                 if self._state == "running":
                     self._state = "finished"
-                # 保留最后一次的实测帧率（不归零）：结束后前端仍能看到本次会话跑多快；
-                # 下次 start() 时会重置为 0。
+                # Keep the last measured frame rate (not reset to zero) so the frontend still shows how fast the session ran;
+                # the next start() resets it to 0.
 
-    # ------------------------------------------------------------ 单帧处理
+    # ------------------------------------------------------------ per-frame processing
     def _process(self, frame, frame_i, do_detect=True, do_prob=True):
         H, W = frame.shape[:2]
 
-        # ① YOLO 人体检测（降频：非检测帧复用上一次的框与置信度）
+        # Stage 1: YOLO person detection (reduced rate: frames without detection reuse the last box and confidence)
         pts = conf = None
         kpts = np.zeros((17, 3), np.float32)
         if do_detect:
@@ -631,20 +631,20 @@ class DetectionEngine:
         if box is not None and score > 0:
             x1, y1, x2, y2 = box
             box_px = [x1 * W, y1 * H, x2 * W, y2 * H]
-            # ② 自研 P1 姿态（始终逐帧：GPU 上仅数毫秒，且窗口需要每帧骨架）
+            # Stage 2: our P1 pose model (every frame: a few ms on a GPU, and the window needs a skeleton per frame)
             pts, conf = self._pose.extract(frame, box_px)
             kpts = np.stack([pts[:, 0] / W, pts[:, 1] / H, conf], axis=1).astype(np.float32)
 
         with self._lock:
-            self._kpts.append(kpts)          # 窗口逐帧增长，不降频
+            self._kpts.append(kpts)          # the window grows every frame, no rate reduction
             self._frames = frame_i
             have_win = len(self._kpts) >= WIN_FRAMES
             kwin = np.stack(list(self._kpts)[-WIN_FRAMES:]).astype(np.float32) if have_win else None
 
-        # ③ A4 滑窗时序检测（降频：非判定帧沿用上一次的概率）
+        # Stage 3: A4 sliding-window temporal decision (reduced rate: other frames keep the last probability)
         prob = self._prob
         if do_prob and kwin is not None:
-            with a4_fast_context():          # 关掉 joblib/OpenMP 的调度开销
+            with a4_fast_context():          # skip the joblib/OpenMP scheduling overhead
                 wp = self._alg.predict(kwin)
             if len(wp):
                 prob = float(wp[0])
@@ -653,7 +653,7 @@ class DetectionEngine:
         with self._lock:
             self._prob = prob
             self._peak = max(self._peak, prob)
-            # 仅在真正的判定帧上累计确认计数，保持 confirm 的时序平滑语义不变
+            # The confirm counter only advances on real decision frames, keeping the smoothing semantics of confirm unchanged
             if do_prob:
                 if prob >= self.threshold:
                     self._hot += 1
@@ -666,7 +666,7 @@ class DetectionEngine:
                 self._last_alarm = now
                 self._alarm_until = now + self.alarm_hold_s
 
-        # 画面叠加（只画在 vis 上：模型输入始终是原始 frame，叠加不会回流进模型）
+        # Overlays (drawn on vis only: the model input is always the raw frame, overlays never feed back into the model)
         vis = frame.copy()
         if self.show_skeleton and pts is not None:
             draw_skeleton(vis, pts, conf, box)
@@ -679,11 +679,11 @@ class DetectionEngine:
         alarm = prob >= self.threshold
         color = (0, 0, 230) if alarm else (0, 170, 0)      # BGR
         cv2.rectangle(vis, (0, 0), (W, 30), (34, 36, 40), -1)
-        # 只用 ASCII，避免 OpenCV 无法渲染中文
+        # ASCII only: OpenCV cannot render Chinese characters
         txt = f"frame {frame_i}  P(fall)={prob:.2f}  {'FALL' if alarm else 'ADL'}"
         cv2.putText(vis, txt, (8, 21), cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 2)
 
-        # 概率条
+        # Probability bar
         bw = int(W * 0.5)
         x0, y0 = int(W * 0.03), 42
         cv2.rectangle(vis, (x0, y0), (x0 + bw, y0 + 12), (70, 74, 80), -1)
@@ -692,12 +692,12 @@ class DetectionEngine:
         cv2.line(vis, (cx, y0 - 4), (cx, y0 + 16), (230, 230, 230), 1)
         return vis
 
-    # ------------------------------------------------------------ 录像
+    # ------------------------------------------------------------ clips
     def _record_flow(self, now, jpeg, triggered, prob):
-        """每帧调用：维护前置缓冲、触发录像、收集后置帧、满 3s 收尾落盘。
+        """Called every frame: maintain the pre-buffer, trigger a clip, collect later frames and write the clip after 3 s.
 
-        用【真实时间戳】采集，保证「3s 录像」是真实 3 秒（1s 前置 + 2s 后置），
-        与推理速度无关（GPU 快、CPU 慢都不影响录像的真实时长）。
+        Frames are collected by REAL timestamps so a "3 s clip" is really 3 seconds (1 s before + 2 s after),
+        independent of the inference speed (a fast GPU or a slow CPU does not change the clip's real duration).
         """
         to_finalize = None
         with self._lock:
@@ -730,7 +730,7 @@ class DetectionEngine:
         if not buf:
             return None
 
-        # 真实时长 → 推导标称帧率，使录像回放速度与实际一致
+        # Real duration -> nominal frame rate, so the clip plays back at real speed
         n = len(buf)
         duration = max(0.1, buf[-1][0] - buf[0][0])
         fps = float(np.clip(n / duration, 1.0, 60.0))
@@ -771,17 +771,17 @@ class DetectionEngine:
         }
         with self._lock:
             self._n_falls += 1
-        saved = self.store.add(entry)          # 写入 SQLite
-        self._refresh_record_cache()           # 同步内存缓存（status() 用）
+        saved = self.store.add(entry)          # write to SQLite
+        self._refresh_record_cache()           # update the in-memory cache (used by status())
         return saved
 
-    # ------------------------------------------------------------ 状态
+    # ------------------------------------------------------------ status
     def _refresh_record_cache(self):
-        """把「记录条数 / 最新一条」缓存到内存。
+        """Cache the record count and the latest record in memory.
 
-        status() 会被前端每 0.5s 轮询一次；如果每次都去查 SQLite，查库要在持锁期间
-        进行，会把推理线程堵在锁上（实测拖慢约 15ms/帧）。所以改成只在记录
-        发生变化时刷新一次，status() 只读内存。
+        status() is polled by the frontend every 0.5 s; querying SQLite each time would happen while holding the lock
+        and block the inference thread on it (measured about 15 ms/frame slower). So the cache is refreshed only when
+        the records change, and status() reads memory only.
         """
         try:
             n = self.store.count()
@@ -829,14 +829,14 @@ class DetectionEngine:
 
 
 if __name__ == "__main__":
-    # 命令行自检：加载模型 + 跑一小段示例，确认引擎可用
+    # Command-line self-check: load the models and run a short sample to confirm the engine works
     eng = DetectionEngine()
-    print("[OK] 模型加载完成：YOLO + P1 姿态 + A4")
-    print("[OK] 可用示例数据源：", list(list_demo_sources().keys()))
-    print("[演示] 启动 urfd/fall-01 共 60 帧 ...")
+    print("[OK] models loaded: YOLO + P1 pose + A4")
+    print("[OK] available sample sources:", list(list_demo_sources().keys()))
+    print("[demo] starting urfd/fall-01 with 60 frames ...")
     eng.start({"type": "demo", "dataset": "urfd", "seq": "fall-01"})
     time.sleep(8)
     st = eng.status()
     eng.stop()
-    print("[结果] state=%s frames=%s peak=%.3f n_falls=%d records=%d"
+    print("[result] state=%s frames=%s peak=%.3f n_falls=%d records=%d"
           % (st["state"], st["frames"], st["peak"], st["n_falls"], st["n_records"]))

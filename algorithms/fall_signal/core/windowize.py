@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""滑窗化与事件聚合（最优组合：窗长 2.0 s、步长 0.25 s、合并间隔 2 窗）。
+"""Sliding windows and event aggregation (best combination: 2.0 s windows, 0.25 s step, merge gap of 2 windows).
 
-步长 0.25 s 的物理依据：跌倒冲击持续 0.3~0.6 s，0.25 s 步长可保证任意
-0.5 s 长的事件至少被 2 个窗口完整覆盖，不会漏掉冲击峰。
+Physical reason for the 0.25 s step: a fall impact lasts 0.3-0.6 s, and a 0.25 s step guarantees that any
+0.5 s event is fully covered by at least 2 windows, so the impact peak is never missed.
 """
 import numpy as np
 
@@ -14,7 +14,7 @@ def n_samples(fs, sec):
 
 
 def make_windows(sig, fs, win_s=C.WIN_S, step_s=C.STEP_S):
-    """[T,C] 或 [T] → windows [N,win_n,C], t0_idx [N]（窗口起始**样本下标**）。"""
+    """[T,C] or [T] -> windows [N,win_n,C], t0_idx [N] (window start **sample index**)."""
     sig = np.asarray(sig)
     if sig.ndim == 1:
         sig = sig[:, None]
@@ -28,10 +28,10 @@ def make_windows(sig, fs, win_s=C.WIN_S, step_s=C.STEP_S):
 
 
 def windows_from_grid(t, sig, fs, win_s=C.WIN_S, step_s=C.STEP_S):
-    """给定绝对时间网格 t 与信号 sig，按绝对时间切窗。
+    """Cut windows by absolute time from the absolute time grid t and the signal sig.
 
-    返回 (wins [N,win_n,C], t_start[N], t_end[N])，时间均为绝对秒。
-    用于流式检测：窗口端点严格落在 step_s 的整数倍上。
+    Returns (wins [N,win_n,C], t_start[N], t_end[N]), all times in absolute seconds.
+    Used for streaming: window end points fall exactly on integer multiples of step_s.
     """
     sig = np.asarray(sig)
     if sig.ndim == 1:
@@ -47,13 +47,13 @@ def windows_from_grid(t, sig, fs, win_s=C.WIN_S, step_s=C.STEP_S):
 
 
 def merge_hits(hit_t_end, win_s=C.WIN_S, gap_win=C.MERGE_GAP_WIN):
-    """把命中窗口（按结束时刻排序）聚成事件。
+    """Aggregate hit windows (sorted by end time) into events.
 
-    规则（与 00_common/windowize.py 的 MERGE_GAP_WIN 语义一致）：
-      相邻命中窗口的**序号间隔** ≤ gap_win 视为同一事件；
-      事件区间 = [首个命中窗起始, 末个命中窗结束]；
-      报警时刻 = **最早命中窗口的结束时刻**（= 最早可报警时刻）。
-    返回 list[dict]，字段：t_win_start / t_win_end / t_alarm / n_windows。
+    Rules (same meaning as MERGE_GAP_WIN in 00_common/windowize.py):
+      hit windows whose **index gap** is <= gap_win belong to the same event;
+      event interval = [start of the first hit window, end of the last hit window];
+      alarm time = **end of the earliest hit window** (= the earliest possible alarm).
+    Returns list[dict] with the fields t_win_start / t_win_end / t_alarm / n_windows.
     """
     hit = np.sort(np.asarray(hit_t_end, np.float64))
     if len(hit) == 0:
@@ -74,7 +74,7 @@ def merge_hits(hit_t_end, win_s=C.WIN_S, gap_win=C.MERGE_GAP_WIN):
         out.append({
             "t_win_start": t_first_end - win_s,
             "t_win_end": t_last_end,
-            "t_alarm": t_first_end,          # 报警时刻 = 最早命窗结束
+            "t_alarm": t_first_end,          # alarm time = end of the earliest hit window
             "n_windows": int(len(ev)),
         })
     return out

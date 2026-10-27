@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 """
-main.py —— 完整跌倒检测识别流（自包含版，端到端 + 可视化）
+main.py - complete fall detection pipeline (self-contained, end to end + visualization)
 ============================================================
 
-这是一个【完全自包含】的测试入口：不 import 项目里任何模块，
-三个环节的模型权重就放在本文件旁边（standalone/ 目录），直接加载使用。
+This is a FULLY SELF-CONTAINED test entry: it imports no project module,
+and the weights of all three stages sit next to this file (the standalone/ folder) and are loaded directly.
 
-  环节① 人体检测 : yolov8n-pose.onnx（YOLOv8n 预训练，只用 box head）
-  环节② 姿态估计 : pose_best.pt（自研 P1 小型 U-Net，从零训练）
-  环节③ 时序检测 : a4_weights.pkl（A4 混合集成，OOF Stacking + XGBoost）
+  Stage 1 person detection : yolov8n-pose.onnx (pre-trained YOLOv8n, box head only)
+  Stage 2 pose estimation  : pose_best.pt (our own small P1 U-Net, trained from scratch)
+  Stage 3 temporal decision: a4_weights.pkl (A4 hybrid ensemble, OOF stacking + XGBoost)
 
-识别流（全程现场推理，不读任何缓存）：
-  视频帧 → YOLO person bbox → P1 姿态骨架 → A4 时序检测 → 跌倒事件
+Pipeline (live inference throughout, no cache is read):
+  video frame -> YOLO person bbox -> P1 pose skeleton -> A4 temporal decision -> fall event
 
-依赖（仅第三方包）: numpy, cv2, torch, sklearn, xgboost, pandas
+Dependencies (third-party packages only): numpy, cv2, torch, sklearn, xgboost, pandas
 
-用法（用 Anaconda 的 python）:
-  E:/anaconda3/python.exe main.py --demo urfd fall-01            # 实时可视化窗口
-  E:/anaconda3/python.exe main.py --demo le2i Home_01_video1
-  E:/anaconda3/python.exe main.py --demo mc chute01
-  E:/anaconda3/python.exe main.py --demo urfd fall-01 --save out.mp4
+Usage:
+  python main.py --demo urfd fall-01            # live visualization window
+  python main.py --demo le2i Home_01_video1
+  python main.py --demo mc chute01
+  python main.py --demo urfd fall-01 --save out.mp4
 
-说明：
-  - 可视化窗口按空格暂停/继续，按 ESC 退出。
-  - 数据路径：脚本会自动定位项目 data/ 目录（相对本文件向上两级）。
+Notes:
+  - In the visualization window, Space pauses/resumes and ESC quits.
+  - Data path: the script finds the project's data/ folder (two levels above this file).
 """
 import os
 import sys
@@ -32,7 +32,7 @@ import glob
 import pickle
 import argparse
 
-# ---- 依赖自检：IDE 误用解释器时给出清晰提示 ----
+# ---- dependency check: a clear message when an IDE uses the wrong interpreter ----
 _MISSING = []
 for _mod in ("numpy", "cv2", "torch", "sklearn", "xgboost", "pandas"):
     try:
@@ -41,8 +41,8 @@ for _mod in ("numpy", "cv2", "torch", "sklearn", "xgboost", "pandas"):
         _MISSING.append(_mod)
 if _MISSING:
     sys.stderr.write(
-        "\n[依赖缺失] 缺少：%s\n请用 Anaconda 运行：\n"
-        "  E:/anaconda3/python.exe main.py --demo urfd fall-01\n\n" % ", ".join(_MISSING))
+        "\n[missing dependencies] missing: %s\nRun it with a Python that has them installed:\n"
+        "  python main.py --demo urfd fall-01\n\n" % ", ".join(_MISSING))
     sys.exit(1)
 
 import cv2
@@ -52,15 +52,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# 共享 A4 核心（同目录 import，无跨目录路径问题）
+# Shared A4 core (imported from the same folder, so no cross-folder path issues)
 from a4_core import (make_windows, extract_window_features, HybridAlgorithm,
                      KinematicBase, TemporalBase, WIN_FRAMES, STEP_FRAMES, IN_DIM)
 
 # ===========================================================================
-# 路径
+# Paths
 # ===========================================================================
 HERE = os.path.dirname(os.path.abspath(__file__))            # standalone/
-PROJECT = os.path.abspath(os.path.join(HERE, ".."))          # 项目根
+PROJECT = os.path.abspath(os.path.join(HERE, ".."))          # project root
 YOLO_ONNX = os.path.join(HERE, "yolov8n-pose.onnx")
 POSE_CKPT = os.path.join(HERE, "pose_best.pt")
 A4_WEIGHTS = os.path.join(HERE, "a4_weights.pkl")
@@ -70,7 +70,7 @@ SRC_FPS = {"urfd": 30.0, "mc": 30.0, "le2i": 25.0}
 SAMPLE_FPS = 15.0
 
 # ===========================================================================
-# 数据源与 GT 定位（内联，只针对真实数据集）
+# Data sources and ground-truth lookup (inline, for the real datasets only)
 # ===========================================================================
 def _kaggle_dir(slug):
     home = os.path.expanduser("~")
@@ -171,14 +171,14 @@ def _source_of(dataset, seq):
     if dataset == "urfd":
         return _urfd_frames_dir(seq), 30.0
     if dataset == "mc":
-        # MCF 视频实际为 120fps（高速录制），语义标注按 30fps。
-        # 采样 step 用实际 fps，保证采样密度正确且推理不过慢。
+        # MCF videos are actually 120 fps (high-speed recording), while the annotations use 30 fps.
+        # The sampling step uses the real fps so the sampling density is correct and inference is not too slow.
         return _mc_video_path(seq), 120.0
     if dataset == "le2i":
         for name, path in _le2i_list_videos():
             if name == seq:
                 return path, 25.0
-    raise ValueError(f"未知序列 {dataset}/{seq}")
+    raise ValueError(f"Unknown sequence {dataset}/{seq}")
 
 
 def _gt_intervals(dataset, seq):
@@ -214,7 +214,7 @@ def _iter_frames(dataset, seq, sample_fps=15.0):
 
 
 # ===========================================================================
-# 环节① YOLO 人体检测（ONNX 现场推理，只用 box head）
+# Stage 1: YOLO person detection (live ONNX inference, box head only)
 # ===========================================================================
 class YOLOPersonDetector:
     def __init__(self, model_path=YOLO_ONNX, conf=0.35, iou=0.45):
@@ -253,7 +253,7 @@ class YOLOPersonDetector:
 
 
 # ===========================================================================
-# 环节② 自研 P1 小型 U-Net 姿态估计（从零训练权重现场推理）
+# Stage 2: our small P1 U-Net pose estimation (weights trained from scratch, live inference)
 # ===========================================================================
 IMG_H, IMG_W = 256, 192
 OUT_H, OUT_W = 64, 48
@@ -310,7 +310,7 @@ def _affine_matrix(center, scale, rot_deg, out_w, out_h):
 
 
 class PoseExtractor:
-    """自研 P1 姿态推理器（现场推理，不读缓存）。"""
+    """Our P1 pose estimator (live inference, no cache)."""
     def __init__(self, ckpt_path=POSE_CKPT, device=None):
         ck = torch.load(ckpt_path, map_location="cpu", weights_only=False)
         self.model = SmallUNet()
@@ -320,7 +320,7 @@ class PoseExtractor:
         self.model.to(self.device)
 
     def extract(self, img, bbox_px):
-        """img BGR; bbox_px [x1,y1,x2,y2] 像素坐标 → (kpts [17,2], conf [17])。"""
+        """img BGR; bbox_px [x1,y1,x2,y2] in pixels -> (kpts [17,2], conf [17])."""
         x1, y1, x2, y2 = [float(v) for v in bbox_px]
         bbox = np.asarray([x1, y1, max(1.0, x2 - x1), max(1.0, y2 - y1)], np.float32)
         cx, cy = bbox[0] + bbox[2] / 2.0, bbox[1] + bbox[3] / 2.0
@@ -343,10 +343,10 @@ class PoseExtractor:
 
 
 # ===========================================================================
-# 环节③ A4 混合集成（加载已训练权重，现场推理）
+# Stage 3: A4 hybrid ensemble (trained weights loaded, live inference)
 # ===========================================================================
 class A4Algorithm:
-    """加载 pickle 权重（a4_weights.pkl），现场推理。"""
+    """Load the pickled weights (a4_weights.pkl) for live inference."""
     def __init__(self, weights_path=A4_WEIGHTS, device=None):
         with open(weights_path, "rb") as f:
             data = pickle.load(f)
@@ -373,7 +373,7 @@ class A4Algorithm:
 
 
 # ===========================================================================
-# 可视化
+# Visualization
 # ===========================================================================
 COCO_EDGES = [(0, 1), (0, 2), (1, 3), (2, 4), (0, 5), (0, 6), (5, 7), (7, 9),
               (6, 8), (8, 10), (5, 11), (6, 12), (11, 13), (13, 15), (12, 14), (14, 16)]
@@ -402,17 +402,17 @@ def draw_skeleton(img, kpts, conf, box_norm=None, thr=0.3):
 
 
 # ===========================================================================
-# 主流程
+# Main flow
 # ===========================================================================
 def run_demo(dataset, seq, save_path=None, headless=False):
-    print(f"[加载模型] YOLO + P1 姿态 + A4 ...", flush=True)
+    print(f"[loading models] YOLO + P1 pose + A4 ...", flush=True)
     det = YOLOPersonDetector()
     pose = PoseExtractor()
     alg = A4Algorithm()
 
     gt = _gt_intervals(dataset, seq)
-    print(f"[{dataset}/{seq}] GT 跌倒区间(秒)={gt}", flush=True)
-    print("[可视化] 空格=暂停/继续  ESC=退出", flush=True)
+    print(f"[{dataset}/{seq}] ground-truth fall interval (s)={gt}", flush=True)
+    print("[visualization] Space=pause/resume  ESC=quit", flush=True)
 
     win_buf = []
     kpts_hist = []
@@ -429,14 +429,14 @@ def run_demo(dataset, seq, save_path=None, headless=False):
         if box_norm is not None and score > 0:
             x1, y1, x2, y2 = box_norm
             box_px = [x1 * W, y1 * H, x2 * W, y2 * H]
-            # ② 姿态
+            # Stage 2: pose
             pts, conf = pose.extract(frame, box_px)
             kpts_norm = np.stack([pts[:, 0] / W, pts[:, 1] / H, conf], axis=1).astype(np.float32)
             kpts_hist.append(kpts_norm)
         else:
             kpts_hist.append(np.zeros((17, 3), np.float32))
 
-        # ③ A4 滑窗时序检测
+        # Stage 3: A4 sliding-window temporal decision
         cur_prob = 0.0
         if len(kpts_hist) >= WIN_FRAMES:
             kwin = np.stack(kpts_hist[-WIN_FRAMES:]).astype(np.float32)
@@ -444,7 +444,7 @@ def run_demo(dataset, seq, save_path=None, headless=False):
             cur_prob = float(wp[0]) if len(wp) else 0.0
             win_buf.append(cur_prob)
 
-        # 可视化
+        # Visualization
         vis = frame.copy()
         if box_px is not None:
             draw_skeleton(vis, pts, conf, box_norm)
@@ -488,24 +488,24 @@ def run_demo(dataset, seq, save_path=None, headless=False):
     cv2.destroyAllWindows()
     if writer is not None:
         writer.release()
-        print(f"[保存] 可视化视频 → {save_path}")
+        print(f"[saved] visualization video -> {save_path}")
     if win_buf:
-        print(f"\n[{dataset}/{seq}] 共处理 {frame_i} 帧，最大窗口概率={max(win_buf):.3f}")
-    print(f"GT 跌倒区间(秒)={gt}")
+        print(f"\n[{dataset}/{seq}] processed {frame_i} frames, maximum window probability={max(win_buf):.3f}")
+    print(f"ground-truth fall interval (s)={gt}")
     return win_buf, gt
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--demo", nargs=2, metavar=("DATASET", "SEQ"),
-                    help="端到端推理+可视化：--demo urfd fall-01")
-    ap.add_argument("--save", default=None, help="保存可视化视频路径（如 out.mp4）")
-    ap.add_argument("--headless", action="store_true", help="无窗口模式（配合 --save）")
-    ap.add_argument("--list", action="store_true", help="列出可选序列后退出")
+                    help="end-to-end inference + visualization: --demo urfd fall-01")
+    ap.add_argument("--save", default=None, help="path to save the visualization video (e.g. out.mp4)")
+    ap.add_argument("--headless", action="store_true", help="no window (use with --save)")
+    ap.add_argument("--list", action="store_true", help="list the available sequences and exit")
     a = ap.parse_args()
 
     if a.list:
-        print("可选序列（--demo <数据集> <序列>）：")
+        print("Available sequences (--demo <dataset> <sequence>):")
         print("  urfd :", " ".join(
             sorted(os.path.basename(d).split("-")[0]
                    for d in glob.glob(os.path.join(URFD_ROOT, "frames", "*-cam0-rgb")))))
@@ -522,10 +522,10 @@ def main():
     if a.demo:
         dataset, seq = a.demo
     else:
-        # 不传参数时：默认跑 urfd fall-01，点运行即可实时看到预测效果
+        # Without arguments run urfd fall-01 by default, so pressing Run shows the predictions live
         dataset, seq = "urfd", "fall-01"
-        print("[默认演示] 未指定序列，使用 urfd/fall-01。"
-              "可用 --demo <数据集> <序列> 指定其它序列。")
+        print("[default demo] no sequence given, using urfd/fall-01. "
+              "Use --demo <dataset> <sequence> to choose another one.")
     run_demo(dataset, seq, save_path=a.save, headless=a.headless)
 
 

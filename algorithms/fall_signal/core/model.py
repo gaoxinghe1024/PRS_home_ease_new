@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""最优组合分类器：RF(400) + XGB(400) 概率平均。
+"""Classifier of the best combination: RF(400) + XGB(400) probability average.
 
-与 `04_alg_ml/src/ml_algorithm.py`（A2）参数完全一致：
+Parameters identical to `04_alg_ml/src/ml_algorithm.py` (A2):
   RF  : n_estimators=400, max_depth=10, min_samples_leaf=2, class_weight='balanced'
   XGB : n_estimators=400, max_depth=5, lr=0.06, subsample=0.9,
-        colsample_bytree=0.9, reg_lambda=1.0, scale_pos_weight=(负/正)
-两者取 predict_proba 的**算术平均**作为窗口跌倒概率。
+        colsample_bytree=0.9, reg_lambda=1.0, scale_pos_weight=(negative/positive)
+The **arithmetic mean** of both predict_proba outputs is the window fall probability.
 
-模型产物（RF + XGB 两个已 fit 的估计器）用 joblib 序列化到 model/best_model.pkl。
+The model (the two fitted RF + XGB estimators) is serialized with joblib to model/best_model.pkl.
 """
 import os
 import json
@@ -18,7 +18,7 @@ from . import features as F
 
 
 class BestFallModel:
-    """A2 最优组合：RF + XGB 概率平均。"""
+    """A2 best combination: RF + XGB probability average."""
 
     name = "A2_RF+XGB_avg"
 
@@ -28,7 +28,7 @@ class BestFallModel:
         self.models = {}
         self.meta = {}
 
-    # ---------------------------------------------------------------- 训练
+    # ---------------------------------------------------------------- training
     def _build(self, spw):
         from sklearn.ensemble import RandomForestClassifier
         from xgboost import XGBClassifier
@@ -41,11 +41,11 @@ class BestFallModel:
         return m
 
     def set_inference_jobs(self, n_jobs=C.INFER_JOBS):
-        """固定推理期线程数。
+        """Fix the number of inference threads.
 
-        流式检测每次只评估**一个**窗口，`n_jobs=-1` 只会为单样本创建/同步线程池
-        （实测单窗 ≈100 ms，绝大部分是调度开销；RF 400 树 22 ms + XGB 0.4 ms 才是
-        真实计算量）。固定为单线程后单窗 ≈23 ms，而预测值是确定性的，**结果逐位不变**。
+        Streaming detection evaluates **one** window at a time, and `n_jobs=-1` would only create / synchronize a thread
+        pool for a single sample (measured about 100 ms per window, mostly scheduling; the real work is 22 ms for the
+        400 RF trees + 0.4 ms for XGB). With one thread a window takes about 23 ms, and since predictions are deterministic **the results are bit-identical**.
         """
         for m in self.models.values():
             try:
@@ -62,7 +62,7 @@ class BestFallModel:
         return self
 
     def fit(self, wins, labels, fs=None):
-        """wins [N,win_n,4]、labels [N] → self。"""
+        """wins [N,win_n,4], labels [N] -> self."""
         if fs is not None:
             self.fs = float(fs)
         y = np.asarray(labels, np.int64)
@@ -71,7 +71,7 @@ class BestFallModel:
         self.models = self._build(spw)
         for m in self.models.values():
             m.fit(X, y)
-        self.set_inference_jobs()          # 训练用满核，推理收敛到单线程
+        self.set_inference_jobs()          # training uses all cores, inference goes back to one thread
         self.meta = {
             "algorithm": self.name,
             "fs": self.fs,
@@ -91,16 +91,16 @@ class BestFallModel:
         }
         return self
 
-    # ---------------------------------------------------------------- 推理
+    # ---------------------------------------------------------------- inference
     def predict_proba(self, wins):
-        """wins [N,win_n,4] → 平均跌倒概率 [N]。空输入返回空数组。"""
+        """wins [N,win_n,4] -> mean fall probability [N]. Empty input returns an empty array."""
         if len(wins) == 0 or not self.models:
             return np.zeros(len(wins), np.float64)
         X = F.extract(wins, self.fs)
         probs = [m.predict_proba(X)[:, 1] for m in self.models.values()]
         return np.mean(probs, axis=0)
 
-    # ------------------------------------------------------------ 持久化
+    # ------------------------------------------------------------ persistence
     def save(self, path):
         import joblib
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
@@ -113,12 +113,12 @@ class BestFallModel:
         obj = cls(fs=blob.get("meta", {}).get("fs", C.RESAMPLE_FS))
         obj.models = blob["models"]
         obj.meta = blob.get("meta", {})
-        obj.set_inference_jobs()           # 载入即固定推理线程
+        obj.set_inference_jobs()           # inference threads are fixed on load
         return obj
 
 
 def feature_importance(model):
-    """RF 与 XGB 的归一化重要性平均，返回 [(name, value)] 降序。"""
+    """Average of the normalized RF and XGB importances, returned as [(name, value)] in descending order."""
     names = F.feature_names()
     imp = []
     if "rf" in model.models:

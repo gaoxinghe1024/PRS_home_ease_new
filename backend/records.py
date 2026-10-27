@@ -1,14 +1,14 @@
-"""删除跌倒事件与运动训练记录，连同关联通知、录像片段与回放派生文件。
+"""Delete fall events and exercise sessions together with their notifications, video clips and playback copies.
 
-与应用内的查看路径保持一致：
+The paths match the ones the application reads from:
 
-* 录像片段 ``runtime/video_bridge/systems/records/clips/<clip>``
-* 回放派生文件 ``runtime/playback/<clip>``
-* 原视频引擎自己的明细 ``runtime/video_bridge/systems/records/falls.db``
+* video clips ``runtime/video_bridge/systems/records/clips/<clip>``
+* playback copies ``runtime/playback/<clip>``
+* the video engine's own records ``runtime/video_bridge/systems/records/falls.db``
 
-删除是**逐条精确**的：只处理与所选记录一一对应的片段，不清空整个目录，
-不触碰居民资料、联系人、声音历史与监测覆盖记录。所有文件操作都限制在数据目录内。
-调用方（``care/services.py``）负责取报告范围与记录编号；本模块不做范围判断。
+Deletion is **exact**: only the clips that belong to the selected records are removed, no directory is emptied,
+and resident data, contacts, sound history and coverage records are never touched. All file operations stay inside the data directory.
+The caller (``backend/services.py``) resolves the report range and the record ids; this module does not check ranges.
 """
 
 import json
@@ -26,7 +26,7 @@ PLAYBACK = RUNTIME / "playback"
 
 
 def _inside(path):
-    """只允许删除数据目录内的真实文件（拒绝符号链接与越界路径）。"""
+    """Only allow deleting real files inside the data directory (no symbolic links, no paths outside it)."""
     try:
         resolved = path.resolve()
     except OSError:
@@ -37,7 +37,7 @@ def _inside(path):
 
 
 def clip_names(events):
-    """事件里登记的录像片段名（去重，保留顺序）。"""
+    """Clip names registered in an event (deduplicated, in order)."""
     names = []
     for event in events:
         clip = (event.get("evidence") or {}).get("clip")
@@ -48,7 +48,7 @@ def clip_names(events):
 
 
 def drop_evidence(names):
-    """删除片段文件、回放派生文件与引擎明细，返回各自删除的数量（尽力而为）。"""
+    """Delete clip files, playback copies and engine records; return how many of each were removed (best effort)."""
     removed = {"clips": 0, "playback": 0, "engine_rows": 0}
     for name in names:
         for directory, key in ((CLIPS, "clips"), (PLAYBACK, "playback")):
@@ -66,7 +66,7 @@ def drop_evidence(names):
                 removed["engine_rows"] = conn.execute(
                     f"DELETE FROM falls WHERE clip IN ({placeholders})", names).rowcount
         except sqlite3.Error:
-            # 视频工作进程可能正占用该库；片段文件已删除，明细留待下次清理。
+            # The video worker may hold this database; the clip files are gone, the records are cleaned up next time.
             log.warning("Cannot clear the engine details %s", ENGINE_DB)
     return removed
 
@@ -84,7 +84,7 @@ def drop_exercise_traces(ids):
 
 
 class Records:
-    """记录删除：事件与训练各自独立，通知随事件一并删除。"""
+    """Record deletion: events and sessions are independent; notifications are deleted with their event."""
 
     def __init__(self, store):
         self.store = store
@@ -115,7 +115,7 @@ class Records:
         return {"sessions": deleted}
 
     def scope(self, mode, since, events=True, sessions=True):
-        """清空某个报告范围：默认同时删除事件与训练记录。"""
+        """Clear a report range: by default both events and exercise sessions are deleted."""
         result = {"events": 0, "notifications": 0, "sessions": 0, "clips": 0, "playback": 0, "engine_rows": 0}
         if events:
             with self.store.connection() as conn:

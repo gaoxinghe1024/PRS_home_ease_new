@@ -106,7 +106,7 @@ class ExercisePlan(Model):
     note: str = Field(default="", max_length=300)
     target_reps: int = Field(default=10, ge=1, le=10000)
     items: list[PlanItem] = Field(default_factory=list, max_length=4)
-    # 长者选择「今天先不做」时记下的日期（ISO 日期串，只保留当天及以后）。
+    # Dates on which the older adult chose "not today" (ISO date strings; only today and later are kept).
     skipped_dates: list[str] = Field(default_factory=list, max_length=64)
     updated_at: str | None = None
     updated_by: Literal["caregiver", "elder"] = "caregiver"

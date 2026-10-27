@@ -1,43 +1,43 @@
-# 数据卡与评估边界
+# Data Card and Evaluation Limits
 
-## UI-PRMD 原始骨架
+## UI-PRMD raw skeletons
 
-| 项目 | 记录 |
+| Item | Record |
 |---|---|
-| 官方来源 | https://webpages.uidaho.edu/ui-prmd/ |
-| 本次下载来源 | jkaethee/UI-PRMD_Exercise_Model 原始文本镜像 |
-| 固定提交 | 475c66aba07731adbe1c90a15462fd30be564593 |
-| 数据文件 | 2,000 个 Positions／Angles 文本，98,438,042 bytes |
-| 骨架片段 | 1,000，每片段 22 关节，30 Hz |
-| 参与者 | 10，不能视为老人代表样本 |
-| 四目标动作 | m05 坐站、m01 深蹲、m06 直腿抬腿、m02 跨步 |
-| 负样本动作 | m07 肩部抬举 |
-| 正确／不正确执行 | 每动作每人各 10 片段，均按人划分 |
-| 训练／验证／测试 | s01–06／s07–08／s09–10，600／200／200 片段 |
-| 来源真值 | 动作类别、参与者、分段重复编号、正确／不正确执行 |
-| 本项目弱标注 | 根据完整片段的运动学信号产生的四阶段标签 |
-| 本项目派生输入 | 真实 3D 骨架的 25°／45°／65°相机平面投影 |
-| 推理 confidence | 来源骨架投影 confidence=1，并非实际 Pose CNN 的可见性置信度 |
-| Count 评估 | 两人每动作正确片段拼接；坐站每人9，其他每人10；总78周期 |
-| 负回放 | 两人的 m07 片段，不应计数 |
-| 视频证据 | 不含实际 RGB 摄像头计数验收 |
+| Official source | https://webpages.uidaho.edu/ui-prmd/ |
+| Download source | raw text mirror jkaethee/UI-PRMD_Exercise_Model |
+| Pinned commit | 475c66aba07731adbe1c90a15462fd30be564593 |
+| Data files | 2,000 Positions / Angles text files, 98,438,042 bytes |
+| Skeleton segments | 1,000, 22 joints per segment, 30 Hz |
+| Participants | 10; not a representative sample of older adults |
+| Four target exercises | m05 sit-to-stand, m01 deep squat, m06 straight-leg raise, m02 hurdle step |
+| Negative exercise | m07 shoulder raise |
+| Correct / incorrect executions | 10 segments each per exercise and person, split by person |
+| Train / validation / test | s01-06 / s07-08 / s09-10, 600 / 200 / 200 segments |
+| Source ground truth | exercise class, participant, segment repetition number, correct / incorrect execution |
+| Weak labels of this project | four-phase labels derived from the kinematic signal of the whole segment |
+| Derived input of this project | 25 / 45 / 65 degree camera-plane projections of the real 3D skeletons |
+| Inference confidence | projected source skeletons have confidence=1, not the visibility confidence of a real pose CNN |
+| Count evaluation | correct segments of two people per exercise concatenated; sit-to-stand 9 per person, the others 10; 78 cycles in total |
+| Negative replays | the m07 segments of the two people, which must not be counted |
+| Video evidence | no count acceptance on real RGB camera video |
 
-每个文件的来源 URL、SHA-256、Git blob SHA 与大小都在 `data/raw/uiprmd/manifest.json`。重新下载脚本默认固定提交，并核对原始 blob SHA，防止同大小的缓存文件损坏未被发现。
+The source URL, SHA-256, Git blob SHA and size of every file are in `data/raw/uiprmd/manifest.json`. The download script pins the commit by default and checks the original blob SHA, so a corrupted cached file of the same size cannot go unnoticed.
 
-来源“不正确执行”不是计数无效的通用定义，例如动作幅度或姿态不标准也可能完成一个周期。本项目没有质量评判模型。因此它们用于增加动作／阶段训练多样性，最终基于正确执行的来源片段构造计数参考，不宣称识别不正确执行。
+"Incorrect execution" in the source is not a general definition of an invalid count: a movement with non-standard range or posture can still complete a cycle. This project has no quality-assessment model. These segments therefore add diversity to action / phase training, while the count reference is built from the correct-execution source segments only; recognizing incorrect executions is not claimed.
 
-标签曲线审计图与测试参与者事件日志可以验证来源周期和明显异常。该审计不能代替独立人工逐帧阶段标注。精确周期时间的指标使用弱边界，count=9／10 使用来源分段参考，解释时不能混淆。
+Audit plots of the label curves and the event logs of the test participants verify the source cycles and obvious anomalies. This audit cannot replace independent manual per-frame phase annotation. Metrics of exact cycle timing use weak boundaries, while count=9 / 10 uses the source segment reference; the two must not be confused when interpreting results.
 
-## COCO 姿态估计子集
+## COCO pose-estimation subset
 
-COCO 2017 val 的官方人体关键点标注，按 image_id 顺序取前 100 张符合标注关键点数≥6、area>4096、非 crowd 的图像，共 198 个人体、2,482 个可见关键点。选样在运行任何姿态模型前固定，保存 `data/coco/manifest.json`。
+The official person keypoint annotations of COCO 2017 val, taking in image_id order the first 100 non-crowd images with >= 6 annotated keypoints and area > 4096: 198 people and 2,482 visible keypoints. The selection was fixed before running any pose model and is saved in `data/coco/manifest.json`.
 
-其用途是相对比较预训练 Pose CNN 的通用感知精度与耗时。PCK@0.2bbox 是宽容阈值，平均 OKS 不是全量官方 AP。该子集不包含专门设计的老人家庭训练协议，也不提供重复计数标签。
+It serves a relative comparison of the general perception accuracy and latency of pre-trained pose CNNs. PCK@0.2bbox is a lenient threshold, and the mean OKS is not the full official AP. The subset contains no protocol designed for home training of older adults and no repetition count labels.
 
-## 使用与再分发
+## Use and redistribution
 
-公开镜像的可访问性不意味着作者授予新的数据许可。研究引用 UI-PRMD 原作者及官方来源，原始数据、图片、Ultralytics 库和预训练权重分别遵循原权利人与许可条款。向系统同学交接代码、权重、数据路径与下载方法时同时提供本数据卡；不把第三方资源重新声明为项目原创。
+Public accessibility of the mirror does not mean the authors granted a new data licence. Research cites the original UI-PRMD authors and the official source; the raw data, images, the Ultralytics library and the pre-trained weights follow the terms of their respective right holders. This data card accompanies the code, weights, data paths and download instructions when they are handed over; third-party resources are never presented as original work of the project.
 
-## 尚未覆盖
+## Not covered yet
 
-自然连续训练、老人参与者、不同椅高、真实衣着／照明／遮挡、多人交叉、双侧单独计数、日常动作负样本、训练动作安全与医学有效性。每一项均需独立数据及相应评估，当前结果不替代这些验证。
+Natural continuous training, older participants, different chair heights, real clothing / lighting / occlusion, people crossing, separate counts per side, negatives from daily activities, and the safety and medical effectiveness of the exercises. Each needs its own data and evaluation; the current results do not replace them.
