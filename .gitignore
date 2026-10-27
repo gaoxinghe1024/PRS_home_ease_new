@@ -1,13 +1,19 @@
+# Python
 .venv/
-runtime/
-/algorithm1/video/records/
-/algorithm1/video/uploads/
 __pycache__/
-.pytest_cache/
 *.pyc
+.pytest_cache/
+
+# Runtime data (database, logs, uploads, event clips)
+runtime/
+runtime-*/
+*.log
+
+# Local tooling
 node_modules/
-artifacts/browser/
+.DS_Store
+
+# Secrets
 .env
 .env.*
 !.env.example
-*.log
