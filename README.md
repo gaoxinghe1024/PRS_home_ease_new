@@ -86,7 +86,7 @@ More detail: [docs/architecture.md](docs/architecture.md).
 | **2. Exercise recognition and counting** | YOLO11n-pose keypoints -> stable80 features -> hierarchical causal TCN (action head + per-exercise phase heads) -> ordered-transition decoder -> complete-cycle counter | test action Macro-F1 **0.9612**, count MAE **0.10** reps, MAPE **1.25%** (UI-PRMD reconstructed replays); 11 architectures compared | [`algorithms/exercise`](algorithms/exercise) |
 | **3. Sound and voice** | Silero VAD; YAMNet embedding + logistic regression for sound events; Whisper tiny + reply rules v2 for calls for help and inquiry replies; optional voiceprint gate | reply recognition Macro-F1 0.894 (rules v2); Silero speech-gate precision 0.995 | [`algorithms/audio`](algorithms/audio) |
 
-Each algorithm folder has its own README with the design, experiments and results. Algorithm 2 additionally documents its full development and optimization process in [`algorithms/exercise/docs`](algorithms/exercise/docs).
+The video, accelerometer and audio folders each have a README with the design, experiments and results. Algorithm 2 keeps the code the system serves in `homeease/` and its offline experiments in `pipeline/`, driven by `python -m algorithms.exercise <stage>`; `python -m algorithms.exercise report` regenerates its result tables and figures from the recorded experiment JSON in [`algorithms/exercise/reports`](algorithms/exercise/reports).
 
 ## Repository layout
 
@@ -111,7 +111,7 @@ HomeEase-Care-System/
 ├── algorithms/
 │   ├── fall_video/           # Algorithm 1a: video fall detection
 │   ├── fall_signal/          # Algorithm 1b: accelerometer fall detection
-│   ├── exercise/             # Algorithm 2: exercise recognition and counting
+│   ├── exercise/             # Algorithm 2: exercise recognition and counting (homeease/ + pipeline/)
 │   └── audio/                # Algorithm 3: sound events, calls for help, voice inquiry
 ├── samples/                  # URFD fall-01 video and accelerometer samples
 ├── scripts/
@@ -196,7 +196,7 @@ Only one server instance may use a data folder at a time; starting a second one 
 | [docs/home-use.md](docs/home-use.md) | the household entry and continuous monitoring |
 | [docs/exercise-integration.md](docs/exercise-integration.md) | deployment adaptations of Algorithm 2 for live cameras and how they were checked |
 | [samples/SOURCES.md](samples/SOURCES.md) | sources of the bundled samples |
-| Algorithm READMEs | [fall_video](algorithms/fall_video/README.md), [fall_signal](algorithms/fall_signal/README.md), [exercise](algorithms/exercise/README.md), [audio](algorithms/audio/README.md) |
+| Algorithm READMEs | [fall_video](algorithms/fall_video/README.md), [fall_signal](algorithms/fall_signal/README.md), [audio](algorithms/audio/README.md); Algorithm 2 stages: [pipeline/cli.py](algorithms/exercise/pipeline/cli.py) |
 
 ## Limitations
 

@@ -1,4 +1,4 @@
-"""Shared inference engine for SDK, replay, video and HTTP integration."""
+"""Causal phase inference and the counting session shared by SDK, replay, video and HTTP."""
 import json
 import threading
 from collections import deque
@@ -81,7 +81,7 @@ class PhaseStream:
 
 
 class MirroredPhaseStream:
-    """Average the two views already used by the original training augmentation."""
+    """Average the original view and its mirror, the pair the training augmentation used."""
     def __init__(self, predictor):
         self.original = predictor.stream()
         self.mirrored = predictor.stream()
@@ -107,8 +107,8 @@ class MirroredPhaseStream:
                     for pose, reflected, timestamp in views]
         predictor = self.original.predictor
         probabilities = []
-        # Each tick retains its own causal window. Only independent model calls
-        # for already available ticks and views share a batch; no future frames wait.
+        # Each tick keeps its own causal window; only ticks that are already
+        # available share a batch, so nothing waits for a future frame.
         with predictor.lock, torch.inference_mode():
             for index, member in enumerate(predictor.members):
                 batch = [stream._window(index, view, timestamp)
@@ -138,8 +138,8 @@ class ExerciseSession:
         self.counting_policy = counting_policy
         self.pose_phases = PoseCyclePhases(exercise) if counting_policy != "original" else None
         self.counting_phase = "other"
-        # Slow chair movements still have usable endpoint observations at 3 FPS.
-        # Lost joints and people continue to invalidate a cycle immediately.
+        # A slow chair movement still leaves usable endpoint poses at 3 FPS.
+        # Lost joints or a new person invalidate the cycle straight away.
         self.max_input_gap_s = .4 if counting_policy == "pose_cycle_v2" else .25
         self.predictor, self.session_id, self.target_reps = predictor, session_id, target_reps
         use_mirror = action_scope == "training" and exercise in {"standing_leg_raise", "hurdle_step"}
@@ -235,7 +235,7 @@ class ExerciseSession:
                 self.next_tick += 1 / 30
             update_many = getattr(self.stream, "update_many", None)
             if type(self.stream) is PhaseStream and self.counting_policy != "pose_cycle_v2":
-                # Keep the original SDK/replay/squat computation path.
+                # The original SDK, replay and squat path stays per frame.
                 update_many = None
             posteriors = (update_many(observations) if update_many is not None else
                           (self.stream.update(pose, tick) for pose, tick in observations))
@@ -260,8 +260,8 @@ class ExerciseSession:
                     self.counting_phase = self.pose_phases.update(observed_pose, tick, self.counter.stage)
                     self.counter.update(self.counting_phase, tick)
                 elif hold_action_gap:
-                    # Keep the confirmed stage for a brief classifier rejection;
-                    # no new stage or repetition is inferred during this hold.
+                    # A short classifier rejection keeps the confirmed stage; it
+                    # never advances or completes a repetition on its own.
                     self.counter.update(PHASES[self.counter.stage], tick)
                 elif self.predictor.selected.get("decoder_strategy") in ["ordered_posterior", "ordered_transition"]:
                     self.counter.update_probabilities(canonical, tick, self.predictor.selected["phase_evidence_threshold"],
@@ -301,7 +301,7 @@ class ExerciseSession:
             index = PHASES.index(self.counting_phase)
             phase = EXERCISES[self.exercise]["phases"][index] if index < 4 else "other"
             if phase == "other" and self.pose_phases.posture in {"standing", "sitting"}:
-                # Recognizing a posture does not mean a repetition has started.
+                # A recognized posture is not a repetition that has started.
                 phase = self.pose_phases.posture
         return {"api_version": "v1", "session_id": self.session_id, "status": self.status,
                 "counting_policy": self.counting_policy, "model_phase": self.phase,

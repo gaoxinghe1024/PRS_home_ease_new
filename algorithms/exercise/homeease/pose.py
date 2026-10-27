@@ -1,4 +1,4 @@
-"""Reusable pose CNN adapter. Ambiguous multi-person observations abstain."""
+"""Pose CNN adapter; an ambiguous multi-person frame abstains."""
 import json
 from pathlib import Path
 

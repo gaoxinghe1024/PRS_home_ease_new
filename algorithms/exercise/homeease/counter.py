@@ -1,4 +1,4 @@
-"""Debounced ordered cycle counting; interruptions invalidate an open cycle."""
+"""Debounced ordered cycle counting; any interruption drops an open cycle."""
 from dataclasses import dataclass, field
 
 PHASES = ["rest", "outbound", "hold", "return", "other"]
@@ -51,17 +51,16 @@ class CycleCounter:
         return False
 
     def update_probabilities(self, probabilities, timestamp, threshold=.35, infer_return=False):
-        """Ordered posterior evidence can preserve short peaks below argmax."""
+        """Ordered posterior evidence, so a short peak below argmax still counts."""
         if probabilities[4] >= .5:
             return self.update("other", timestamp)
         next_stage = 0 if self.stage < 0 else (self.stage + 1) % 4
         if infer_return and self.stage == 2 and probabilities[0] >= .6:
-            # A visible return to baseline after a confirmed peak supplies return
-            # evidence even if the classifier misses the brief transition phase.
+            # Back at baseline after a confirmed peak: the brief return phase may
+            # never win the argmax, but the visible descent is enough evidence.
             return self.update("return", timestamp)
         required = max(.5, threshold) if next_stage == 0 else threshold
         if probabilities[next_stage] >= required:
             return self.update(PHASES[next_stage], timestamp)
-        # Preserve an already confirmed phase while waiting for the next one.
         current = self.stage if self.stage >= 0 else 4
         return self.update(PHASES[current], timestamp)

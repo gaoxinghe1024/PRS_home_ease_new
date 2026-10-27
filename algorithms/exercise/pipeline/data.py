@@ -1,20 +1,70 @@
-"""Reconstruct original skeletons and export explicit weak phase annotations."""
+"""Download the UI-PRMD clips and turn them into skeletons with weak phase labels."""
+import hashlib
 import json
 import re
-import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from urllib.parse import quote
 
 import numpy as np
+import requests
 from scipy.ndimage import gaussian_filter1d
 from scipy.spatial.transform import Rotation
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-from homeease.features import extract_sequence
 from homeease.exercises import MOVEMENT_TO_INDEX
 
+from .common import ROOT
+from .config import LABEL_SOURCE
+
+REPO = "jkaethee/UI-PRMD_Exercise_Model"
+REVISION = "475c66aba07731adbe1c90a15462fd30be564593"
 PARENTS = [-1, 0, 1, 2, 3, 4, 2, 6, 7, 8, 2, 10, 11, 12, 0, 14, 15, 16, 0, 18, 19, 20]
 NODES = [7, 11, 8, 12, 9, 13, 14, 18, 15, 19, 16, 20]
+
+
+def fetch(url):
+    for attempt in range(5):
+        try:
+            response = requests.get(url, timeout=90)
+            response.raise_for_status()
+            return response.content
+        except requests.RequestException:
+            if attempt == 4:
+                raise
+            time.sleep(2 ** attempt)
+
+
+def download(movements=("m01", "m02", "m05", "m06", "m07"), revision=REVISION):
+    dest = ROOT / "data/raw/uiprmd"
+    dest.mkdir(parents=True, exist_ok=True)
+    commit = json.loads(fetch(f"https://api.github.com/repos/{REPO}/commits/{revision}"))["sha"]
+    tree = json.loads(fetch(f"https://api.github.com/repos/{REPO}/git/trees/{commit}?recursive=1"))
+    entries = [e for e in tree["tree"] if e["path"].startswith(("Segmented Movements/Kinect/", "Incorrect Segmented Movements/Kinect/"))
+               and e["path"].endswith(".txt") and any(f"/{m}_" in e["path"] for m in movements)]
+
+    def save(entry):
+        path = entry["path"]
+        local = dest / Path(path).name
+        url = f"https://raw.githubusercontent.com/{REPO}/{commit}/{quote(path)}"
+        if not local.exists() or local.stat().st_size != entry["size"]:
+            local.write_bytes(fetch(url))
+        raw = local.read_bytes()
+        blob_hash = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+        if blob_hash != entry["sha"]:
+            raw = fetch(url)
+            blob_hash = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+            if blob_hash != entry["sha"]:
+                raise ValueError(f"Source blob integrity failed: {path}")
+            local.write_bytes(raw)
+        return {"file": local.name, "source_path": path, "url": url,
+                "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(), "git_blob_sha": entry["sha"]}
+
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        manifest = list(pool.map(save, entries))
+    (dest / "manifest.json").write_text(json.dumps({"dataset": "UI-PRMD", "official": "https://webpages.uidaho.edu/ui-prmd/",
+        "mirror": REPO, "commit": commit, "movements": movements, "files": manifest}, indent=2), encoding="utf-8")
+    print(f"Downloaded {len(manifest)} files, {sum(e['bytes'] for e in manifest):,} bytes; commit {commit}", flush=True)
 
 
 def reconstruct(position_path):
@@ -32,7 +82,7 @@ def reconstruct(position_path):
 
 
 def project(skeleton, angle=45):
-    # Oblique views expose knee flexion; y-up mocap becomes y-down camera space.
+    # An oblique view exposes knee flexion; y-up mocap becomes y-down camera space.
     theta = np.deg2rad(angle)
     p = skeleton[:, NODES]
     xy = np.stack([p[:, :, 0] * np.cos(theta) + p[:, :, 2] * np.sin(theta), -p[:, :, 1]], axis=-1)
@@ -49,7 +99,7 @@ def motion_signal(skeleton, movement):
 def weak_labels(skeleton, movement):
     if movement not in MOVEMENT_TO_INDEX:
         return np.full(len(skeleton), 16, dtype=np.int64)
-    # Offline annotation heuristic, never used as an inference input or count oracle.
+    # Annotation heuristic only; it is never an inference input or a count oracle.
     h = gaussian_filter1d(motion_signal(skeleton, movement), 1.3)
     lo, hi = np.quantile(h, [.05, .95])
     relative = (h - lo) / max(hi - lo, 1)
@@ -60,7 +110,7 @@ def weak_labels(skeleton, movement):
     return (labels + 4 * MOVEMENT_TO_INDEX[movement]).astype(np.int64)
 
 
-def main():
+def prepare():
     records = []
     output = ROOT / "data/processed"
     output.mkdir(parents=True, exist_ok=True)
@@ -76,11 +126,11 @@ def main():
         split = "train" if int(subject) <= 6 else "validation" if int(subject) <= 8 else "test"
         records.append({"id": key, "subject": int(subject), "episode": int(episode), "movement": movement,
                         "incorrect": bool(incorrect), "split": split, "frames": len(skeleton),
-                        "phase_label_source": "weak_kinematic_offline_v2", "source_file": path.name})
+                        "phase_label_source": LABEL_SOURCE, "source_file": path.name})
     np.savez_compressed(output / "skeletons.npz", **arrays)
     (output / "records.json").write_text(json.dumps(records, indent=2), encoding="utf-8")
     print({s: sum(r["split"] == s for r in records) for s in ["train", "validation", "test"]})
-    # A human-readable audit of all correct sit-to-stand clips and phase boundaries.
+    # Plot the annotation signal of every clip so the weak boundaries can be eyeballed.
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -99,7 +149,3 @@ def main():
             fig.tight_layout()
             fig.savefig(audit / f"source_audit_{movement}_s{subject:02}.png", dpi=120)
             plt.close(fig)
-
-
-if __name__ == "__main__":
-    main()

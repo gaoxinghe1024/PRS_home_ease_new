@@ -1,4 +1,4 @@
-"""Shared camera-space features: COCO joints 5..16, x right and y down."""
+"""Camera-space features over COCO joints 5..16, x to the right and y down."""
 import numpy as np
 
 JOINT_NAMES = ["left_shoulder", "right_shoulder", "left_elbow", "right_elbow",
@@ -32,7 +32,7 @@ def frame_features(pose):
 
 
 def stable_features(pose):
-    """Torso scaling avoids shrinking the denominator when a leg flexes."""
+    """Scale by torso length, which does not shrink when a leg flexes."""
     p = np.asarray(pose, dtype=np.float32)[:, :2]
     hips = (p[6] + p[7]) * .5
     shoulders = (p[0] + p[1]) * .5
@@ -44,12 +44,12 @@ def stable_features(pose):
         min(q[8, 1], q[9, 1]), min(q[10, 1], q[11, 1]),
         q[8, 1] - q[9, 1], q[10, 1] - q[11, 1],
     ], dtype=np.float32)
-    # Angles are dimensionless; vertical limb signals retain unilateral motion.
+    # Angles are dimensionless; the vertical terms keep one-sided movement visible.
     return np.concatenate([q.reshape(-1), angles, extra])
 
 
 class FeatureExtractor:
-    """Causal EMA and backward difference, identical in training and serving."""
+    """Causal EMA plus backward difference, the same in training and serving."""
     def __init__(self, mode="hybrid", alpha=.65):
         self.mode, self.alpha = mode, alpha
         self.previous = None
