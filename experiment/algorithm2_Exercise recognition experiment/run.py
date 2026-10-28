@@ -1,4 +1,5 @@
-"""Standalone command line for the organized Algorithm 2 experiment snapshot."""
+"""Command line for exercise experiments."""
+
 
 if __name__ == "__main__":
     from pipeline.cli import main

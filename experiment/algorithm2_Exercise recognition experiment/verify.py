@@ -1,8 +1,4 @@
-"""Read-only model/data checks and real HTTP regression checks for Algorithm 2.
-
-Run in a fresh Python process. Runtime files and uploaded test videos use a temporary
-directory. No camera or microphone is opened, and no training/report stage is run.
-"""
+"""Check exercise data, models and HTTP integration in isolation."""
 import argparse
 import hashlib
 import importlib.metadata
@@ -44,7 +40,6 @@ def request(client, method, path, expected=200, **kwargs):
 
 
 def run_checks(include_system=True):
-    # Force local tool settings to the isolated run, not the user's actual settings.
     with tempfile.TemporaryDirectory(prefix="homeease-algorithm2-") as directory:
         runtime = Path(directory)
         os.environ["YOLO_CONFIG_DIR"] = str(runtime / "ultralytics")
@@ -106,8 +101,7 @@ def _run_checks(runtime, include_system):
                 raw = raw.replace(b"\r\n", b"\n")
             require(len(raw) == entry["bytes"] and hashlib.sha256(raw).hexdigest() == entry["sha256"],
                     "Artifact mismatch: " + entry["file"])
-        # Confirm the exporter survives a Windows text checkout while a binary
-        # checkpoint still gets an exact-byte hash.
+        # Text hashes must survive CRLF conversion; binary hashes must not change.
         from pipeline.common import artifact_manifest
         fixture = runtime / "manifest-fixture"
         (fixture / "artifacts").mkdir(parents=True)
@@ -120,8 +114,7 @@ def _run_checks(runtime, include_system):
         require(artifact_manifest(fixture) == before, "Manifest changes under CRLF")
         binary_entry = next(x for x in before if x["file"].endswith(".pt"))
         require(binary_entry["sha256"] == hashlib.sha256(weight.read_bytes()).hexdigest(), "Binary hash normalized")
-        # The experiment is a standalone snapshot. Confirm that this inspection
-        # starts with the same implementation/data/weights as the deployed copy.
+        # Check the experiment against the deployed files.
         snapshot_files = 0
         if include_system:
             for folder in ("homeease", "pipeline", "artifacts", "data/processed", "examples"):
@@ -289,8 +282,7 @@ def check_system(runtime, sdk):
                     request(client, "POST", f"/api/sessions/{sid}/control", json={"action": "pause"})
                     request(client, "POST", f"/api/sessions/{sid}/control", json={"action": "resume"})
                     request(client, "POST", f"/api/sessions/{sid}/control", json={"action": "end"})
-                # A generated empty scene exercises real video decoding, pose inference
-                # and the upload worker. It is explicitly a negative functional test.
+                # Exercise the upload and pose pipeline with an empty scene.
                 video_path = runtime / "empty-scene.avi"
                 writer = cv2.VideoWriter(str(video_path), cv2.VideoWriter_fourcc(*"MJPG"), 10, (320, 240))
                 require(writer.isOpened(), "Cannot encode the negative test video")
@@ -310,7 +302,6 @@ def check_system(runtime, sdk):
                 result = {"pages": pages, "counts": counts, "deployment_policies": policies,
                           "upload_negative": {"frames": 12, "count": state["count"]},
                           "exercise_worker": next(m for m in health["modules"] if m["id"] == "exercise")}
-                # Absolute PIDs/timestamps are transient; don't publish them as artifacts.
                 result["exercise_worker"].pop("pid", None)
                 result["exercise_worker"].pop("last_call", None)
                 return result

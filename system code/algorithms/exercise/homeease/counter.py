@@ -56,8 +56,7 @@ class CycleCounter:
             return self.update("other", timestamp)
         next_stage = 0 if self.stage < 0 else (self.stage + 1) % 4
         if infer_return and self.stage == 2 and probabilities[0] >= .6:
-            # Back at baseline after a confirmed peak: the brief return phase may
-            # never win the argmax, but the visible descent is enough evidence.
+            # Infer a short return phase when the pose reaches baseline.
             return self.update("return", timestamp)
         required = max(.5, threshold) if next_stage == 0 else threshold
         if probabilities[next_stage] >= required:

@@ -68,7 +68,6 @@ def train(epochs=25, seed=42, only=None):
             total_loss = 0
             for x, y in loader:
                 x, y = x.to(device), y.to(device)
-                # Small feature noise, training only.
                 prediction = model(x + torch.randn_like(x) * .015)
                 loss = loss_fn(prediction.transpose(1, 2), y)
                 optimizer.zero_grad(set_to_none=True)

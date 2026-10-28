@@ -16,12 +16,10 @@ def decode(probabilities, exercise, action_scope="open"):
     action = int(action_probabilities.argmax())
     target = EXERCISE_NAMES.index(exercise)
     phase = int(p[target * 4:target * 4 + 4].argmax())
-    # Rest poses look alike across exercises, so phases are conditioned on the
-    # exercise the user picked and need supporting action evidence once moving.
+    # Shared rest poses need action evidence before a motion phase.
     support = action_probabilities[target]
     if action_scope == "training":
-        # The training screen already knows the four candidate actions; score
-        # against those instead of letting the open-set prior wipe them out.
+        # Condition on the four training actions.
         support /= max(action_probabilities[:4].sum(), 1e-8)
     if phase != 0 and support < .15:
         phase = 4

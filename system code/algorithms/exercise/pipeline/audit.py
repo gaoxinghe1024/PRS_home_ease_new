@@ -35,7 +35,7 @@ def fixed_model():
     p = probabilities(np.repeat(pose[None], 300, axis=0))
     for exercise in EXERCISE_NAMES:
         output["static_all_targets"].append({"target": exercise, "count": count(p, exercise), "expected": 0})
-    # Re-time the old and the new default with identical warmup and thread settings.
+    # Compare models under the same timing settings.
     old = json.loads((ROOT / "reports/optimization/baseline/selected.json").read_text())
     for filename in old["members"] + selected["members"]:
         package = torch.load(ROOT / "artifacts" / filename, map_location="cpu", weights_only=True)

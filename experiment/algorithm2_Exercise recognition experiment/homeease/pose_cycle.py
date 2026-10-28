@@ -1,9 +1,4 @@
-"""Visible endpoint evidence for the two exercises counted from explicit camera training.
-
-The learned action/phase posteriors stay untouched; this policy only supplies
-movement phases to the ordered counter, for exercises whose transitions the
-camera-domain classifier represents poorly.
-"""
+"""Pose-based phases for seated stands and straight-leg raises."""
 import numpy as np
 
 from .features import cosine

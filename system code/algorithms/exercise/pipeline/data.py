@@ -130,7 +130,6 @@ def prepare():
     np.savez_compressed(output / "skeletons.npz", **arrays)
     (output / "records.json").write_text(json.dumps(records, indent=2), encoding="utf-8")
     print({s: sum(r["split"] == s for r in records) for s in ["train", "validation", "test"]})
-    # Plot the annotation signal of every clip so the weak boundaries can be eyeballed.
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt

@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-10-28T07:38:18.418405+00:00",
+  "checked_at_utc": "2026-10-28T08:02:09.872020+00:00",
   "scope": "Algorithm 2 only; real SDK, standalone HTTP and HomeEase HTTP",
   "python": "3.12.12",
   "platform": "Windows-11-10.0.26200-SP0",
@@ -31,7 +31,7 @@
         "manifest_lf_crlf_regression": true,
         "system_snapshot_files_compared": 52
       },
-      "seconds": 2.504
+      "seconds": 3.041
     },
     {
       "name": "four full replays through the original CPU SDK",
@@ -58,7 +58,7 @@
           "frames": 644
         }
       },
-      "seconds": 18.152
+      "seconds": 18.724
     },
     {
       "name": "standalone HTTP replay and session contract",
@@ -76,7 +76,7 @@
         "delete": true,
         "saved_openapi_properties": true
       },
-      "seconds": 20.61
+      "seconds": 19.0
     },
     {
       "name": "interruption and still-input safeguards",
@@ -87,7 +87,7 @@
         "missing_joint": true,
         "still_count": 0
       },
-      "seconds": 0.795
+      "seconds": 0.752
     },
     {
       "name": "real HomeEase server, worker, replay, controls and upload",
@@ -146,7 +146,7 @@
           }
         }
       },
-      "seconds": 78.955
+      "seconds": 80.802
     }
   ],
   "not_checked": [

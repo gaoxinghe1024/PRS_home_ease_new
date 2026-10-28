@@ -1,4 +1,4 @@
-"""Repository paths and seeding; importing this also puts the serving package on sys.path."""
+"""Shared paths and random seeds."""
 import hashlib
 import random
 import sys
@@ -20,11 +20,7 @@ def seeds(seed):
 
 
 def artifact_manifest(root=ROOT):
-    """Hash binary weights exactly and JSON with the repository's LF convention.
-
-    Windows text writes otherwise produce CRLF hashes that become stale when
-    .gitattributes normalizes the JSON during a Git commit/checkout.
-    """
+    """Hash JSON with LF endings and binary weights byte for byte."""
     entries = []
     for path in sorted((root / "artifacts").glob("*")):
         if not path.is_file():

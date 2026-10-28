@@ -109,7 +109,7 @@ def train(records, skeletons, epochs=80, seed=2026, only=None):
                 pose = pose[:, [1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]]
             training.append((extract_sequence(pose, mode="stable80"), labels))
     print(f"Prepared {len(training)} augmented clips", flush=True)
-    # Repetitions that follow each other are part of the deployment input, so train on them too.
+    # Include consecutive repetitions in training.
     for session in sessions_for(records, skeletons, "train"):
         for angle in PROJECTION_ANGLES:
             training.append((extract_sequence(project(session["skel"], angle), mode="stable80"), session["labels"]))

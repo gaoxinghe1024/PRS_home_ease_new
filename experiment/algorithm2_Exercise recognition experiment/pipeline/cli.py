@@ -1,12 +1,4 @@
-"""Command line for the algorithm-2 stages.
-
-    python -m algorithms.exercise <stage> [options]
-
-Stages follow the order they were run in: download, prepare, pose, train, optimize, calibrate,
-finalize, select, robustness, audit, replay, video, smoke, report, optimization-report, openapi,
-sources. The training stages overwrite the checkpoints they own, so run them on a copy when the
-current numbers have to stay reproducible.
-"""
+"""Run Algorithm 2 experiment stages."""
 import argparse
 import sys
 
@@ -57,8 +49,8 @@ def main(argv=None):
 
     stages.add_parser("smoke", help="run the real pose CNN on a static image and expect zero cycles")
     stages.add_parser("sources", help="verify the downloaded source files against their hashes")
-    stages.add_parser("report", help="write the result document, figures and artifact hashes")
-    stages.add_parser("optimization-report", help="write the optimization document and training curves")
+    stages.add_parser("report", help="write result JSON, figures and artifact hashes")
+    stages.add_parser("optimization-report", help="write optimization JSON and training curves")
     stages.add_parser("openapi", help="export docs/openapi.json")
 
     args = parser.parse_args(argv)
