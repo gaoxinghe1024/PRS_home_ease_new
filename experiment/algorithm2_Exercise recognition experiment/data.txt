@@ -1,0 +1,49 @@
+算法2（exercise，四类康复动作识别与计数）数据位置
+整理日期：2026-10-28
+
+以下路径均相对于 PRS_home_ease_new 仓库根目录；不是本机的绝对路径。
+
+1. 已提交、可直接用于实验的处理后数据：
+   experiment/algorithm2_Exercise recognition experiment/data/processed/records.json
+   experiment/algorithm2_Exercise recognition experiment/data/processed/skeletons.npz
+   records.json 有 1000 段记录，按受试者划分：s01-s06 训练 600 段，
+   s07-s08 验证 200 段，s09-s10 测试 200 段。划分不是随机拆帧。
+   skeletons.npz 保存对应的三维骨架和弱监督阶段标签；投影后的关键点由代码生成。
+
+2. 原始 UI-PRMD 数据下载位置（未提交 Git，被 .gitignore 排除）：
+   experiment/algorithm2_Exercise recognition experiment/data/raw/uiprmd/
+   包括 positions/angles 的 txt 文件以及下载后生成的 manifest.json。
+   如果目录不存在，是尚未下载，不代表处理后数据不能使用。
+   数据镜像：jkaethee/UI-PRMD_Exercise_Model
+   固定来源提交：475c66aba07731adbe1c90a15462fd30be564593
+   使用 m01 深蹲、m02 跨栏步、m05 坐站、m06 站立抬腿，m07 肩部动作作负样本；
+   同时包含正确/错误动作片段，阶段标签是离线运动学弱标签，不是人工逐帧标注。
+   在本实验目录运行以下命令可恢复并校验原始数据：
+     python run.py download
+     python run.py sources
+   prepare 会重新生成处理后数据和审核图；仅下载原始数据不需要运行 prepare。
+
+3. 系统演示与接口检查使用的四类回放数据：
+   experiment/algorithm2_Exercise recognition experiment/examples/*_replay.json
+   experiment/algorithm2_Exercise recognition experiment/examples/*_frames.json
+   前者是完整测试回放；后者是前 100 帧的接口示例。
+   这些是测试骨架的二维投影回放，不是真实家庭摄像头录像。
+
+4. COCO 姿态模型对比数据（需要 pose 实验时自动下载，未提交 Git）：
+   experiment/algorithm2_Exercise recognition experiment/data/coco/
+   具体下载与筛选逻辑见 pipeline/pose.py；不需要此数据即可启动默认模型和运行回放。
+
+5. 模型和结果不是原始 data：
+   本实验目录 artifacts/ 保存阶段模型、YOLO 姿态权重和选型配置。
+   本实验目录 reports/ 保存原有实验指标、图和模型哈希清单。
+   本目录 results/ 保存此次运行检查的报告，不改写原有实验指标。
+
+6. 系统运行时数据：
+   默认在 system code/runtime/，HOMEEASE_SYSTEM_DATA 环境变量可更改位置。
+   包括数据库、上传录像、日志、exercise-traces 骨架诊断；不应当作为训练集提交。
+   verify.py 使用临时独立目录，不读取或覆盖已有照护记录，也不打开摄像头。
+
+7. 原系统仍然使用 system code/algorithms/exercise/ 下的对应 data、artifacts、examples。
+   本实验目录是整理时的完整实验快照，包含独立源码、处理后数据、权重和报告。
+   没有移动系统原文件。verify.py 同时核对两份源码、数据和模型，并实测原系统。
+   后续若单独修改/重训实验副本，需审核后再同步部署，不能认为系统会自动改变。

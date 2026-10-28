@@ -283,6 +283,52 @@
             "title": "Inference Views",
             "default": "original"
           },
+          "phase_policy": {
+            "type": "string",
+            "enum": [
+              "original",
+              "action_gap_hold_v1"
+            ],
+            "title": "Phase Policy",
+            "default": "original"
+          },
+          "counting_policy": {
+            "type": "string",
+            "enum": [
+              "original",
+              "pose_cycle_v1",
+              "pose_cycle_v2"
+            ],
+            "title": "Counting Policy",
+            "default": "original"
+          },
+          "model_phase": {
+            "type": "string",
+            "title": "Model Phase",
+            "default": "other"
+          },
+          "setup_pose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "waiting",
+                  "standing",
+                  "sitting",
+                  "transitioning"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Pose"
+          },
+          "max_input_gap_ms": {
+            "type": "number",
+            "title": "Max Input Gap Ms",
+            "default": 250
+          },
           "exercise_probabilities": {
             "additionalProperties": {
               "type": "number"
@@ -471,6 +517,16 @@
             ],
             "title": "Action Scope",
             "default": "open"
+          },
+          "counting_policy": {
+            "type": "string",
+            "enum": [
+              "original",
+              "pose_cycle_v1",
+              "pose_cycle_v2"
+            ],
+            "title": "Counting Policy",
+            "default": "original"
           }
         },
         "additionalProperties": false,
@@ -701,6 +757,52 @@
             ],
             "title": "Inference Views",
             "default": "original"
+          },
+          "phase_policy": {
+            "type": "string",
+            "enum": [
+              "original",
+              "action_gap_hold_v1"
+            ],
+            "title": "Phase Policy",
+            "default": "original"
+          },
+          "counting_policy": {
+            "type": "string",
+            "enum": [
+              "original",
+              "pose_cycle_v1",
+              "pose_cycle_v2"
+            ],
+            "title": "Counting Policy",
+            "default": "original"
+          },
+          "model_phase": {
+            "type": "string",
+            "title": "Model Phase",
+            "default": "other"
+          },
+          "setup_pose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "waiting",
+                  "standing",
+                  "sitting",
+                  "transitioning"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Pose"
+          },
+          "max_input_gap_ms": {
+            "type": "number",
+            "title": "Max Input Gap Ms",
+            "default": 250
           },
           "exercise_probabilities": {
             "additionalProperties": {

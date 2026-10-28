@@ -1,0 +1,175 @@
+{
+  "checked_at_utc": "2026-10-28T07:38:18.418405+00:00",
+  "scope": "Algorithm 2 only; real SDK, standalone HTTP and HomeEase HTTP",
+  "python": "3.12.12",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "torch": "2.14.1",
+    "torchvision": "0.29.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "fastapi": "0.142.4",
+    "uvicorn": "0.54.0",
+    "httpx": "0.28.1",
+    "ultralytics": "8.4.191",
+    "opencv-python": "5.0.0.93"
+  },
+  "checks": [
+    {
+      "name": "data, subject split and delivered artifact hashes",
+      "status": "passed",
+      "details": {
+        "records": 1000,
+        "splits": {
+          "train": 600,
+          "validation": 200,
+          "test": 200
+        },
+        "verified_artifacts": 19,
+        "raw_data_present": false,
+        "manifest_lf_crlf_regression": true,
+        "system_snapshot_files_compared": 52
+      },
+      "seconds": 2.504
+    },
+    {
+      "name": "four full replays through the original CPU SDK",
+      "status": "passed",
+      "details": {
+        "chair_sit_to_stand": {
+          "count": 9,
+          "reference_count": 9,
+          "frames": 790
+        },
+        "squat": {
+          "count": 10,
+          "reference_count": 10,
+          "frames": 887
+        },
+        "standing_leg_raise": {
+          "count": 10,
+          "reference_count": 10,
+          "frames": 572
+        },
+        "hurdle_step": {
+          "count": 10,
+          "reference_count": 10,
+          "frames": 644
+        }
+      },
+      "seconds": 18.152
+    },
+    {
+      "name": "standalone HTTP replay and session contract",
+      "status": "passed",
+      "details": {
+        "counts": {
+          "chair_sit_to_stand": 9,
+          "squat": 10,
+          "standing_leg_raise": 10,
+          "hurdle_step": 10
+        },
+        "retry_idempotency": true,
+        "conflict_and_validation": true,
+        "pause_resume_end": true,
+        "delete": true,
+        "saved_openapi_properties": true
+      },
+      "seconds": 20.61
+    },
+    {
+      "name": "interruption and still-input safeguards",
+      "status": "passed",
+      "details": {
+        "timestamp_gap": true,
+        "person_change": true,
+        "missing_joint": true,
+        "still_count": 0
+      },
+      "seconds": 0.795
+    },
+    {
+      "name": "real HomeEase server, worker, replay, controls and upload",
+      "status": "passed",
+      "details": {
+        "pages": [
+          "/",
+          "/home",
+          "/elder",
+          "/api/exercises",
+          "/static/app.js",
+          "/static/exercise.css"
+        ],
+        "counts": {
+          "chair_sit_to_stand": 9,
+          "squat": 10,
+          "standing_leg_raise": 10,
+          "hurdle_step": 10
+        },
+        "deployment_policies": {
+          "chair_sit_to_stand": {
+            "counting_policy": "pose_cycle_v2",
+            "inference_views": "original",
+            "phase_policy": "original"
+          },
+          "squat": {
+            "counting_policy": "original",
+            "inference_views": "original",
+            "phase_policy": "original"
+          },
+          "standing_leg_raise": {
+            "counting_policy": "pose_cycle_v1",
+            "inference_views": "mirror_average",
+            "phase_policy": "original"
+          },
+          "hurdle_step": {
+            "counting_policy": "original",
+            "inference_views": "mirror_average",
+            "phase_policy": "action_gap_hold_v1"
+          }
+        },
+        "upload_negative": {
+          "frames": 12,
+          "count": 0
+        },
+        "exercise_worker": {
+          "id": "exercise",
+          "state": "ready",
+          "error": null,
+          "details": {
+            "status": "ready",
+            "api_version": "v1",
+            "model_id": "opt_tcn_b4_w48",
+            "session_count": 0,
+            "device": "cpu"
+          }
+        }
+      },
+      "seconds": 78.955
+    }
+  ],
+  "not_checked": [
+    "physical camera/microphone capture",
+    "CUDA acceleration",
+    "new home-video/older-adult accuracy",
+    "retraining",
+    "Algorithm 1 and Algorithm 3 availability/accuracy"
+  ],
+  "model": {
+    "api_version": "v1",
+    "model": "opt_tcn_b4_w48",
+    "members": [
+      "opt_tcn_b4_w48.pt"
+    ],
+    "pose_model": "yolo11n-pose.pt",
+    "confidence_threshold": 0,
+    "min_dwell_s": 0.033,
+    "decoder": "conditioned_target_action_support_015",
+    "decoder_strategy": "ordered_transition",
+    "phase_evidence_threshold": 0.25,
+    "selection_rule": "validation count MAE <= best+.2; joint phase F1 >= eligible best-.02; minimum CPU p50",
+    "optimization_selection_lock": "reports/optimization/selection_lock.json"
+  },
+  "passed": true
+}

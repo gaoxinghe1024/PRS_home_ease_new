@@ -1,5 +1,4 @@
 """Result documents, figures and artifact hashes generated from the recorded experiment JSON."""
-import hashlib
 import importlib.metadata
 import json
 import platform
@@ -12,7 +11,7 @@ import numpy as np
 
 from homeease.exercises import EXERCISE_NAMES
 
-from .common import ROOT
+from .common import ROOT, artifact_manifest
 
 
 def write_results():
@@ -168,8 +167,8 @@ def write_results():
     (ROOT / "docs/RESULTS.md").write_text("\n".join(lines), encoding="utf-8")
     environment = {"python": sys.version, "platform": platform.platform(), "packages": {p: importlib.metadata.version(p) for p in ["torch", "torchvision", "numpy", "scipy", "scikit-learn", "matplotlib", "opencv-python", "ultralytics", "fastapi", "uvicorn"]}}
     (ROOT / "reports/environment.json").write_text(json.dumps(environment, indent=2))
-    manifest = [{"file": str(p.relative_to(ROOT)), "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted((ROOT / "artifacts").glob("*")) if p.is_file()]
-    (ROOT / "reports/artifact_manifest.json").write_text(json.dumps(manifest, indent=2))
+    (ROOT / "reports/artifact_manifest.json").write_text(
+        json.dumps(artifact_manifest(), indent=2), encoding="utf-8", newline="\n")
     print("Generated docs/RESULTS.md, figures, environment and artifact hashes")
 
 
