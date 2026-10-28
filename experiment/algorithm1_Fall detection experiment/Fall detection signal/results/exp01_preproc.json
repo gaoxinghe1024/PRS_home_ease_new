@@ -1,0 +1,479 @@
+{
+ "E1a_resample": {
+  "raw": {
+   "auroc_seq": 0.9814814814814815,
+   "window": {
+    "acc": 0.94291454442558,
+    "precision": 0.7928571428571429,
+    "recall": 0.8672691851844743,
+    "f1": 0.809714350980034,
+    "auroc": 0.9658447704124548
+   },
+   "sequence": {
+    "acc": 0.9076923076923077,
+    "precision": 0.875,
+    "recall": 0.96,
+    "f1": 0.9030525030525031
+   },
+   "event": {
+    "event_recall": 0.9199999999999999,
+    "event_precision": 0.825,
+    "event_f1": 0.8586080586080586,
+    "event_accuracy": 0.775
+   },
+   "event_calib": {
+    "event_recall": 0.96,
+    "event_precision": 0.5956709956709957,
+    "event_f1": 0.7267582417582417,
+    "event_accuracy": 0.5867821067821068
+   },
+   "delay_mean_s": 1.9511288888888891,
+   "fp_per_hour": 68.24885920377837,
+   "per_fold_auroc": [
+    1.0,
+    1.0,
+    1.0,
+    0.975,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.47284900857214734,
+    "quiet_noise_ratio": 0.8902337551116943,
+    "phase_lag_ms": 0.0
+   },
+   "desc": ""
+  },
+  "50.0": {
+   "auroc_seq": 0.9683333333333334,
+   "window": {
+    "acc": 0.9197640275557604,
+    "precision": 0.8031871657754011,
+    "recall": 0.7987443239223252,
+    "f1": 0.7654689214239776,
+    "auroc": 0.9603259644133464
+   },
+   "sequence": {
+    "acc": 0.8714285714285716,
+    "precision": 0.8128571428571428,
+    "recall": 0.9666666666666668,
+    "f1": 0.8724775224775225
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.7928571428571429,
+    "event_f1": 0.8558108558108557,
+    "event_accuracy": 0.7595238095238096
+   },
+   "event_calib": {
+    "event_recall": 1.0,
+    "event_precision": 0.5063025210084033,
+    "event_f1": 0.6600621118012422,
+    "event_accuracy": 0.5063025210084033
+   },
+   "delay_mean_s": 2.2507111111111113,
+   "fp_per_hour": 92.7920641312242,
+   "per_fold_auroc": [
+    0.875,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.6808865181851391,
+    "quiet_noise_ratio": 0.9626349806785583,
+    "phase_lag_ms": 0.0
+   },
+   "desc": ""
+  },
+  "60.0": {
+   "auroc_seq": 0.9666666666666667,
+   "window": {
+    "acc": 0.9211859889407936,
+    "precision": 0.8079918300653594,
+    "recall": 0.7895538505257175,
+    "f1": 0.7587661979597464,
+    "auroc": 0.963273186097266
+   },
+   "sequence": {
+    "acc": 0.8714285714285716,
+    "precision": 0.8128571428571428,
+    "recall": 0.9666666666666668,
+    "f1": 0.8724775224775225
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.7928571428571429,
+    "event_f1": 0.8558108558108557,
+    "event_accuracy": 0.7595238095238096
+   },
+   "event_calib": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.6128571428571429,
+    "event_f1": 0.7395604395604396,
+    "event_accuracy": 0.595
+   },
+   "delay_mean_s": 2.180777777777778,
+   "fp_per_hour": 84.85902380658561,
+   "per_fold_auroc": [
+    0.9166666666666666,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.6799871836447795,
+    "quiet_noise_ratio": 0.9514245986938477,
+    "phase_lag_ms": 0.0
+   },
+   "desc": ""
+  },
+  "100.0": {
+   "auroc_seq": 0.97,
+   "window": {
+    "acc": 0.9243504561418421,
+    "precision": 0.8114020917469194,
+    "recall": 0.7914061329406599,
+    "f1": 0.7716618302972317,
+    "auroc": 0.9638917145840932
+   },
+   "sequence": {
+    "acc": 0.8571428571428571,
+    "precision": 0.7914285714285715,
+    "recall": 0.9666666666666668,
+    "f1": 0.8592907092907092
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.7714285714285715,
+    "event_f1": 0.8426240426240426,
+    "event_accuracy": 0.7380952380952381
+   },
+   "event_calib": {
+    "event_recall": 0.9333333333333333,
+    "event_precision": 0.7329004329004329,
+    "event_f1": 0.7942767036884683,
+    "event_accuracy": 0.6757575757575758
+   },
+   "delay_mean_s": 2.2107777777777775,
+   "fp_per_hour": 100.10190305438478,
+   "per_fold_auroc": [
+    0.9166666666666666,
+    0.9791666666666666,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.5970605460064808,
+    "quiet_noise_ratio": 0.9508364200592041,
+    "phase_lag_ms": 0.0
+   },
+   "desc": ""
+  }
+ },
+ "E1b_filter": {
+  "none": {
+   "auroc_seq": 0.9766666666666667,
+   "window": {
+    "acc": 0.9032432101906762,
+    "precision": 0.7567883372502938,
+    "recall": 0.7905226174791392,
+    "f1": 0.7348278675653291,
+    "auroc": 0.9602783919280016
+   },
+   "sequence": {
+    "acc": 0.8428571428571429,
+    "precision": 0.7733766233766234,
+    "recall": 0.9666666666666668,
+    "f1": 0.8510665804783452
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.7565934065934067,
+    "event_f1": 0.8362058993637941,
+    "event_accuracy": 0.7387362637362638
+   },
+   "event_calib": {
+    "event_recall": 1.0,
+    "event_precision": 0.5574242424242424,
+    "event_f1": 0.7102673796791443,
+    "event_accuracy": 0.5574242424242424
+   },
+   "delay_mean_s": 2.2474444444444446,
+   "fp_per_hour": 102.9090887190446,
+   "per_fold_auroc": [
+    0.9583333333333334,
+    0.9583333333333334,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 1.0,
+    "quiet_noise_ratio": 1.0,
+    "phase_lag_ms": 0.0
+   },
+   "desc": "no filtering"
+  },
+  "ma": {
+   "auroc_seq": 0.9741666666666666,
+   "window": {
+    "acc": 0.9265405942073164,
+    "precision": 0.8368840579710145,
+    "recall": 0.789127593066212,
+    "f1": 0.7724141414880923,
+    "auroc": 0.9570242028474357
+   },
+   "sequence": {
+    "acc": 0.9142857142857144,
+    "precision": 0.8761904761904761,
+    "recall": 0.9666666666666668,
+    "f1": 0.911048951048951
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.8628571428571428,
+    "event_f1": 0.901048951048951,
+    "event_accuracy": 0.8295238095238094
+   },
+   "event_calib": {
+    "event_recall": 0.9333333333333332,
+    "event_precision": 0.5883333333333333,
+    "event_f1": 0.6767099567099568,
+    "event_accuracy": 0.5216666666666666
+   },
+   "delay_mean_s": 2.1974444444444443,
+   "fp_per_hour": 63.997900547457924,
+   "per_fold_auroc": [
+    0.9166666666666666,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.49602504026992206,
+    "quiet_noise_ratio": 0.8509154319763184,
+    "phase_lag_ms": 0.0
+   },
+   "desc": "moving average (k=5, symmetric kernel, zero-phase)"
+  },
+  "median": {
+   "auroc_seq": 0.945,
+   "window": {
+    "acc": 0.9158008670669678,
+    "precision": 0.778855863698545,
+    "recall": 0.7447472164096205,
+    "f1": 0.7365478623016305,
+    "auroc": 0.9435464265593521
+   },
+   "sequence": {
+    "acc": 0.8714285714285713,
+    "precision": 0.8142857142857143,
+    "recall": 0.9333333333333333,
+    "f1": 0.8651282051282051
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.8209523809523809,
+    "event_f1": 0.8801282051282051,
+    "event_accuracy": 0.7948412698412699
+   },
+   "event_calib": {
+    "event_recall": 1.0,
+    "event_precision": 0.46765783236371467,
+    "event_f1": 0.6306636155606408,
+    "event_accuracy": 0.46765783236371467
+   },
+   "delay_mean_s": 2.215222222222222,
+   "fp_per_hour": 76.46545781541877,
+   "per_fold_auroc": [
+    0.7916666666666666,
+    0.9583333333333334,
+    0.9583333333333334,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.4946159720122947,
+    "quiet_noise_ratio": 0.8869097828865051,
+    "phase_lag_ms": 0.0
+   },
+   "desc": "median filter (k=5, symmetric window, zero-phase)"
+  },
+  "butter5": {
+   "auroc_seq": 0.9841666666666666,
+   "window": {
+    "acc": 0.9437380880172297,
+    "precision": 0.8858739684921231,
+    "recall": 0.8165785734583688,
+    "f1": 0.822316682525481,
+    "auroc": 0.9595096637195928
+   },
+   "sequence": {
+    "acc": 0.9,
+    "precision": 0.85,
+    "recall": 0.9666666666666668,
+    "f1": 0.8980952380952381
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.85,
+    "event_f1": 0.8980952380952381,
+    "event_accuracy": 0.8261904761904763
+   },
+   "event_calib": {
+    "event_recall": 1.0,
+    "event_precision": 0.458974358974359,
+    "event_f1": 0.6239348370927318,
+    "event_accuracy": 0.458974358974359
+   },
+   "delay_mean_s": 2.225777777777778,
+   "fp_per_hour": 52.25312989145225,
+   "per_fold_auroc": [
+    0.9375,
+    0.9791666666666666,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.4111949207194172,
+    "quiet_noise_ratio": 0.822291374206543,
+    "phase_lag_ms": 0.0
+   },
+   "desc": "Butterworth 4th-order low-pass 5Hz (gravity kept, zero-phase)"
+  },
+  "butter10": {
+   "auroc_seq": 0.9666666666666667,
+   "window": {
+    "acc": 0.9211859889407936,
+    "precision": 0.8079918300653594,
+    "recall": 0.7895538505257175,
+    "f1": 0.7587661979597464,
+    "auroc": 0.963273186097266
+   },
+   "sequence": {
+    "acc": 0.8714285714285716,
+    "precision": 0.8128571428571428,
+    "recall": 0.9666666666666668,
+    "f1": 0.8724775224775225
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.7928571428571429,
+    "event_f1": 0.8558108558108557,
+    "event_accuracy": 0.7595238095238096
+   },
+   "event_calib": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.6128571428571429,
+    "event_f1": 0.7395604395604396,
+    "event_accuracy": 0.595
+   },
+   "delay_mean_s": 2.180777777777778,
+   "fp_per_hour": 84.85902380658561,
+   "per_fold_auroc": [
+    0.9166666666666666,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.6799871836447795,
+    "quiet_noise_ratio": 0.9514245986938477,
+    "phase_lag_ms": 0.0
+   },
+   "desc": "Butterworth 4th-order low-pass 10Hz (gravity kept, zero-phase)"
+  },
+  "butter20": {
+   "auroc_seq": 0.9625,
+   "window": {
+    "acc": 0.9073832090677995,
+    "precision": 0.7781859070464767,
+    "recall": 0.7675160815314268,
+    "f1": 0.7296482744209078,
+    "auroc": 0.9580198674102072
+   },
+   "sequence": {
+    "acc": 0.8285714285714286,
+    "precision": 0.7642857142857143,
+    "recall": 0.9666666666666668,
+    "f1": 0.8432234432234432
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.75,
+    "event_f1": 0.8298901098901099,
+    "event_accuracy": 0.7321428571428572
+   },
+   "event_calib": {
+    "event_recall": 1.0,
+    "event_precision": 0.5673076923076923,
+    "event_f1": 0.7115971747550696,
+    "event_accuracy": 0.5673076923076923
+   },
+   "delay_mean_s": 2.1974444444444443,
+   "fp_per_hour": 109.35639582583777,
+   "per_fold_auroc": [
+    0.9791666666666666,
+    0.9583333333333334,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.9420409038494244,
+    "quiet_noise_ratio": 0.9933835864067078,
+    "phase_lag_ms": 0.0
+   },
+   "desc": "Butterworth 4th-order low-pass 20Hz (gravity kept, zero-phase)"
+  },
+  "savgol": {
+   "auroc_seq": 0.9633333333333334,
+   "window": {
+    "acc": 0.905387200355149,
+    "precision": 0.7947945960849186,
+    "recall": 0.7717672892608954,
+    "f1": 0.731600682465578,
+    "auroc": 0.9562157048723072
+   },
+   "sequence": {
+    "acc": 0.8428571428571429,
+    "precision": 0.7733766233766234,
+    "recall": 0.9666666666666668,
+    "f1": 0.8510665804783452
+   },
+   "event": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.7565934065934067,
+    "event_f1": 0.8362058993637941,
+    "event_accuracy": 0.7387362637362638
+   },
+   "event_calib": {
+    "event_recall": 0.9666666666666668,
+    "event_precision": 0.6131818181818182,
+    "event_f1": 0.7232620320855615,
+    "event_accuracy": 0.5798484848484848
+   },
+   "delay_mean_s": 2.1974444444444443,
+   "fp_per_hour": 104.22209584960767,
+   "per_fold_auroc": [
+    0.875,
+    0.9583333333333334,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "signal": {
+    "peak_retention": 0.8469449844992848,
+    "quiet_noise_ratio": 0.9760683178901672,
+    "phase_lag_ms": 0.0
+   },
+   "desc": "Savitzky-Golay (win=11, poly=2)"
+  }
+ }
+}
