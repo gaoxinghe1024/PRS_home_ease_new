@@ -1,0 +1,159 @@
+{
+ "note": "A1/A2/A3/A4 unified evaluation (grouped 5-fold CV + LODO), multi-level metrics (window / sequence / event). Data: unified pool of 223 sequences (149 fall / 74 non-fall).",
+ "a1": {
+  "cv": {
+   "auroc_seq": 0.5528,
+   "window": {
+    "acc": 0.8144,
+    "precision": 0.3483,
+    "recall": 0.2931,
+    "f1": 0.3183,
+    "auroc": 0.6862
+   },
+   "sequence": {
+    "acc": 0.5455,
+    "precision": 0.7018,
+    "recall": 0.5479,
+    "f1": 0.6154,
+    "auroc": 0.5528
+   },
+   "event": {
+    "event_accuracy": 0.0061,
+    "event_precision": 0.1,
+    "event_recall": 0.0064,
+    "event_f1": 0.012
+   }
+  },
+  "lodo": {
+   "urfd": {
+    "auroc": 0.42,
+    "n": 70
+   },
+   "mc": {
+    "auroc": null,
+    "n": 23
+   },
+   "le2i": {
+    "auroc": 0.525,
+    "n": 130
+   }
+  }
+ },
+ "a2": {
+  "cv": {
+   "auroc_seq": 0.8378,
+   "window": {
+    "acc": 0.906,
+    "precision": 0.7603,
+    "recall": 0.5317,
+    "f1": 0.6258,
+    "auroc": 0.8976
+   },
+   "sequence": {
+    "acc": 0.7955,
+    "precision": 0.8258,
+    "recall": 0.8767,
+    "f1": 0.8505,
+    "auroc": 0.8378
+   },
+   "event": {
+    "event_accuracy": 0.599,
+    "event_precision": 0.7246,
+    "event_recall": 0.7756,
+    "event_f1": 0.7492
+   }
+  },
+  "lodo": {
+   "urfd": {
+    "auroc": 0.616,
+    "n": 70
+   },
+   "mc": {
+    "auroc": null,
+    "n": 23
+   },
+   "le2i": {
+    "auroc": 0.758,
+    "n": 130
+   }
+  }
+ },
+ "a3": {
+  "cv": {
+   "auroc_seq": 0.9437,
+   "window": {
+    "acc": 0.9267,
+    "precision": 0.7951,
+    "recall": 0.6798,
+    "f1": 0.7329,
+    "auroc": 0.9317
+   },
+   "sequence": {
+    "acc": 0.9136,
+    "precision": 0.9045,
+    "recall": 0.9726,
+    "f1": 0.9373,
+    "auroc": 0.9437
+   },
+   "event": {
+    "event_accuracy": 0.6636,
+    "event_precision": 0.6952,
+    "event_recall": 0.9359,
+    "event_f1": 0.7978
+   }
+  },
+  "lodo": {
+   "urfd": {
+    "auroc": 0.8408,
+    "n": 70
+   },
+   "mc": {
+    "auroc": null,
+    "n": 23
+   },
+   "le2i": {
+    "auroc": 0.8045,
+    "n": 130
+   }
+  }
+ },
+ "a4": {
+  "cv": {
+   "auroc_seq": 0.9783,
+   "window": {
+    "acc": 0.9529,
+    "precision": 0.8667,
+    "recall": 0.8051,
+    "f1": 0.8348,
+    "auroc": 0.9711
+   },
+   "sequence": {
+    "acc": 0.9455,
+    "precision": 0.9351,
+    "recall": 0.9863,
+    "f1": 0.96,
+    "auroc": 0.9783
+   },
+   "event": {
+    "event_accuracy": 0.7241,
+    "event_precision": 0.7577,
+    "event_recall": 0.9423,
+    "event_f1": 0.84
+   }
+  },
+  "lodo": {
+   "urfd": {
+    "auroc": 0.9,
+    "n": 70
+   },
+   "mc": {
+    "auroc": null,
+    "n": 23
+   },
+   "le2i": {
+    "auroc": 0.997,
+    "n": 130
+   }
+  }
+ }
+}

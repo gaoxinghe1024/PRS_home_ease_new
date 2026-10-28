@@ -1,0 +1,36 @@
+{
+ "mode": "val_split",
+ "epochs": 30,
+ "rows": [
+  {
+   "arch": "p1",
+   "name": "P1 SmallUNet (U-Net encoder-decoder)",
+   "params_m": 2.67,
+   "best_epoch": 30,
+   "val_pck02": 0.431,
+   "val_pck05": 0.711,
+   "final_loss": 0.0361,
+   "train_wall_sec": 1185.6
+  },
+  {
+   "arch": "p2",
+   "name": "P2 CPM3Stage (3-stage iterative refinement + intermediate supervision)",
+   "params_m": 3.01,
+   "best_epoch": 28,
+   "val_pck02": 0.285,
+   "val_pck05": 0.517,
+   "final_loss": 0.0566,
+   "train_wall_sec": 1672.9
+  },
+  {
+   "arch": "p3",
+   "name": "P3 SimpleBaseline (slim ResNet + 3x deconv head)",
+   "params_m": 5.95,
+   "best_epoch": 29,
+   "val_pck02": 0.3481,
+   "val_pck05": 0.7277,
+   "final_loss": 0.0409,
+   "train_wall_sec": 777.4
+  }
+ ]
+}
