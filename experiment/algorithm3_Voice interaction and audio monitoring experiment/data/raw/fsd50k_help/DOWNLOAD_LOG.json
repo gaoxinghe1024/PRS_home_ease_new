@@ -1,0 +1,2155 @@
+{
+  "meta": {
+    "dataset": "fsd50k_help",
+    "license": "per clip: CC0 / CC BY / CC BY-NC (see selection.json: uploader, title, licence URL, Freesound id)",
+    "source": "https://zenodo.org/records/4060432 (labels, metadata) + https://huggingface.co/datasets/Fhrozen/FSD50k/tree/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b (audio)",
+    "archives_deleted": [
+      "FSD50K.ground_truth.zip",
+      "FSD50K.metadata.zip"
+    ],
+    "clips": 265,
+    "clips_failed": [],
+    "downloaded_bytes_total": 40266598,
+    "citation": "Fonseca, Favory, Pons, Font, Serra (2022) FSD50K: an open dataset of human-labeled sound events, IEEE/ACM TASLP 30, doi:10.1109/TASLP.2021.3133208",
+    "note": "third-party Hugging Face mirror; per-file sha256 = the mirror's LFS oid"
+  },
+  "accessed_at": "2026-10-07T15:19:17Z",
+  "files": [
+    {
+      "url": "https://zenodo.org/api/records/4060432/files/FSD50K.ground_truth.zip/content",
+      "path": "data/raw/fsd50k_help/_src/FSD50K.ground_truth.zip",
+      "status": "cached",
+      "bytes": 334701,
+      "md5": "ca27382c195e37d2269c4c866dd73485",
+      "sha256": "db2396260a7b1fb06feb6ccac71685794fc89917d71c3a8d64a1de85c2cc0ebf"
+    },
+    {
+      "url": "https://zenodo.org/api/records/4060432/files/FSD50K.metadata.zip/content",
+      "path": "data/raw/fsd50k_help/_src/FSD50K.metadata.zip",
+      "status": "cached",
+      "bytes": 6700838,
+      "md5": "b9ea0c829a411c1d42adb9da539ed237",
+      "sha256": "9a738e032546f9a2c6e3d04566928d04a65fb79b422cc9d78bb781723537bd19"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/348310.wav",
+      "path": "data/raw/fsd50k_help/audio/348310.wav",
+      "status": "downloaded",
+      "bytes": 100078,
+      "md5": "cc074451caf2eb046a3e640172b68d8c",
+      "sha256": "f5051f1e6482c412ddfe0f565b8bee619e41776543d309727835578ed5b5594a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/68058.wav",
+      "path": "data/raw/fsd50k_help/audio/68058.wav",
+      "status": "downloaded",
+      "bytes": 216168,
+      "md5": "92001feafbf7ee212313aa4f096985be",
+      "sha256": "407f434ee70650388153b591ca7bc3f26a4133c8fe8fc0a06c770cf7128920f5"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/161360.wav",
+      "path": "data/raw/fsd50k_help/audio/161360.wav",
+      "status": "downloaded",
+      "bytes": 71502,
+      "md5": "f67d7e622f5b3f36a2ea633d19741bc0",
+      "sha256": "f4581507be0e281b9aca061d2f0fd8115353f382ea1ed448e9098e0bd50b284c"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/321971.wav",
+      "path": "data/raw/fsd50k_help/audio/321971.wav",
+      "status": "downloaded",
+      "bytes": 250958,
+      "md5": "634e1162765f97364dd99e78a7fa4b6b",
+      "sha256": "55e78879f51d273bb2ba4347e64574d3bb485b59f56bb1fec0db45de32173769"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/89362.wav",
+      "path": "data/raw/fsd50k_help/audio/89362.wav",
+      "status": "downloaded",
+      "bytes": 156750,
+      "md5": "500871bfe0239f600812270b4b4ac458",
+      "sha256": "7d6c9592508a5a9c8963c0f77f0e608fca210c2652b18d67fd034af79eaafb15"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/394282.wav",
+      "path": "data/raw/fsd50k_help/audio/394282.wav",
+      "status": "downloaded",
+      "bytes": 270362,
+      "md5": "40b5c7b48e132980851e40abdc2c6edf",
+      "sha256": "291ccc70f144d91d0c93988fd03f0bbf472c8e4bde3616458a5dc4f12795fa47"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/323080.wav",
+      "path": "data/raw/fsd50k_help/audio/323080.wav",
+      "status": "downloaded",
+      "bytes": 160034,
+      "md5": "b288cf9c11a6836b2e6e027a58ff8ada",
+      "sha256": "a27c11e42b9af912cec375a2d7b1e1ad94de5b0a7754fd2d1ec2dc653a0e4653"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/202037.wav",
+      "path": "data/raw/fsd50k_help/audio/202037.wav",
+      "status": "downloaded",
+      "bytes": 125642,
+      "md5": "b6866aec0e2e747be7028025ec0b12c8",
+      "sha256": "41660e6857b395618866f4d0a57a1106137a83826ce28aa3f70b839e33dc1086"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/175385.wav",
+      "path": "data/raw/fsd50k_help/audio/175385.wav",
+      "status": "downloaded",
+      "bytes": 237160,
+      "md5": "0cf822acb30276d635c31445cce11cae",
+      "sha256": "21770f7e4e2e42c474198b607b0f74814395137fc4335027bb6cbf1e23d49eca"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/316398.wav",
+      "path": "data/raw/fsd50k_help/audio/316398.wav",
+      "status": "downloaded",
+      "bytes": 77988,
+      "md5": "417dfc191b868e86d6f89c639fb33acb",
+      "sha256": "2c341d431e8e6437c5c8469b474c81068688af3b8407de2b558e8961bcdd6820"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/209164.wav",
+      "path": "data/raw/fsd50k_help/audio/209164.wav",
+      "status": "downloaded",
+      "bytes": 41354,
+      "md5": "2aeb0e20de51e0a1a86f79cf828fd6d4",
+      "sha256": "fd9a08b647f9fb6ebb45dcd61ea0c126ff0207808d7b7dde767c746d6bb48f37"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/180310.wav",
+      "path": "data/raw/fsd50k_help/audio/180310.wav",
+      "status": "downloaded",
+      "bytes": 175238,
+      "md5": "6e00440e45af711c836a7fd8e9e44ea8",
+      "sha256": "4c6b8bd47a330ccb5c7af235c8e8d27288f91693192494bfb05f6dd8d1cca747"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/180344.wav",
+      "path": "data/raw/fsd50k_help/audio/180344.wav",
+      "status": "downloaded",
+      "bytes": 63930,
+      "md5": "878be88efa8882501fea09d1402f7c3b",
+      "sha256": "867f93d8dc4589d9b9674f28dcea8cc01ba5dc12ed8c08d443f356ab42793a47"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/381894.wav",
+      "path": "data/raw/fsd50k_help/audio/381894.wav",
+      "status": "downloaded",
+      "bytes": 223566,
+      "md5": "ea4a890c5a750defdb5f2072e1a2849a",
+      "sha256": "7d0a6ccd745a4d0e8742d78833417f11e225b90a6a738074fa4ee97754801ca3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/344029.wav",
+      "path": "data/raw/fsd50k_help/audio/344029.wav",
+      "status": "downloaded",
+      "bytes": 57428,
+      "md5": "2773347d0e9f04dfdfb777b22745e16c",
+      "sha256": "06a09ea3dca5e6c250c44d85f6765732c9f124fe374de4a6b31dc4c57cec0fed"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/64940.wav",
+      "path": "data/raw/fsd50k_help/audio/64940.wav",
+      "status": "downloaded",
+      "bytes": 106130,
+      "md5": "5d03bc13baef8fba22e9a04b8f6dc8da",
+      "sha256": "3662b1e1d014bb862fc10f09e3d4f9d870f0f4133e610ca343f4a651b61fca81"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/222674.wav",
+      "path": "data/raw/fsd50k_help/audio/222674.wav",
+      "status": "downloaded",
+      "bytes": 88526,
+      "md5": "a85d13f616fb88affe164af568b0111f",
+      "sha256": "f6804ed32d9c486cdee1dbc32deef1832f1c5221d3acee15db21d2b785240b09"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/125131.wav",
+      "path": "data/raw/fsd50k_help/audio/125131.wav",
+      "status": "downloaded",
+      "bytes": 162908,
+      "md5": "a42a7d0576e5a783d7a9e386a7bbbf45",
+      "sha256": "c870c27a3297205d0ee31d8189284f554e511086272b9e0547f243ef5765aea3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/427774.wav",
+      "path": "data/raw/fsd50k_help/audio/427774.wav",
+      "status": "downloaded",
+      "bytes": 293336,
+      "md5": "b39e42b92615c757d64317141b5fa9a5",
+      "sha256": "83cfc0b92d05d0eebaf4de0730a6476a93ce8698e05cd8887376ea5d06f32ee2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/353291.wav",
+      "path": "data/raw/fsd50k_help/audio/353291.wav",
+      "status": "downloaded",
+      "bytes": 143148,
+      "md5": "0b32d95fb6b609c9d51275b3f16c77ed",
+      "sha256": "e76fb5953fc75c2fc7b0b741339c06b60293029e2c752a4e3379482d418ee73a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/222535.wav",
+      "path": "data/raw/fsd50k_help/audio/222535.wav",
+      "status": "downloaded",
+      "bytes": 115278,
+      "md5": "e068a8b115afc809083b4d09138e6e09",
+      "sha256": "92efc65954e51805fa49de6e9e1776a4614113c7d1eba656892829196f75f8bd"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/343954.wav",
+      "path": "data/raw/fsd50k_help/audio/343954.wav",
+      "status": "downloaded",
+      "bytes": 63566,
+      "md5": "b569eb6a900c8c7524420c44543363d2",
+      "sha256": "e45e51c6b5eb9eefaa6a6ffa71964ebb392f58aee2f8dcc6552de5acde7885a3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/222545.wav",
+      "path": "data/raw/fsd50k_help/audio/222545.wav",
+      "status": "downloaded",
+      "bytes": 191524,
+      "md5": "56fcd84c902ce7599fa2bdb10ff21407",
+      "sha256": "e15810ea206b26bad552c1638051985b9b7fe4662be9d502ba1b903f9b043783"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/66949.wav",
+      "path": "data/raw/fsd50k_help/audio/66949.wav",
+      "status": "downloaded",
+      "bytes": 117760,
+      "md5": "c53463ef2e371d4e500d7ecb7d39beef",
+      "sha256": "75035d63f587165f998508c3e5e7746b30195a5aeac8733fd929f608470a98ef"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/270446.wav",
+      "path": "data/raw/fsd50k_help/audio/270446.wav",
+      "status": "downloaded",
+      "bytes": 157284,
+      "md5": "e71b4784ea308d525cb5bb43bf2f092d",
+      "sha256": "99e2c4d434ca41c37b709a6ad97b3a5873cb4784d3f37b4c392d4d99ff97b2cc"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/353287.wav",
+      "path": "data/raw/fsd50k_help/audio/353287.wav",
+      "status": "downloaded",
+      "bytes": 77694,
+      "md5": "6042bb9a46ba2d763e0ca5f659b350b2",
+      "sha256": "1ddf006e14f8fd22a280acca5f654693844ed155ac3b7e30027690277edb7cba"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/315828.wav",
+      "path": "data/raw/fsd50k_help/audio/315828.wav",
+      "status": "downloaded",
+      "bytes": 166212,
+      "md5": "5a66cd517b9671d626fc2f223fc0c7ca",
+      "sha256": "828fb1ec82347484876806e38bb8ff6dbdfb05c93785f2a5d50f10398f958c90"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/220311.wav",
+      "path": "data/raw/fsd50k_help/audio/220311.wav",
+      "status": "downloaded",
+      "bytes": 119886,
+      "md5": "e98654520d8216325e4f263335af338f",
+      "sha256": "656a3cb5e938cadf7c630726a3c602ecd8aaab3675b8b25f12fd74c9a2c894a9"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/426195.wav",
+      "path": "data/raw/fsd50k_help/audio/426195.wav",
+      "status": "downloaded",
+      "bytes": 207606,
+      "md5": "83064ce93b7a1da283088563be191c1b",
+      "sha256": "eec959871f51e28bfb5e1223cbecc545b35f6238fa689836686347a4d123b6f2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/219856.wav",
+      "path": "data/raw/fsd50k_help/audio/219856.wav",
+      "status": "downloaded",
+      "bytes": 105552,
+      "md5": "eda108cd5cbc132cab8c25cd97f2315b",
+      "sha256": "f5e42be04b2894ae58c08133186272b9e2452aa3f5d72bb73be25d28618498c2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220658.wav",
+      "path": "data/raw/fsd50k_help/audio/220658.wav",
+      "status": "downloaded",
+      "bytes": 64592,
+      "md5": "dd1b288da6fbc5498f79ba5c5b14e12a",
+      "sha256": "ea56a1eff3e6415283c2ad902523d1f94f63d255f34936cf62bae9036b875496"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/219867.wav",
+      "path": "data/raw/fsd50k_help/audio/219867.wav",
+      "status": "downloaded",
+      "bytes": 148586,
+      "md5": "aa5115dd689692088014c906a4d79a26",
+      "sha256": "fa0900c494a80f955649bcf5278b7eb7e2ed5118866ed105fb373e0ac96b2979"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/63641.wav",
+      "path": "data/raw/fsd50k_help/audio/63641.wav",
+      "status": "downloaded",
+      "bytes": 59128,
+      "md5": "3e29280cfa0b2f354d604d775b8e3249",
+      "sha256": "8e0f9caf06d67ba24cb85f412b2ce30a5a3f4c1bcbf930b6ab2a2a0c7aafa2ad"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/340940.wav",
+      "path": "data/raw/fsd50k_help/audio/340940.wav",
+      "status": "downloaded",
+      "bytes": 278606,
+      "md5": "14c47df60790c081d086c68e1e57a52a",
+      "sha256": "93d86d1664547f18ad209b2225935e3cd30e8fa31f975ade39b559aa5e57ff34"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/220049.wav",
+      "path": "data/raw/fsd50k_help/audio/220049.wav",
+      "status": "downloaded",
+      "bytes": 179918,
+      "md5": "09089058f33f0617b86042a9f8b551e3",
+      "sha256": "ce9bf384dae56903174aa3116f3cc4ed68eace04cdbbd1e2c14a562115989c6e"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/270474.wav",
+      "path": "data/raw/fsd50k_help/audio/270474.wav",
+      "status": "downloaded",
+      "bytes": 132378,
+      "md5": "a866d89391fe82d43cafeb756509ba9d",
+      "sha256": "aece3eb649dc55ccfecf86b223b59e6a07c1695f73266e31ab378cb4ed239844"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/220045.wav",
+      "path": "data/raw/fsd50k_help/audio/220045.wav",
+      "status": "downloaded",
+      "bytes": 229222,
+      "md5": "4702d5c2aefd5d6fe394f4ac16fa345b",
+      "sha256": "6533a9516f9c27da182d29b869e3450dd353a51ab1ae337adceaea81827fbd9f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/420018.wav",
+      "path": "data/raw/fsd50k_help/audio/420018.wav",
+      "status": "downloaded",
+      "bytes": 214990,
+      "md5": "66a1456ae6dde4d37f8a5f9421867275",
+      "sha256": "fa6118875480841f5d2f7130dc72e7cff294ebc5050c4ca9e65a9f2cc8664efc"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/91294.wav",
+      "path": "data/raw/fsd50k_help/audio/91294.wav",
+      "status": "downloaded",
+      "bytes": 209200,
+      "md5": "7131d3ff7e67af1ba28699b5f76d3a8c",
+      "sha256": "8589697bfcf1fb47a414dea5cd25fedf7065575113d169e3894cbc82cc073608"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/340889.wav",
+      "path": "data/raw/fsd50k_help/audio/340889.wav",
+      "status": "downloaded",
+      "bytes": 65614,
+      "md5": "3ace9a11d61f89a55713822e35d844c4",
+      "sha256": "94a8860ab34dd4fc202cd4d738142506dcafc59c6d5854c923dc816d66f77126"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/33443.wav",
+      "path": "data/raw/fsd50k_help/audio/33443.wav",
+      "status": "downloaded",
+      "bytes": 181800,
+      "md5": "f42b213ae452d87163ca46bbc06a8da2",
+      "sha256": "a48dbef5230742ac48472d0f1ca5e41991aa01cd6536096bcec64fc3a24090d6"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/203594.wav",
+      "path": "data/raw/fsd50k_help/audio/203594.wav",
+      "status": "downloaded",
+      "bytes": 85966,
+      "md5": "8674be246cfdb6682666ae3773872f03",
+      "sha256": "eac8df5bdd066dbb43c79e5628299a21b180c8e2bfcdac256414c9424b10f3c0"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/21324.wav",
+      "path": "data/raw/fsd50k_help/audio/21324.wav",
+      "status": "downloaded",
+      "bytes": 297550,
+      "md5": "7a633a82ced14a66d3226658ead890d1",
+      "sha256": "c31844268d0d80b67abee9619d9a716b4ab3166cc2dde3d874c96f722bdf46c6"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/180309.wav",
+      "path": "data/raw/fsd50k_help/audio/180309.wav",
+      "status": "downloaded",
+      "bytes": 254756,
+      "md5": "b63d1a12a5335118b1a984a80c23f236",
+      "sha256": "57659403e06cdbab68b95e26afa8e5da1dab2a432cfb2bd70ed818fe90db710d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/221150.wav",
+      "path": "data/raw/fsd50k_help/audio/221150.wav",
+      "status": "downloaded",
+      "bytes": 146520,
+      "md5": "3ebc17f50172249de21f728fb9173b23",
+      "sha256": "8113008a015a86d7c08eba72ed43acbcbfbcd39204f7234e2b357701e6004b8a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/219882.wav",
+      "path": "data/raw/fsd50k_help/audio/219882.wav",
+      "status": "downloaded",
+      "bytes": 163918,
+      "md5": "dcf8435b3a75494abef60486fff0b460",
+      "sha256": "7bf2d545bfec8d64bdd3473512de5e219b4d698a2b2b27277a73e1c2427736e9"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/382991.wav",
+      "path": "data/raw/fsd50k_help/audio/382991.wav",
+      "status": "downloaded",
+      "bytes": 124968,
+      "md5": "d1d5ac17ed7b86ea6507759714b94247",
+      "sha256": "454fa11c5f8a1354c7dde661d1c8441d33d3cd151cdab7523e925737eec6e8f7"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/235595.wav",
+      "path": "data/raw/fsd50k_help/audio/235595.wav",
+      "status": "downloaded",
+      "bytes": 209026,
+      "md5": "df6d910dbdd2b390ba7b04a6784332ae",
+      "sha256": "3954d7d0559c99ec4575cc66a6fdc296993af15be20358f592e1c6722fca6c22"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/84353.wav",
+      "path": "data/raw/fsd50k_help/audio/84353.wav",
+      "status": "downloaded",
+      "bytes": 152830,
+      "md5": "6ef5027e0e27824c46a595968a7d5062",
+      "sha256": "ebf4f5b7934a2c08aac25876db093a72fa33566bc99c726c5135c215614d5b75"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/221151.wav",
+      "path": "data/raw/fsd50k_help/audio/221151.wav",
+      "status": "downloaded",
+      "bytes": 188846,
+      "md5": "b2bed53b864295baba1e28863e24e0d1",
+      "sha256": "c2a0a5058443309665d94f2d87e464c670b99a771c84bf9c1dcb64d4c7d586b1"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/351630.wav",
+      "path": "data/raw/fsd50k_help/audio/351630.wav",
+      "status": "downloaded",
+      "bytes": 209816,
+      "md5": "5eea6e2ad33c34d73c426640e48e0d70",
+      "sha256": "909c858347eefc4fa3b89265777543062ff9e713c87a0ee5235f2eb6d9936a31"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/323083.wav",
+      "path": "data/raw/fsd50k_help/audio/323083.wav",
+      "status": "downloaded",
+      "bytes": 166698,
+      "md5": "a54fd0f1cd91db30aa3959eb4b81ecc1",
+      "sha256": "fc6735e10bc7111d4e859aa0f910d9fcd2d249c4311b02d967429a21c89c87c6"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/168777.wav",
+      "path": "data/raw/fsd50k_help/audio/168777.wav",
+      "status": "downloaded",
+      "bytes": 197310,
+      "md5": "e995b9ab4c3e95bd4d67ef7492d8da50",
+      "sha256": "2ed799067ff8b5bf84de548105324f0dfc7036b09d3c66091be93b8a2f2fd18a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/278108.wav",
+      "path": "data/raw/fsd50k_help/audio/278108.wav",
+      "status": "downloaded",
+      "bytes": 119890,
+      "md5": "e20ef797e7370973e1ac08e22bfe3f22",
+      "sha256": "fff1d441e5a2e82ba07748e7c5bd41597202ba54f8c09dbdde9fab43f5001025"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/110139.wav",
+      "path": "data/raw/fsd50k_help/audio/110139.wav",
+      "status": "downloaded",
+      "bytes": 125726,
+      "md5": "9b0f69223a1c0b7d28d1e09ec5148181",
+      "sha256": "ee5c76cc480b5fd1b224642a6a48a27a60be784e3849f8b6f31697f4af0efdde"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220291.wav",
+      "path": "data/raw/fsd50k_help/audio/220291.wav",
+      "status": "downloaded",
+      "bytes": 214522,
+      "md5": "bbf61d70f59ed75553bcb7f5745591b2",
+      "sha256": "f2fc09cf6043d1ed1ade5cdb59bd7a4781db59846043ffdfee7183d4b88cbe53"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/241472.wav",
+      "path": "data/raw/fsd50k_help/audio/241472.wav",
+      "status": "downloaded",
+      "bytes": 186448,
+      "md5": "63fb0a24462c0c0491e335214eae0da2",
+      "sha256": "54372219a45196402680ade9575c27e1eeb9138f83194510977cb5f324ac799a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220649.wav",
+      "path": "data/raw/fsd50k_help/audio/220649.wav",
+      "status": "downloaded",
+      "bytes": 116812,
+      "md5": "4f00c60ff6c3b9a78c4c9d0cce0df258",
+      "sha256": "c9a5f3affd6a59b26ab13d437fa5c8d009abecdbb6b3bf3214393553e15e71de"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/166619.wav",
+      "path": "data/raw/fsd50k_help/audio/166619.wav",
+      "status": "downloaded",
+      "bytes": 59820,
+      "md5": "7e1ece4cca93d47e2c0e7a867c1cd805",
+      "sha256": "4aeb7eef8a5f4564b6d58476c66a56620f786735b9cb4638af5284f594be074c"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/219657.wav",
+      "path": "data/raw/fsd50k_help/audio/219657.wav",
+      "status": "downloaded",
+      "bytes": 141390,
+      "md5": "45af66ffe1bcd4649ae296cc9d578926",
+      "sha256": "cb429165e8955fdc9aea6d0461ab6d7334e0a90a08e7d09e9fc6f1fba95202c0"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/345933.wav",
+      "path": "data/raw/fsd50k_help/audio/345933.wav",
+      "status": "downloaded",
+      "bytes": 117366,
+      "md5": "ebf1cf632e68366fad7b3d0a4de5eaf1",
+      "sha256": "38af39732dcf2bfc9a7880bec74cae554cff1d7d5368a443eb89094c36fe0952"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/156901.wav",
+      "path": "data/raw/fsd50k_help/audio/156901.wav",
+      "status": "downloaded",
+      "bytes": 227378,
+      "md5": "2d5d8168322cd13239ff5ae212fc489a",
+      "sha256": "f62ad4ba8e1d58a1e22ba0346c904e1af6935b4d257943dad55ad64dec76572f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/344056.wav",
+      "path": "data/raw/fsd50k_help/audio/344056.wav",
+      "status": "downloaded",
+      "bytes": 90754,
+      "md5": "e5b940f365b568a45e5e31b226db6ede",
+      "sha256": "4746f12af2230fa85a2ead3e2c7177ecf29854838ce35f627eff5953c916c095"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/332451.wav",
+      "path": "data/raw/fsd50k_help/audio/332451.wav",
+      "status": "downloaded",
+      "bytes": 241742,
+      "md5": "5fd8ad43eadbb27fddad7243c9ae4bdb",
+      "sha256": "4bca0e48c7feccf9eaad268155e087e8d498ce938966f638778513b4a52c7aba"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/104029.wav",
+      "path": "data/raw/fsd50k_help/audio/104029.wav",
+      "status": "downloaded",
+      "bytes": 231604,
+      "md5": "0f4e4328681862d46f6d99ad91360b1b",
+      "sha256": "f2a23f04bec99d28e1d60400350c4713f1dae054e0af7092c64f817922cb2b02"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/400183.wav",
+      "path": "data/raw/fsd50k_help/audio/400183.wav",
+      "status": "downloaded",
+      "bytes": 136122,
+      "md5": "450ffebf2d7ad8d7a6801799a64463de",
+      "sha256": "baa39e027081a92ed3660adcc3acae9c52a479a2a641f9178a72b277b30a8b4b"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/125130.wav",
+      "path": "data/raw/fsd50k_help/audio/125130.wav",
+      "status": "downloaded",
+      "bytes": 162910,
+      "md5": "6ef7160f605f82b796cc90ce9cd891c9",
+      "sha256": "6a5b489c9d9ee9b4d7606710f3e6b04fe81b588af507d0c77369acbc4d8c828d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/406843.wav",
+      "path": "data/raw/fsd50k_help/audio/406843.wav",
+      "status": "downloaded",
+      "bytes": 82870,
+      "md5": "834e121a5dd817b786e6d726c3b5cb44",
+      "sha256": "c1bbdd0e5e1440a48cb073d4760a6de999fbf5cd902c3522d45c82a921805dbe"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/220306.wav",
+      "path": "data/raw/fsd50k_help/audio/220306.wav",
+      "status": "downloaded",
+      "bytes": 201806,
+      "md5": "7529119dca1008f8d02c9249c6ba0f07",
+      "sha256": "cc73ccc82089225366e04cbfed9cb67b3bf09eeaaf1807f124550d1c187fed10"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/345450.wav",
+      "path": "data/raw/fsd50k_help/audio/345450.wav",
+      "status": "downloaded",
+      "bytes": 161870,
+      "md5": "d9def58079e136c101cdea142ed39d3b",
+      "sha256": "77099db33db12fa1cb806cd78d1ee17c49473f915c15d71fff2bc2de4c7c8910"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220365.wav",
+      "path": "data/raw/fsd50k_help/audio/220365.wav",
+      "status": "downloaded",
+      "bytes": 153456,
+      "md5": "d92a9d28a83d0e72343ecee3b8e7a286",
+      "sha256": "1eaedd269efd33a6d9865a00612932cf10af3becfb4807697986079bf445b2b2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220302.wav",
+      "path": "data/raw/fsd50k_help/audio/220302.wav",
+      "status": "downloaded",
+      "bytes": 183422,
+      "md5": "5b55c78ef78259e52106f3b7062ebd75",
+      "sha256": "6fd00e86c2caddd4091ace623c9ea1a2230d40ea6c46428c9601c31fb3e5d330"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/432875.wav",
+      "path": "data/raw/fsd50k_help/audio/432875.wav",
+      "status": "downloaded",
+      "bytes": 49230,
+      "md5": "f827e30e521b0d06f0dedff4211e190d",
+      "sha256": "2f8c0c52141e28c973d0b9cc60366dc0f5c39223ddbdf3a46cb6a72888cc2f16"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/387409.wav",
+      "path": "data/raw/fsd50k_help/audio/387409.wav",
+      "status": "downloaded",
+      "bytes": 91730,
+      "md5": "098f23318c3db76beed848d1e92112e3",
+      "sha256": "46b5a401f7b5816ec5e1258e00af4d1c7e8fda02dbbd94cb2ecf24f9f7be6a57"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/222669.wav",
+      "path": "data/raw/fsd50k_help/audio/222669.wav",
+      "status": "downloaded",
+      "bytes": 147274,
+      "md5": "abfbb0251d52bd785c786927cbb0fcb1",
+      "sha256": "09fe7a12be2d63f4b7d47a98388f48899deb1cc0673db95a8418601691628737"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/219693.wav",
+      "path": "data/raw/fsd50k_help/audio/219693.wav",
+      "status": "downloaded",
+      "bytes": 173162,
+      "md5": "7d44f6b54e94ac04fda2947a735a36be",
+      "sha256": "9312becc8ee09b8e8dac02c2d5d71f044690b8884fa41ee7e7e93e3293db9ebc"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/9433.wav",
+      "path": "data/raw/fsd50k_help/audio/9433.wav",
+      "status": "downloaded",
+      "bytes": 176478,
+      "md5": "fccacd07911f1543d6924822012486d1",
+      "sha256": "12fbab9df5894f5ccde9da87043ddaae1439b760ec81daf7d7af40e151835227"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/316411.wav",
+      "path": "data/raw/fsd50k_help/audio/316411.wav",
+      "status": "downloaded",
+      "bytes": 101508,
+      "md5": "cd740402e592c3d6977db8b415f713c4",
+      "sha256": "746ce642b76d9da8fc4a2d1964fcf982f4790481cc7a1a0fa3ca9d6ed26ecf4c"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/344028.wav",
+      "path": "data/raw/fsd50k_help/audio/344028.wav",
+      "status": "downloaded",
+      "bytes": 84046,
+      "md5": "1f7e695ce2e43534b175445139d561c7",
+      "sha256": "4437c9927583b0ab1dfbb87f33d3fae064173712e41bfa2fe6891058211a4708"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220814.wav",
+      "path": "data/raw/fsd50k_help/audio/220814.wav",
+      "status": "downloaded",
+      "bytes": 75958,
+      "md5": "dea5005712ec18b0caa5807dad02314e",
+      "sha256": "8da36e65e97fd6c123a5da56ed2cab5165da7132f0d2b7ca37e4054e7692b582"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/166621.wav",
+      "path": "data/raw/fsd50k_help/audio/166621.wav",
+      "status": "downloaded",
+      "bytes": 177888,
+      "md5": "2f999edbf8b66f4702886fe906f6276b",
+      "sha256": "a41ff3293332d1c0f763a5bd0ebc14c944301ece80173b32067e0d28ae8b25ac"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/9704.wav",
+      "path": "data/raw/fsd50k_help/audio/9704.wav",
+      "status": "downloaded",
+      "bytes": 72400,
+      "md5": "22f0d556b642a31ecea9e7f5251470af",
+      "sha256": "92c9c8848444cb0aa0baae3d9a6740d5144b9e9034e95ac831bd670e6c9c5041"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/82418.wav",
+      "path": "data/raw/fsd50k_help/audio/82418.wav",
+      "status": "downloaded",
+      "bytes": 275262,
+      "md5": "a9890658903cead3ba69dfe16398b8d0",
+      "sha256": "25a1a3287d0c97a8a9f353952f8839d004173cb1780a0f5f7fe85fd83a62df0e"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/34281.wav",
+      "path": "data/raw/fsd50k_help/audio/34281.wav",
+      "status": "downloaded",
+      "bytes": 140304,
+      "md5": "9fbb84eb8aff51742320d23b0278d22c",
+      "sha256": "25093f7ca67f534c2cdb0f2fc579c3f836b8e491d9cf62976cf423d566ca3acc"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/30277.wav",
+      "path": "data/raw/fsd50k_help/audio/30277.wav",
+      "status": "downloaded",
+      "bytes": 176478,
+      "md5": "29b035619875d296fc21d69cb4cd3720",
+      "sha256": "7a9b23954cf569e649323d4c5879d73669878cbc7a190c68956045c9fd9ffa47"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220293.wav",
+      "path": "data/raw/fsd50k_help/audio/220293.wav",
+      "status": "downloaded",
+      "bytes": 198870,
+      "md5": "50a461ed16b417bc27b2f9d8718c09cd",
+      "sha256": "740c801ca236746d1b417bb94bb1bf5af7225b174d645ba35e0ae1e91696ce5e"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/77148.wav",
+      "path": "data/raw/fsd50k_help/audio/77148.wav",
+      "status": "downloaded",
+      "bytes": 161358,
+      "md5": "d05df0901bd86abf26030185a289f761",
+      "sha256": "d1b630a70bd3d594f235fd01af96332557b2a759fe2bd414654465e04a20aed2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/180341.wav",
+      "path": "data/raw/fsd50k_help/audio/180341.wav",
+      "status": "downloaded",
+      "bytes": 92322,
+      "md5": "38caa755d2c950b57664f5f4dbf9621c",
+      "sha256": "4c194f05a2d35357f8adcd4bb8453f8f78d29aabde121ccf3a40e3292d59c400"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/221153.wav",
+      "path": "data/raw/fsd50k_help/audio/221153.wav",
+      "status": "downloaded",
+      "bytes": 92056,
+      "md5": "ec7bb5472101014fd383b19a5631cd53",
+      "sha256": "6408ba4e67b9edda1e8ea76b1f121cd957efaee54582f42e6e25169da06d35e6"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220822.wav",
+      "path": "data/raw/fsd50k_help/audio/220822.wav",
+      "status": "downloaded",
+      "bytes": 66326,
+      "md5": "e4c5bd687f487b37fe30060790a209a6",
+      "sha256": "e38d16edde8e1becc6ce24dba2417668dfbd61dd6677d033267785684bcc65ce"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220818.wav",
+      "path": "data/raw/fsd50k_help/audio/220818.wav",
+      "status": "downloaded",
+      "bytes": 75958,
+      "md5": "bda0c629864d31fda26779cfbfedf699",
+      "sha256": "59df6f933f67ccaa81de5f974189777ec25e13ffd6de48bea8eabffb3f1d2aa4"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/220694.wav",
+      "path": "data/raw/fsd50k_help/audio/220694.wav",
+      "status": "downloaded",
+      "bytes": 243510,
+      "md5": "cf3af0232ffacea5a4716360b9185680",
+      "sha256": "ca3bc96df86dcc2809989530488b3e73932ccac3b290921353a218b179de1c0d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/353086.wav",
+      "path": "data/raw/fsd50k_help/audio/353086.wav",
+      "status": "downloaded",
+      "bytes": 247288,
+      "md5": "62b8d01b40642064ec1a4a9682765367",
+      "sha256": "c6d89db5a9e664d46d4b40fc213c49725603a932e69e34a49919af9724f68e31"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/31635.wav",
+      "path": "data/raw/fsd50k_help/audio/31635.wav",
+      "status": "downloaded",
+      "bytes": 231604,
+      "md5": "22754325d1c9f3d533bca23ca6823a3a",
+      "sha256": "7c82f40cf318c72efdd553c1d7e880e6984b86434de2140cbac99aab7fb241e3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/381803.wav",
+      "path": "data/raw/fsd50k_help/audio/381803.wav",
+      "status": "downloaded",
+      "bytes": 71502,
+      "md5": "83974c1993d03bc60bc08b9811a6ec8d",
+      "sha256": "9cb8db19a692f64c720384f157979b018b6388bc7e842c5c673b63ec9a19be78"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/222589.wav",
+      "path": "data/raw/fsd50k_help/audio/222589.wav",
+      "status": "downloaded",
+      "bytes": 147906,
+      "md5": "8600dc53a5a91bfed3a6258bfec68347",
+      "sha256": "b3e8c9d097939c579c5826e5677a39c76cf99851df61a6a6e4e96b86fca2609a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/344037.wav",
+      "path": "data/raw/fsd50k_help/audio/344037.wav",
+      "status": "downloaded",
+      "bytes": 74830,
+      "md5": "30499ff1706f5891d1db7157834bf582",
+      "sha256": "f35286376cf7560c8039a5876718536a50ee5fc91a3b3f8253bfd03631a3758b"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/67324.wav",
+      "path": "data/raw/fsd50k_help/audio/67324.wav",
+      "status": "downloaded",
+      "bytes": 193452,
+      "md5": "f6efda29b980f34a7bf7ca713762d3f2",
+      "sha256": "4a8be652422547ed36bd30b808b0336b4526b0e1110708937853ca01c70739dc"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/219665.wav",
+      "path": "data/raw/fsd50k_help/audio/219665.wav",
+      "status": "downloaded",
+      "bytes": 186670,
+      "md5": "c31cb9ed4c950a5c9ff52a52b61af733",
+      "sha256": "c6c6bc7e7e20f066f730aa1e6e80562baeb19f986c31f58a3c2c536918231253"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/34283.wav",
+      "path": "data/raw/fsd50k_help/audio/34283.wav",
+      "status": "downloaded",
+      "bytes": 53064,
+      "md5": "a186c10729ce593b5164076e0b9bd2f3",
+      "sha256": "ecfb2cdc87992433c739b0fb923f117eac5cc0009ed6783b9fccf193c55de7ec"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/353295.wav",
+      "path": "data/raw/fsd50k_help/audio/353295.wav",
+      "status": "downloaded",
+      "bytes": 92140,
+      "md5": "7a51d8f4aac51ffb761cf8f518c2256f",
+      "sha256": "490f49f7ceb9393dca756eabea39e287154f2ba47151b2423885b4990b184653"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/316409.wav",
+      "path": "data/raw/fsd50k_help/audio/316409.wav",
+      "status": "downloaded",
+      "bytes": 50794,
+      "md5": "da986a94cfc062e781b0b26a6d21ab02",
+      "sha256": "1b3ca67e2f6c39927504d1a847a7c6dcc6b825494d048cf33a00eff709b1f91e"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/219653.wav",
+      "path": "data/raw/fsd50k_help/audio/219653.wav",
+      "status": "downloaded",
+      "bytes": 99700,
+      "md5": "c6758aae12a9b03ee055a66ff0bcc2f2",
+      "sha256": "e1bb25d1ad9e3ca17ce79587c07866201f22c4eace57b6fe75729475e6870bac"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/368824.wav",
+      "path": "data/raw/fsd50k_help/audio/368824.wav",
+      "status": "downloaded",
+      "bytes": 75882,
+      "md5": "5113880592a453bb90cf51dd377b61a2",
+      "sha256": "505c3ff548f546ce21758e31d0421accbaa12d373f609068f29de15db76ac9fd"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/220646.wav",
+      "path": "data/raw/fsd50k_help/audio/220646.wav",
+      "status": "downloaded",
+      "bytes": 123172,
+      "md5": "e82a22af642e241ac0132de620cde16e",
+      "sha256": "1703a55250c39cd1f343fbc37bc93643aed4adbd7ec862f09b2e9eea67d21e4b"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/400182.wav",
+      "path": "data/raw/fsd50k_help/audio/400182.wav",
+      "status": "downloaded",
+      "bytes": 194216,
+      "md5": "2c495b2928378f4ac75863a26230100c",
+      "sha256": "294d281e1e4a42cf12a7db8b370c4840649591fef007a417b72f6811a070af3e"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220289.wav",
+      "path": "data/raw/fsd50k_help/audio/220289.wav",
+      "status": "downloaded",
+      "bytes": 111550,
+      "md5": "a56fe7712d4854e3a330887791741bf4",
+      "sha256": "43e9952b326fe82953e9810d678397a4ea5056c2ea025b338f44c1e8c6ccfac4"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/315833.wav",
+      "path": "data/raw/fsd50k_help/audio/315833.wav",
+      "status": "downloaded",
+      "bytes": 167766,
+      "md5": "9c9a188a57ec391f1d42e43108d24f7a",
+      "sha256": "b1d58691e87b1e14d4701bb6a2fc07edc8d48bc76034ee0fa28af9f7a90e23e1"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/63632.wav",
+      "path": "data/raw/fsd50k_help/audio/63632.wav",
+      "status": "downloaded",
+      "bytes": 102576,
+      "md5": "9378b099dba79791b9c33f65f2c5c175",
+      "sha256": "aaea2b2313d3c835c1717f7b7dbe2ece567639ba74995a7ae85abe442f3d8e28"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/406088.wav",
+      "path": "data/raw/fsd50k_help/audio/406088.wav",
+      "status": "downloaded",
+      "bytes": 232206,
+      "md5": "b6dabbee61c615bc0c36385417820d87",
+      "sha256": "7f9f9254f2355d0daf0a0a63421bc526c1017d63b81a1266463504e14296a312"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/163728.wav",
+      "path": "data/raw/fsd50k_help/audio/163728.wav",
+      "status": "downloaded",
+      "bytes": 125910,
+      "md5": "9a8416147a460647bfff3dcd05178c6f",
+      "sha256": "31d400df673de3691dd94a4a3772ea632765c96520c9057086f0776480c23b88"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/144338.wav",
+      "path": "data/raw/fsd50k_help/audio/144338.wav",
+      "status": "downloaded",
+      "bytes": 127506,
+      "md5": "fdee591e6fcaaa49811c579b681c5da6",
+      "sha256": "9d517c4cb8c7d4e4b7a5f08b0168d442507b1ae36b06232a46ee0b6d74aa1999"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/221152.wav",
+      "path": "data/raw/fsd50k_help/audio/221152.wav",
+      "status": "downloaded",
+      "bytes": 143700,
+      "md5": "df6482a3737ebbd99d360a7f18ce1d3e",
+      "sha256": "f74ff7cf82386d4a8608946ab730143b482c107088b1230d9365b30b4980cfce"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/343948.wav",
+      "path": "data/raw/fsd50k_help/audio/343948.wav",
+      "status": "downloaded",
+      "bytes": 53582,
+      "md5": "78ddca4d6a43e21797d1e181c05b30d5",
+      "sha256": "bc7b1b87a6ac91688eb7de26c9b7eb279d50da83fb6f77ecf05aaeda1a56ae17"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/402861.wav",
+      "path": "data/raw/fsd50k_help/audio/402861.wav",
+      "status": "downloaded",
+      "bytes": 136630,
+      "md5": "39a099deca334d5d5d4dd6ed490b04fd",
+      "sha256": "b98abf339792bb3ccd118200c4f04b458a5d77218d8710e027c3d78cf3f47967"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/9434.wav",
+      "path": "data/raw/fsd50k_help/audio/9434.wav",
+      "status": "downloaded",
+      "bytes": 209554,
+      "md5": "3c54cc434acc93335eabd18b9470217e",
+      "sha256": "8d401c1194de0c5f464cad25667eedbcfce00f4f8e25a77d1b9ad30911c29c7d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/219658.wav",
+      "path": "data/raw/fsd50k_help/audio/219658.wav",
+      "status": "downloaded",
+      "bytes": 141390,
+      "md5": "5edbd02c50dbba847afd13ca63a7ce15",
+      "sha256": "34e7b62d0691ffd7a8415ac229d27dfa239d4a8ea633f273fbde80d06275fa53"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/353296.wav",
+      "path": "data/raw/fsd50k_help/audio/353296.wav",
+      "status": "downloaded",
+      "bytes": 221870,
+      "md5": "ecaa68414346045e6a7601f675b520cc",
+      "sha256": "788211329a795c4cde6fe314b1dbe238a95bbb7f34120b2bc51738336f1c2cad"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/168725.wav",
+      "path": "data/raw/fsd50k_help/audio/168725.wav",
+      "status": "downloaded",
+      "bytes": 123982,
+      "md5": "7614408f71c522a51950d82bf7b2d53b",
+      "sha256": "86811fb954a94057d1cbfd897dd7f549e1bf3c31a00342db02d3b1c56e0586ef"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/241515.wav",
+      "path": "data/raw/fsd50k_help/audio/241515.wav",
+      "status": "downloaded",
+      "bytes": 164430,
+      "md5": "f534bfdf357fb26680371fc8b18f1169",
+      "sha256": "733274f319b082c2b06162b06f17d1870d5bc10f1829c70f1b1ba2a0d216aeb9"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/9429.wav",
+      "path": "data/raw/fsd50k_help/audio/9429.wav",
+      "status": "downloaded",
+      "bytes": 253654,
+      "md5": "b55c129fe9f2db2849ba4a57c62364a9",
+      "sha256": "4f4ce0dfef671b2f326bf7e61fe1ddc84377faba4d74513a94b428f38fff3786"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/179315.wav",
+      "path": "data/raw/fsd50k_help/audio/179315.wav",
+      "status": "downloaded",
+      "bytes": 282226,
+      "md5": "a6af0460159978cef47e387f4aed20a0",
+      "sha256": "2b86da035921442de186ec1aa10b195faa2fc6d32eda93cee3039b68ac23442b"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/222530.wav",
+      "path": "data/raw/fsd50k_help/audio/222530.wav",
+      "status": "downloaded",
+      "bytes": 115278,
+      "md5": "948de8e01513a4e362bb8ddeabedcc75",
+      "sha256": "ae9080530c6914403d05a0dacbfbe971ec755f829eb916d02c55fd1693a988ac"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/320247.wav",
+      "path": "data/raw/fsd50k_help/audio/320247.wav",
+      "status": "downloaded",
+      "bytes": 160326,
+      "md5": "3a7dd9585240c6a576e79a285d872153",
+      "sha256": "0443730da35ede0e136ee62375a740a098da5317aa15e9a1efcc2a48c64cf061"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/30276.wav",
+      "path": "data/raw/fsd50k_help/audio/30276.wav",
+      "status": "downloaded",
+      "bytes": 264678,
+      "md5": "c5afe29d05d0669dae33a20d9f87dd55",
+      "sha256": "072db6efd8ea9aa023f424873a3155b6e098601d9952fc3f8ffcbeb9747db378"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/58803.wav",
+      "path": "data/raw/fsd50k_help/audio/58803.wav",
+      "status": "downloaded",
+      "bytes": 65616,
+      "md5": "77e8bb184608d47e3368f805c00b1047",
+      "sha256": "531626c8f63f6f9729ef645538f759b323cb225b557938280d76dc6b93cb4977"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/250550.wav",
+      "path": "data/raw/fsd50k_help/audio/250550.wav",
+      "status": "downloaded",
+      "bytes": 176478,
+      "md5": "785cc15127f2691bfd196e035d789513",
+      "sha256": "3344bcad680692c19b66b0e60f50bb5cf16139be38940cfdf70eed21e0b1e929"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/169811.wav",
+      "path": "data/raw/fsd50k_help/audio/169811.wav",
+      "status": "downloaded",
+      "bytes": 173888,
+      "md5": "e7bef7dd3c656a4c31bfde78f7afa905",
+      "sha256": "cf8da9607ecdd7f2167d1b8a82a87aebf7dbe58c373782d19052cdfc6f63de04"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/220663.wav",
+      "path": "data/raw/fsd50k_help/audio/220663.wav",
+      "status": "downloaded",
+      "bytes": 118862,
+      "md5": "53a07e53d8d7fb2c20feed0f4fdbbc90",
+      "sha256": "2260f9fe433ca74d34c69fadabde655f6de900cc3ddd0a31ef639ae5a525b550"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/180350.wav",
+      "path": "data/raw/fsd50k_help/audio/180350.wav",
+      "status": "downloaded",
+      "bytes": 129346,
+      "md5": "c400e360804839af45fce98b2abbc9e7",
+      "sha256": "7a18153373df8f6a81d29afc078e84448c81d6a8b8c1a2e050e2c4b6dae611da"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/412125.wav",
+      "path": "data/raw/fsd50k_help/audio/412125.wav",
+      "status": "downloaded",
+      "bytes": 50912,
+      "md5": "c695ed732f99e1609ce38ab719658237",
+      "sha256": "19d11f60e3dacd8d7821155825528ee0c0701f254d334c73fcc80b101677d6f9"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/345440.wav",
+      "path": "data/raw/fsd50k_help/audio/345440.wav",
+      "status": "downloaded",
+      "bytes": 39070,
+      "md5": "4f6bb2ab382f863d68efcd4c0bd34194",
+      "sha256": "043495bd2e8cceda42577fda4c5e7784947879749a28aaec27c6675521d0a427"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/13874.wav",
+      "path": "data/raw/fsd50k_help/audio/13874.wav",
+      "status": "downloaded",
+      "bytes": 150094,
+      "md5": "062f8c2f82ce7d5d41097580359e7c62",
+      "sha256": "fa20241f58bd6158a2a148e4f3207a932d1540ba4aecb48510c9146b81707533"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/164582.wav",
+      "path": "data/raw/fsd50k_help/audio/164582.wav",
+      "status": "downloaded",
+      "bytes": 66596,
+      "md5": "a287779a0e68f15008920309d7d8ee54",
+      "sha256": "7bc3fda20319ae8c943213b02da175ece7fea71d8f604624338c3078563c4b32"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/13882.wav",
+      "path": "data/raw/fsd50k_help/audio/13882.wav",
+      "status": "downloaded",
+      "bytes": 58444,
+      "md5": "ce8b920a7b15b034b2befef2b049dbe6",
+      "sha256": "55ac43bcae5ed388fffcd2cf2247f18c6f667505d9b7c5a108c775571ad4b1a7"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/57785.wav",
+      "path": "data/raw/fsd50k_help/audio/57785.wav",
+      "status": "downloaded",
+      "bytes": 104084,
+      "md5": "70abcaabe043aafce8416213fda1520c",
+      "sha256": "3a2a6a6aa60acee5a8ed6d51979b8557dd75f8c392e0a0badac4947981d6f373"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/244976.wav",
+      "path": "data/raw/fsd50k_help/audio/244976.wav",
+      "status": "downloaded",
+      "bytes": 64656,
+      "md5": "96617a4a48bc571998a6c87cd1abe750",
+      "sha256": "a65fdc586c796c60dca758bb2a63e698e83bd6a6e0b8e06c80cc925f4f7f9187"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/13854.wav",
+      "path": "data/raw/fsd50k_help/audio/13854.wav",
+      "status": "downloaded",
+      "bytes": 97870,
+      "md5": "d93e8a7072a847ab1cd67a1f39368fb6",
+      "sha256": "c0c9b18d0bda3ad426f27b8373aee9c224e1353dccb3fff05e97b340e3f24ae7"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/13511.wav",
+      "path": "data/raw/fsd50k_help/audio/13511.wav",
+      "status": "downloaded",
+      "bytes": 293124,
+      "md5": "8f93d52d7c07f2bee60193aede14d765",
+      "sha256": "7c65a4bf140e9bbbf01f35bb80142ff9dcda6aeef53c9ff0faf30f6861c4a304"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/337354.wav",
+      "path": "data/raw/fsd50k_help/audio/337354.wav",
+      "status": "downloaded",
+      "bytes": 56120,
+      "md5": "b728c37bb43d0b639aef94b6f9d6c1b5",
+      "sha256": "33c0a7afb21687f44fd674e4596cbd22d17a7900bc25d69361f98be41229e85d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/363186.wav",
+      "path": "data/raw/fsd50k_help/audio/363186.wav",
+      "status": "downloaded",
+      "bytes": 130638,
+      "md5": "d6fd27d0e1d9fb5423a2b2c035c83f0e",
+      "sha256": "9e69706c88717a52419fb95e12b2ec649c2069fadeb3c5d29205c18c18145011"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/336488.wav",
+      "path": "data/raw/fsd50k_help/audio/336488.wav",
+      "status": "downloaded",
+      "bytes": 119424,
+      "md5": "864642b117ddc0ea55a44bddc69be749",
+      "sha256": "15114c78f5e3139d6df8ac8353752b6c12fbc352dcfc2a323f8d7e1b983aec47"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/10752.wav",
+      "path": "data/raw/fsd50k_help/audio/10752.wav",
+      "status": "downloaded",
+      "bytes": 64740,
+      "md5": "99fb2f2a68cf8a8e40e01337865d7e34",
+      "sha256": "1f86186574ca2c96808f231be28e914532d74be498ee24839b48ce1e09a23089"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/369084.wav",
+      "path": "data/raw/fsd50k_help/audio/369084.wav",
+      "status": "downloaded",
+      "bytes": 94710,
+      "md5": "25210dc4326a3532dc640112c8d82096",
+      "sha256": "140f1c1908fec580be23275c66662ad67f1352ef1b1f76c29736e717923e6032"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/353396.wav",
+      "path": "data/raw/fsd50k_help/audio/353396.wav",
+      "status": "downloaded",
+      "bytes": 39426,
+      "md5": "247c0bddd37be77483fbd95ba2455a70",
+      "sha256": "ab40eb4650385bb470b1a9df9b261db1191488b744c9dbb7854698b02d5e041d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/320909.wav",
+      "path": "data/raw/fsd50k_help/audio/320909.wav",
+      "status": "downloaded",
+      "bytes": 141900,
+      "md5": "90ae6e1f3eff7b04b1d8782416baea0e",
+      "sha256": "d34d0b57f4660591a8ab9678fb8878a951ab9574264f0915e44361f553243124"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/321805.wav",
+      "path": "data/raw/fsd50k_help/audio/321805.wav",
+      "status": "downloaded",
+      "bytes": 69892,
+      "md5": "6faa9c8a13b4d52a8785cf9acc0bf70a",
+      "sha256": "b2b8bcaa9bb9242b74120d78c371513a3448551efbdfd01c6b1b96ecf306baaf"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/383750.wav",
+      "path": "data/raw/fsd50k_help/audio/383750.wav",
+      "status": "downloaded",
+      "bytes": 34682,
+      "md5": "11eb17fad3b722aa6a56f9a39cc5eaf9",
+      "sha256": "299225ba31df40467799a911d22ddc717e3d8a5ae4d1a5721a39ff27fa851466"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/349269.wav",
+      "path": "data/raw/fsd50k_help/audio/349269.wav",
+      "status": "downloaded",
+      "bytes": 120332,
+      "md5": "ea076d3ba924fc1bd5120bf4867077a8",
+      "sha256": "d299fc2db3823d0575be6b52972d7f70064392758b6388b4bd4d4c0605aa878d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/324677.wav",
+      "path": "data/raw/fsd50k_help/audio/324677.wav",
+      "status": "downloaded",
+      "bytes": 73536,
+      "md5": "6ecb3856ec24a7d00f713c0c25039e4e",
+      "sha256": "239bd312b8c50e586f8dc1faf12fe6e8c3313542d3f3af7f38e9df169a9b893d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/10762.wav",
+      "path": "data/raw/fsd50k_help/audio/10762.wav",
+      "status": "downloaded",
+      "bytes": 59174,
+      "md5": "1942bea07c898117b021f0e775b8ca16",
+      "sha256": "3c00a206553ff99c422d62d46978bb94fd8a11b47d3275a6b7a693b9d998e394"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/117042.wav",
+      "path": "data/raw/fsd50k_help/audio/117042.wav",
+      "status": "downloaded",
+      "bytes": 96846,
+      "md5": "22beaa2d6b3f43ffb19927ba1604608b",
+      "sha256": "07fc2cf9ff51eda0bd0810f150e2ea9d0d3b36fb93aa2dfabd1f754bd69b7c28"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/348243.wav",
+      "path": "data/raw/fsd50k_help/audio/348243.wav",
+      "status": "downloaded",
+      "bytes": 113004,
+      "md5": "567f864910e9c30efbd72f17c25da8a0",
+      "sha256": "102dc566fb3851c674de15925172816cab809f165eb1e964e70c090a0e6844b2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/65734.wav",
+      "path": "data/raw/fsd50k_help/audio/65734.wav",
+      "status": "downloaded",
+      "bytes": 66210,
+      "md5": "76171241b66469fb28a36ae6a05fc7b3",
+      "sha256": "0be82b53e0db2c63d062756eb2bae0e93152e018de96c730e2ad24ad0c1e525b"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/389999.wav",
+      "path": "data/raw/fsd50k_help/audio/389999.wav",
+      "status": "downloaded",
+      "bytes": 252522,
+      "md5": "3b6e24ed841a06dca01089e20b771d1f",
+      "sha256": "eb5bf6a143589ea6ba817ac217a1494253e56b952eb142ef744a3abb005b245a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/193849.wav",
+      "path": "data/raw/fsd50k_help/audio/193849.wav",
+      "status": "downloaded",
+      "bytes": 214482,
+      "md5": "8bf4e2cc1d0deb081f5b3aa8a5c55b5e",
+      "sha256": "9f92cecdefb437c61672586e185aa6e842f1490b2b80f9b2a83fb8957ed22fcf"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/148950.wav",
+      "path": "data/raw/fsd50k_help/audio/148950.wav",
+      "status": "downloaded",
+      "bytes": 288156,
+      "md5": "7152d787a5d94ff2c908dac23d405dee",
+      "sha256": "d977c1c146a8a4e222580b02c3ad6e75dbe6890f486bce23271f058a627aecdc"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/193850.wav",
+      "path": "data/raw/fsd50k_help/audio/193850.wav",
+      "status": "downloaded",
+      "bytes": 218578,
+      "md5": "f6fa71c530c46004b4b9e5e7d14f29fa",
+      "sha256": "e1bf86ce1569d05b44ef0e3db49cd6750a1e9875603ff336f6c8cf3ba0b6f32f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/148947.wav",
+      "path": "data/raw/fsd50k_help/audio/148947.wav",
+      "status": "downloaded",
+      "bytes": 102050,
+      "md5": "b5e8e971ecb622f04e4efb5f912ccef6",
+      "sha256": "e658a8557b7985ca52bed6484e0614b9829080cd0ff6dddc70bc91e1c14aed02"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/193864.wav",
+      "path": "data/raw/fsd50k_help/audio/193864.wav",
+      "status": "downloaded",
+      "bytes": 201002,
+      "md5": "8f863f6ba232be5915cf61a43190517f",
+      "sha256": "bf783bdf533c7cb36fa4aa642b227f6819a49cae4ebe57fb51e8e01af824a515"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/193854.wav",
+      "path": "data/raw/fsd50k_help/audio/193854.wav",
+      "status": "downloaded",
+      "bytes": 200682,
+      "md5": "4f8cb4faf89ac8bfa80e1ddbadb8c6d6",
+      "sha256": "575bf0810af61d2bd9c8efabd3f470a86f44c2f9937a96a9d1b87fb92f268fc7"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/347944.wav",
+      "path": "data/raw/fsd50k_help/audio/347944.wav",
+      "status": "downloaded",
+      "bytes": 72588,
+      "md5": "bae37eade783883b7d1ffff7fd7c8818",
+      "sha256": "d5d3d5a8400395a6c7702bfe0355774715d9839979b544974a92b1c8d2fa8a76"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/85253.wav",
+      "path": "data/raw/fsd50k_help/audio/85253.wav",
+      "status": "downloaded",
+      "bytes": 185734,
+      "md5": "6e8915dc70e04121847dcd7ffcc141f2",
+      "sha256": "236a61567a467c21b3236af18ec7a9231333ceb455207aee84e4d386bf1926b3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/193870.wav",
+      "path": "data/raw/fsd50k_help/audio/193870.wav",
+      "status": "downloaded",
+      "bytes": 273600,
+      "md5": "90092045311d082586d15c311750c513",
+      "sha256": "80d71bf15d9e46a1e2d9c3985e9ebbdf1305f0035585ef5e0559108fceb54b6d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/396280.wav",
+      "path": "data/raw/fsd50k_help/audio/396280.wav",
+      "status": "downloaded",
+      "bytes": 97040,
+      "md5": "8d9cf8f75b62b30084689ea1fcdde977",
+      "sha256": "929f890c75876c9e4df548db5a8d5c10a0a311f8fb1f31c52cc6b888f0347334"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/209222.wav",
+      "path": "data/raw/fsd50k_help/audio/209222.wav",
+      "status": "downloaded",
+      "bytes": 171466,
+      "md5": "29b2a920ef9f53ab3f5cfb817a0dd6f1",
+      "sha256": "d1992a303283fc962f22e6d76ce1980366254a9a096804e1efc2ff3c3a9c7c71"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/349285.wav",
+      "path": "data/raw/fsd50k_help/audio/349285.wav",
+      "status": "downloaded",
+      "bytes": 132032,
+      "md5": "cd41b2aa6c24fac9339c60c835349e8a",
+      "sha256": "0e10a969b4242756539a5a501f69535a89a573ee41a272ef4391c3ac494dfe00"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/190023.wav",
+      "path": "data/raw/fsd50k_help/audio/190023.wav",
+      "status": "downloaded",
+      "bytes": 30190,
+      "md5": "55f0c4497a128c6e073935673b81d532",
+      "sha256": "6d936986975c487f42138bbbe8ee991dbc7bddc311ae35ae7cb78a3f5d8dbb27"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/114042.wav",
+      "path": "data/raw/fsd50k_help/audio/114042.wav",
+      "status": "downloaded",
+      "bytes": 91756,
+      "md5": "a81f967bed2b5f208cfc51d0df808d4b",
+      "sha256": "fc13404eacc34d962ef0cf4a9700ad71a6d51c67ed436907e6f959c27d147aad"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/193841.wav",
+      "path": "data/raw/fsd50k_help/audio/193841.wav",
+      "status": "downloaded",
+      "bytes": 193686,
+      "md5": "108fa7a79f7220fb69a86a211f6dd422",
+      "sha256": "bd25733ee3ccc9033c5cb24e61be2884bb0009391358178e90f3d4508346c70f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/265003.wav",
+      "path": "data/raw/fsd50k_help/audio/265003.wav",
+      "status": "downloaded",
+      "bytes": 69824,
+      "md5": "55d3a767b92f15ffc18fe1d096e766d9",
+      "sha256": "74471303fd25847f5e3688b5bf804335aa1b4a1e0b05b7113ca0fd84b58b43c8"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/329924.wav",
+      "path": "data/raw/fsd50k_help/audio/329924.wav",
+      "status": "downloaded",
+      "bytes": 76518,
+      "md5": "4711ec13bcdbe812c8c7f8641582be05",
+      "sha256": "9175f38a5e68313f25c373f6aa2cf9aa45174d7fca3b72b3f72cd252c960163d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/182023.wav",
+      "path": "data/raw/fsd50k_help/audio/182023.wav",
+      "status": "downloaded",
+      "bytes": 275258,
+      "md5": "42797673a237baadcde5828eae111cc4",
+      "sha256": "d7e1d8537db0f9355c196cdf265f304ba78bfd6cd25c2b4d00374fa1c189cca2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/336391.wav",
+      "path": "data/raw/fsd50k_help/audio/336391.wav",
+      "status": "downloaded",
+      "bytes": 223566,
+      "md5": "8cb428704078d07c94a622fe464ecd3c",
+      "sha256": "95e5c911e8e79c57219cb64b8a294a4b5e706449cf7810fd7811991e230d4b65"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/352673.wav",
+      "path": "data/raw/fsd50k_help/audio/352673.wav",
+      "status": "downloaded",
+      "bytes": 148594,
+      "md5": "858de8041cccc543629049407718408b",
+      "sha256": "32eca67789fcaf1b6c6419e07b8d6514c0d2818cddda7547ac5f2cd169d24605"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/141563.wav",
+      "path": "data/raw/fsd50k_help/audio/141563.wav",
+      "status": "downloaded",
+      "bytes": 164618,
+      "md5": "4ac599971b2b26d03a6d0f484127c68e",
+      "sha256": "65447a968807975f2edbc27e3197baba007f307647c73335fef6a019d9651bf1"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/245410.wav",
+      "path": "data/raw/fsd50k_help/audio/245410.wav",
+      "status": "downloaded",
+      "bytes": 243358,
+      "md5": "fa0bb6399159189ccc461fa2c41a8b14",
+      "sha256": "a19d9ef9f07ae6d98d00fc796eee0fbcb7fc6ee9032f62c930e8bc8158b8bc14"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/219845.wav",
+      "path": "data/raw/fsd50k_help/audio/219845.wav",
+      "status": "downloaded",
+      "bytes": 209064,
+      "md5": "4ad5689373a068b64a8a4bd82a5b5163",
+      "sha256": "fb142f506e7767c314bcf4c001ccede34870e89ec138d5bbfd13bed3cacc380a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/216282.wav",
+      "path": "data/raw/fsd50k_help/audio/216282.wav",
+      "status": "downloaded",
+      "bytes": 264642,
+      "md5": "e3b6e89d3b2af82f3b913063541ae745",
+      "sha256": "6e02dc18db7e47108f68ae38b79c9dfa1acd76a7323a73c4feb634aed533eb81"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/368328.wav",
+      "path": "data/raw/fsd50k_help/audio/368328.wav",
+      "status": "downloaded",
+      "bytes": 35366,
+      "md5": "518e219fb5e160210dbc3d67dba97471",
+      "sha256": "145d99869bf8e7e8f3ee535634e984dab89aa9b66f67b87d96748512d0d8ee8c"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/126878.wav",
+      "path": "data/raw/fsd50k_help/audio/126878.wav",
+      "status": "downloaded",
+      "bytes": 184038,
+      "md5": "3071366e20bbaa9a1a8521ca95d7205a",
+      "sha256": "8f88939e01c71ba4d7d1293f2be478c9a6885a2462f0d83c82faff3ef3a16bbf"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/145558.wav",
+      "path": "data/raw/fsd50k_help/audio/145558.wav",
+      "status": "downloaded",
+      "bytes": 144480,
+      "md5": "dcce321da573924e42e66034a7cd98a4",
+      "sha256": "341a6dbf50df115191c81e3170bb94ce7a5eff855904a68c4e32b835d7d70742"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/233606.wav",
+      "path": "data/raw/fsd50k_help/audio/233606.wav",
+      "status": "downloaded",
+      "bytes": 176478,
+      "md5": "a0295c46e2218b66bcc31b28a58f5513",
+      "sha256": "ad919cef2c13f2fe80f319a4f899bda4341a5687218d86c72b7c069f5f5669a9"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/255182.wav",
+      "path": "data/raw/fsd50k_help/audio/255182.wav",
+      "status": "downloaded",
+      "bytes": 167304,
+      "md5": "ae228dd1b10c63ea780d0b9b5c41eb51",
+      "sha256": "b6abe2dd519b4fdba5749389072c36909463fc5e3f2b63e057485a3b3da59758"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/212698.wav",
+      "path": "data/raw/fsd50k_help/audio/212698.wav",
+      "status": "downloaded",
+      "bytes": 203292,
+      "md5": "b69e75f3a03f4d62a852bdead45792f7",
+      "sha256": "14e8e3509052f74a45f0ffc6318858761c9d4e7c8d29a4bbc3ca7bb357cab6e8"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/159462.wav",
+      "path": "data/raw/fsd50k_help/audio/159462.wav",
+      "status": "downloaded",
+      "bytes": 186702,
+      "md5": "773d02502fe010f7a40a34f79f4cc2c7",
+      "sha256": "f41f37ce94525706e3ae260cee8a85fc6f64f889c092a309dc41a7c4b1a8d0f3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/977.wav",
+      "path": "data/raw/fsd50k_help/audio/977.wav",
+      "status": "downloaded",
+      "bytes": 120936,
+      "md5": "8d98a258522f3e7dff2967cb218e4423",
+      "sha256": "ad006a690927e42f5dde329a377c4ee4f091b2eccb48030674add5847fc7c7c2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/346173.wav",
+      "path": "data/raw/fsd50k_help/audio/346173.wav",
+      "status": "downloaded",
+      "bytes": 196686,
+      "md5": "2d59ec49a4b63a521aca4c386a74f729",
+      "sha256": "d918d71c38b53c377183b3d53d0a419b49b53fdb13c335cf50da1e0368f30e2f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/216292.wav",
+      "path": "data/raw/fsd50k_help/audio/216292.wav",
+      "status": "downloaded",
+      "bytes": 264642,
+      "md5": "550354b2c42992016a60f67d845555b2",
+      "sha256": "5d333b319d10c0eea99197bde2263c20acc2a283f3bac3091f15460960d5ba91"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/88941.wav",
+      "path": "data/raw/fsd50k_help/audio/88941.wav",
+      "status": "downloaded",
+      "bytes": 71578,
+      "md5": "67a1b8fc7ff6dbd4296d7ed3c92923b9",
+      "sha256": "ea616576227ce954992965a3b91db0a4a1147042d64b9bcc460ba3f82f7c0339"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/213158.wav",
+      "path": "data/raw/fsd50k_help/audio/213158.wav",
+      "status": "downloaded",
+      "bytes": 143294,
+      "md5": "00c13963866bf4cde8ec1fcca4ec6e45",
+      "sha256": "cddd9ec17aa2c827b24990c96cfce4a7f73b749ec44ebfbf84f5de43d2e249bf"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/406257.wav",
+      "path": "data/raw/fsd50k_help/audio/406257.wav",
+      "status": "downloaded",
+      "bytes": 207824,
+      "md5": "88444261c6475d4bcd4664bebc4fda8c",
+      "sha256": "58d0d53a36ddeb6268fd0343001cda8a3d08f725009ccd923a32789457cdd548"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/368342.wav",
+      "path": "data/raw/fsd50k_help/audio/368342.wav",
+      "status": "downloaded",
+      "bytes": 77962,
+      "md5": "f6fffb43b7a2b17d94a0b1ac8545ca46",
+      "sha256": "d02aab80417b065f1fca2ffaf959364259cf6eb87d03de7ba3e48dc88ef72e1b"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/368330.wav",
+      "path": "data/raw/fsd50k_help/audio/368330.wav",
+      "status": "downloaded",
+      "bytes": 37466,
+      "md5": "804785a481fdf7cae345910e9deb795f",
+      "sha256": "52354f21ecbce01948a906d7e974ce07e0387123fab5b37c8ec6846e119b1e40"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/209996.wav",
+      "path": "data/raw/fsd50k_help/audio/209996.wav",
+      "status": "downloaded",
+      "bytes": 100136,
+      "md5": "c7e830adee833343810bf21cc8698a7f",
+      "sha256": "d5e8fe53296df55e532576c6388c0e013a180f3689bc7c198cfd1e91d9231835"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/203379.wav",
+      "path": "data/raw/fsd50k_help/audio/203379.wav",
+      "status": "downloaded",
+      "bytes": 69070,
+      "md5": "e6d6e8e57851147fe1e5a9bbabdd29e9",
+      "sha256": "9a8217b4b1f1d1f1a4f5e9270fc89f04388b657ca547e586cfb0124da63ac6b8"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/174750.wav",
+      "path": "data/raw/fsd50k_help/audio/174750.wav",
+      "status": "downloaded",
+      "bytes": 249068,
+      "md5": "05554d5f9e462807a7b55845e3764d33",
+      "sha256": "28f879f41c1d30831ad958784cc21b1b376b65a173be7a894e4e944a44bb9a23"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/315646.wav",
+      "path": "data/raw/fsd50k_help/audio/315646.wav",
+      "status": "downloaded",
+      "bytes": 162136,
+      "md5": "52da0ca2e2512dc94c38a328ac59aaa7",
+      "sha256": "76501d7af5ea950e3c362236c058b20f35bfcacac23fd01a4a5f53ca9e8c4a54"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/204134.wav",
+      "path": "data/raw/fsd50k_help/audio/204134.wav",
+      "status": "downloaded",
+      "bytes": 164942,
+      "md5": "c511bf84e9a016bf94b0f1e81cf4e6ca",
+      "sha256": "0d88781f4eb1182a7b6fc5f5112f1026c07a91b92338bc2da006b0e0779342b1"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/88935.wav",
+      "path": "data/raw/fsd50k_help/audio/88935.wav",
+      "status": "downloaded",
+      "bytes": 67200,
+      "md5": "ddbde4c562168fbe47ea1b166c879278",
+      "sha256": "fa16bac905378e0e593ba6a02b4a91010de9523b125af0663b36b2e3ee00dff8"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/429076.wav",
+      "path": "data/raw/fsd50k_help/audio/429076.wav",
+      "status": "downloaded",
+      "bytes": 260752,
+      "md5": "a4097c02edf2864eef2c43e578e70f67",
+      "sha256": "857d5df57a0d7b47c7f0b179b174b552d20be8f6d2e16e90dcb8e364bcb9477d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/196065.wav",
+      "path": "data/raw/fsd50k_help/audio/196065.wav",
+      "status": "downloaded",
+      "bytes": 239310,
+      "md5": "5efab229fb2a436edc9b9fc109c2c2b1",
+      "sha256": "7e9a2a2e4c0df4fc144ca66d106dd5e9fc6a2237c0106eee1431cde15cc37254"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/9547.wav",
+      "path": "data/raw/fsd50k_help/audio/9547.wav",
+      "status": "downloaded",
+      "bytes": 198528,
+      "md5": "6fdb10e6eeb179f05f499fee86237083",
+      "sha256": "af1dada71afa49a0b46f1545d82626e7c3e71e9b4b25272724144d6738f7b57f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/193673.wav",
+      "path": "data/raw/fsd50k_help/audio/193673.wav",
+      "status": "downloaded",
+      "bytes": 262168,
+      "md5": "48f99fa3761ba69d5286298092d55541",
+      "sha256": "2ccba813477baf7ad320c1245ad4fa7f2edf4c578b64a2ffa3226e52a272e39c"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/364484.wav",
+      "path": "data/raw/fsd50k_help/audio/364484.wav",
+      "status": "downloaded",
+      "bytes": 185488,
+      "md5": "b72dc8db543e7d880fb97e321755f745",
+      "sha256": "51b0f1da26ac695bde4d8dcae93b53e2fa7fce4de0c494c09dfc378963e0d85a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/154529.wav",
+      "path": "data/raw/fsd50k_help/audio/154529.wav",
+      "status": "downloaded",
+      "bytes": 73842,
+      "md5": "c31add3bc956ac9ba8c162426f02d6c2",
+      "sha256": "500b405b6070697a29ef0cf6367083429b88a195b4fb6271ccc31fe53bbe841b"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/25281.wav",
+      "path": "data/raw/fsd50k_help/audio/25281.wav",
+      "status": "downloaded",
+      "bytes": 154666,
+      "md5": "0d59abb8e5ea8a248d6407ce633fdf8a",
+      "sha256": "21eaaa1abfd70cfa560605b90313258735610518570d99a854db15eb0df49aa8"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/161367.wav",
+      "path": "data/raw/fsd50k_help/audio/161367.wav",
+      "status": "downloaded",
+      "bytes": 126798,
+      "md5": "1b393daba90b86607deb62d708f6a39f",
+      "sha256": "4424e139c0da097017006d2b1ddb144464063f89ecedd485539d8334e517cd05"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/347912.wav",
+      "path": "data/raw/fsd50k_help/audio/347912.wav",
+      "status": "downloaded",
+      "bytes": 259144,
+      "md5": "46fd7b4a937f98ce6bf26eda38977840",
+      "sha256": "a601723d6c5075134e10fd633bfa2dc41194b96f82a98e9df37449558eb2bcd4"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/92389.wav",
+      "path": "data/raw/fsd50k_help/audio/92389.wav",
+      "status": "downloaded",
+      "bytes": 183674,
+      "md5": "0783e2adda006b46793bcecdff9501b5",
+      "sha256": "ccbc02ad19395769e2be75ffef184ffc51c6155570442f45cc0b406a7b39d286"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/383237.wav",
+      "path": "data/raw/fsd50k_help/audio/383237.wav",
+      "status": "downloaded",
+      "bytes": 138222,
+      "md5": "c08e70d41e18cce63a37a4b89a07eb79",
+      "sha256": "5a41d745de442934929589b81a34793729f8586e3104576895bbeb0dbf866b45"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/364485.wav",
+      "path": "data/raw/fsd50k_help/audio/364485.wav",
+      "status": "downloaded",
+      "bytes": 282202,
+      "md5": "53857306a86e8e2e2feb6a5064313b6d",
+      "sha256": "72946375485dc64eb22a07e0c1fbb22e925b63c5e4193b8f0ebd5b1cd5b2a193"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/319148.wav",
+      "path": "data/raw/fsd50k_help/audio/319148.wav",
+      "status": "downloaded",
+      "bytes": 125596,
+      "md5": "a7226e504f93149d4cc8ec0020b689ab",
+      "sha256": "3117184a915a29491fe88dd865b379309b1adb4b38a3f08be0b2c374c9575ceb"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/16201.wav",
+      "path": "data/raw/fsd50k_help/audio/16201.wav",
+      "status": "downloaded",
+      "bytes": 219102,
+      "md5": "f602fa97f5e0fc0a0df0f213ebbf7a99",
+      "sha256": "193c4ce18bae2505468c8271e6dbb2dbb0c9fe7ab4d0298b95f67a8974d651a3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/239582.wav",
+      "path": "data/raw/fsd50k_help/audio/239582.wav",
+      "status": "downloaded",
+      "bytes": 136194,
+      "md5": "ef6aabf2b6bb79c40ff8fbf7c48d1385",
+      "sha256": "af6b837c496e19e8ba42e9713c168f463189dc05bedbc52e1092d0eb62540db8"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/198262.wav",
+      "path": "data/raw/fsd50k_help/audio/198262.wav",
+      "status": "downloaded",
+      "bytes": 183376,
+      "md5": "15c6da950fb0b6e1af594defb6f7da03",
+      "sha256": "2113ae08dfa69235b3c6c6ab83da00066287b9322478714fdcbbd3f4feb757cb"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/99977.wav",
+      "path": "data/raw/fsd50k_help/audio/99977.wav",
+      "status": "downloaded",
+      "bytes": 150018,
+      "md5": "01012cf21753549c6b8fa8827fdec496",
+      "sha256": "74cd977426092cd20ae7b9e9cb762abfd7a2933565eb8606da2105fd26051aa0"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/411082.wav",
+      "path": "data/raw/fsd50k_help/audio/411082.wav",
+      "status": "downloaded",
+      "bytes": 155266,
+      "md5": "d7edc0876cab7dece009927e91da6ffc",
+      "sha256": "8dd356349ad8f7815f53140545f21cfcac977b15a3ae680d4757f89538cb8a38"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/172923.wav",
+      "path": "data/raw/fsd50k_help/audio/172923.wav",
+      "status": "downloaded",
+      "bytes": 220578,
+      "md5": "6e1940bd102b4814726ebe48c0d5fd4c",
+      "sha256": "92e0dba2ed9aa13f1c8675f2f07d6cbefc85920ef3dd48b95f67133da5a403ae"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/152912.wav",
+      "path": "data/raw/fsd50k_help/audio/152912.wav",
+      "status": "downloaded",
+      "bytes": 222286,
+      "md5": "badeab433228dab019256d20600a02b9",
+      "sha256": "8248a2744f460e99e83d24cbe4e2b0fdd54ac594b0348bdc2562c55d6fa527a1"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/178419.wav",
+      "path": "data/raw/fsd50k_help/audio/178419.wav",
+      "status": "downloaded",
+      "bytes": 161358,
+      "md5": "be087e916fec0ce685d9f4ce9a9a730f",
+      "sha256": "5c05f3513d53ebd84226a87e7a403a92526e22540d6eb509d28e95606c2932c1"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/59031.wav",
+      "path": "data/raw/fsd50k_help/audio/59031.wav",
+      "status": "downloaded",
+      "bytes": 263078,
+      "md5": "3637b1e36edd1ce776c9e159a460b7f9",
+      "sha256": "5b988f7c6d860979768b6f97bcda9f6609063532a2db1d1058c189d17f234d76"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/139983.wav",
+      "path": "data/raw/fsd50k_help/audio/139983.wav",
+      "status": "downloaded",
+      "bytes": 71502,
+      "md5": "e5ee48238248585cf9d7f352223450ad",
+      "sha256": "1ad8507b289bbdd947465a1cefbaca2666dde245a251567c7efe587cf3c63e71"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/319687.wav",
+      "path": "data/raw/fsd50k_help/audio/319687.wav",
+      "status": "downloaded",
+      "bytes": 60822,
+      "md5": "a9527dfec46d4f56227e12073344a4b1",
+      "sha256": "104328161a54f754511ff378b2d7d3e500789b7e2359834dc58bdbe202d05858"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/239586.wav",
+      "path": "data/raw/fsd50k_help/audio/239586.wav",
+      "status": "downloaded",
+      "bytes": 179446,
+      "md5": "e452e4a94a493835435ec7ca6b23ccb0",
+      "sha256": "0e2f200acbd9fbf3b366535a92938c99f7598d212110b47fd505af20255952dd"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/325462.wav",
+      "path": "data/raw/fsd50k_help/audio/325462.wav",
+      "status": "downloaded",
+      "bytes": 64462,
+      "md5": "bfbb68ff8559c01f7d62d3314811b8e4",
+      "sha256": "baffd67bebfbe1291c573b22c5ab79f8bb0fe7a17d4132d51ea8bbed0f3da5b7"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/198253.wav",
+      "path": "data/raw/fsd50k_help/audio/198253.wav",
+      "status": "downloaded",
+      "bytes": 213070,
+      "md5": "5b639e1966ad5b274fdd7d9fe5165f60",
+      "sha256": "274ab62fd616b24441f12e5e1d995629b8c0cb62220f541f76268ee3d820dd6f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/30043.wav",
+      "path": "data/raw/fsd50k_help/audio/30043.wav",
+      "status": "downloaded",
+      "bytes": 285468,
+      "md5": "7c0d14e64ba68beecae6e46dd1420330",
+      "sha256": "07ad804db05fbac210047b05f1877f9c816a66d7f58510c7535a7510b7d1e86a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/431610.wav",
+      "path": "data/raw/fsd50k_help/audio/431610.wav",
+      "status": "downloaded",
+      "bytes": 124902,
+      "md5": "ea278aa8bf5e26052b41d98e180da03d",
+      "sha256": "069887f215ec1d5274e1d2cd960f9159275dc08866bf305685629c8f37fb06e0"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/242240.wav",
+      "path": "data/raw/fsd50k_help/audio/242240.wav",
+      "status": "downloaded",
+      "bytes": 155118,
+      "md5": "e81788ead01aa4fb61338be66b92df4a",
+      "sha256": "7598094bb25e7a39a1bfb44de2e9237a12cf15b3948497d06a7381a48f595e71"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/77157.wav",
+      "path": "data/raw/fsd50k_help/audio/77157.wav",
+      "status": "downloaded",
+      "bytes": 168024,
+      "md5": "49104b967e65cb9583dd93f7cf63a6ee",
+      "sha256": "c9e072d02fcd974b585bec99f1410d0350fcd62e862f08826b10e00a1b3f9605"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/326096.wav",
+      "path": "data/raw/fsd50k_help/audio/326096.wav",
+      "status": "downloaded",
+      "bytes": 93262,
+      "md5": "fce747be2b33f813b3f161b0f22cfeeb",
+      "sha256": "d7118c29c37089cecca93b0c3707440f7cea67f3d48716b99c24710fcb6a55dc"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/19123.wav",
+      "path": "data/raw/fsd50k_help/audio/19123.wav",
+      "status": "downloaded",
+      "bytes": 38526,
+      "md5": "24d63802c9dd1118f766c55a2cb059db",
+      "sha256": "61f545761046180cb0d67e6ee83c9334080df6780c91de783382323745b0849f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/383335.wav",
+      "path": "data/raw/fsd50k_help/audio/383335.wav",
+      "status": "downloaded",
+      "bytes": 48974,
+      "md5": "17591f54bb0523ce5eab82cea556e445",
+      "sha256": "7791ebad99617adfc46efc729c88fa4d2fa8e779c362c1397a6424fb075b6b59"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/19804.wav",
+      "path": "data/raw/fsd50k_help/audio/19804.wav",
+      "status": "downloaded",
+      "bytes": 57392,
+      "md5": "5e28b13dcbcb3febce468a45465252c3",
+      "sha256": "d20c763df7239f7bb3344d622cf9df11cc36ef8748353b3d0e111f8fb469f29f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/41386.wav",
+      "path": "data/raw/fsd50k_help/audio/41386.wav",
+      "status": "downloaded",
+      "bytes": 101234,
+      "md5": "23604ea9e43315ae58e8b5f438e3dffd",
+      "sha256": "577180c64a4c134c0291f2006e32394c714f0c451294004f2f6db775fd7ecce3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/204604.wav",
+      "path": "data/raw/fsd50k_help/audio/204604.wav",
+      "status": "downloaded",
+      "bytes": 213070,
+      "md5": "4c48f6ba2c84368b1909a28ece9b44c5",
+      "sha256": "d85b107218f21ff79eac79c6c8c07dc8858bdbd314a22fb26f3941b38cd606ed"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/21314.wav",
+      "path": "data/raw/fsd50k_help/audio/21314.wav",
+      "status": "downloaded",
+      "bytes": 138318,
+      "md5": "20343c9b2248ccd0c0f5d1169e8ac469",
+      "sha256": "fdd6a77f626b97e5ec45637a678eb4261c8b26d0f29c9a44d02a7117ebf4baea"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/331057.wav",
+      "path": "data/raw/fsd50k_help/audio/331057.wav",
+      "status": "downloaded",
+      "bytes": 166234,
+      "md5": "851dae88d70a83b8595af3e1cb097316",
+      "sha256": "82a043677f2cca88f5c3988db3b1552f2f23882424d122d1d78c187c0df0e4a5"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/98676.wav",
+      "path": "data/raw/fsd50k_help/audio/98676.wav",
+      "status": "downloaded",
+      "bytes": 191310,
+      "md5": "9ab678987c8e8a65df84d07f4d1898b0",
+      "sha256": "657dbbf6452cc273155d4e182e13cab66f9a7959bb46340985475bcaefbcc171"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/432266.wav",
+      "path": "data/raw/fsd50k_help/audio/432266.wav",
+      "status": "downloaded",
+      "bytes": 210466,
+      "md5": "e26b880215d070f0dc1c2d080210522f",
+      "sha256": "1e87898ff162bb1c6cc35abdfe5ac510e56909da7657be70d23a37b1ff03d4c9"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/259513.wav",
+      "path": "data/raw/fsd50k_help/audio/259513.wav",
+      "status": "downloaded",
+      "bytes": 267342,
+      "md5": "d7fb04bb89a2300b81c4738abaf3f3ed",
+      "sha256": "c460aa81c2a3155371fdb9b1e15f81ce35ae9494056cd7a1c686adf8035e4cd1"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/323532.wav",
+      "path": "data/raw/fsd50k_help/audio/323532.wav",
+      "status": "downloaded",
+      "bytes": 135318,
+      "md5": "a1c401ecdac7a896cffce9568b0c8f30",
+      "sha256": "9398a8cd1561fb18c644b349bf10977f23b6e89a802ee83d678aba003ebbf1d3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/19124.wav",
+      "path": "data/raw/fsd50k_help/audio/19124.wav",
+      "status": "downloaded",
+      "bytes": 54946,
+      "md5": "4a9a1819719663605f9c0c4198fab3ea",
+      "sha256": "53990e5c884582031d9bfe060a0558f1ab8889ee501fec16b7524f86fe478a93"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/109639.wav",
+      "path": "data/raw/fsd50k_help/audio/109639.wav",
+      "status": "downloaded",
+      "bytes": 277202,
+      "md5": "60a65e152dee363cfa81f41eb76a803b",
+      "sha256": "99df6cafbb6aa0d6afe5ad68895bff43c32bd95ddc4cdbb3858b95af2f50bd9b"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/387398.wav",
+      "path": "data/raw/fsd50k_help/audio/387398.wav",
+      "status": "downloaded",
+      "bytes": 173102,
+      "md5": "7f9407e273c3c6a60914970fe67cf4e6",
+      "sha256": "94ca78aaa5bbf73ed623415d10a6ca3d2d9943b99492e9062ff92553c1efca7a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/258256.wav",
+      "path": "data/raw/fsd50k_help/audio/258256.wav",
+      "status": "downloaded",
+      "bytes": 167072,
+      "md5": "2ae7f9f4a6355cfee0636289d93d8e18",
+      "sha256": "62f3bdb4b0f4d2b11edb1d133334ff2fe65e83fe758f0f00ec057f8643deea89"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/254467.wav",
+      "path": "data/raw/fsd50k_help/audio/254467.wav",
+      "status": "downloaded",
+      "bytes": 210026,
+      "md5": "dd81f15b170e9d435a2521430474a8fe",
+      "sha256": "df2cbe8484768741d1a1ddef4bccf28628e60af84a7c146218ddf8fa8455c9c2"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/149042.wav",
+      "path": "data/raw/fsd50k_help/audio/149042.wav",
+      "status": "downloaded",
+      "bytes": 178390,
+      "md5": "e98da5c04792eb58c2117a47842930b3",
+      "sha256": "e1a374fe0fc92954399525413e601d36aadd7cc0b5794e4e1fac8bfa1683b9b7"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/272029.wav",
+      "path": "data/raw/fsd50k_help/audio/272029.wav",
+      "status": "downloaded",
+      "bytes": 77332,
+      "md5": "961f6160f1262834e90eea3ff847f002",
+      "sha256": "e026fdaef895ea836389b74257f88831de2682d0f24bfd0e84dd2bd74ab7b227"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/180924.wav",
+      "path": "data/raw/fsd50k_help/audio/180924.wav",
+      "status": "downloaded",
+      "bytes": 148520,
+      "md5": "a09b4529e9f2873af367aa7cf56deaf0",
+      "sha256": "cba3a4b922d517089659ea0d3c8ddece1eddf3488274405d9ae1e1a0713897ef"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/26143.wav",
+      "path": "data/raw/fsd50k_help/audio/26143.wav",
+      "status": "downloaded",
+      "bytes": 205216,
+      "md5": "06ed39c13f79907111b4f127eebafdfd",
+      "sha256": "156e738f1b9da670bcacbd644a120c0806a1261e08920560e6e0de6b82b3307d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/185415.wav",
+      "path": "data/raw/fsd50k_help/audio/185415.wav",
+      "status": "downloaded",
+      "bytes": 171598,
+      "md5": "9c1e21d681d34691daced130caefc628",
+      "sha256": "896ef7551718eaa7f86cfe43fc4f767ea22747c605f98978ef3c842ba8a4856a"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/365710.wav",
+      "path": "data/raw/fsd50k_help/audio/365710.wav",
+      "status": "downloaded",
+      "bytes": 291138,
+      "md5": "212e55f700e3260b6618893c046e3c0b",
+      "sha256": "8228c441c7f582c14723c3839dd1e05643c11301ff36b48b8f461ab298cb469f"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/325643.wav",
+      "path": "data/raw/fsd50k_help/audio/325643.wav",
+      "status": "downloaded",
+      "bytes": 299948,
+      "md5": "174544101a150baab8c0818fd66ea174",
+      "sha256": "514fda7e5ebca65a0e5e18f6623b184631dc19aa4cfec679c7e9d1fcb754a7c5"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/81883.wav",
+      "path": "data/raw/fsd50k_help/audio/81883.wav",
+      "status": "downloaded",
+      "bytes": 210630,
+      "md5": "b65fd6ae9dcda76832e926864dfd0f08",
+      "sha256": "ac47a0dda9b0129ab4ac4c1d804996a26c204d80c70db47b9b85c677d2e80ea3"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/180048.wav",
+      "path": "data/raw/fsd50k_help/audio/180048.wav",
+      "status": "downloaded",
+      "bytes": 70932,
+      "md5": "b2c76ee5ee7158696d97ca95ea2ce9aa",
+      "sha256": "60d7667ac6754eacfe77051ee9d1fb4ac62d4dc8068b32920a76d7535a5a4901"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/349902.wav",
+      "path": "data/raw/fsd50k_help/audio/349902.wav",
+      "status": "downloaded",
+      "bytes": 68104,
+      "md5": "6fcfd98fbc8b173a509d0801d32e6399",
+      "sha256": "2afce70a4e6ebb9bd6f240b8c3c61d7286438a8518cfe5dc7c12ed59361a6aa6"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/184436.wav",
+      "path": "data/raw/fsd50k_help/audio/184436.wav",
+      "status": "downloaded",
+      "bytes": 218446,
+      "md5": "9f0004da4743e2d61794f5aece0e8678",
+      "sha256": "4fbf3de40d4cb437f90b7c0971db2bf6d67b5b3f9b987fb3ed9ecf1c677ada2e"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/339414.wav",
+      "path": "data/raw/fsd50k_help/audio/339414.wav",
+      "status": "downloaded",
+      "bytes": 217120,
+      "md5": "a0f62e6f049c2dee7a2e6fbac4a234b3",
+      "sha256": "a1ffffd31ad72f5b930c71ae6a9d9c67edeacd3f10a33f55a9bccece70706a60"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/121784.wav",
+      "path": "data/raw/fsd50k_help/audio/121784.wav",
+      "status": "downloaded",
+      "bytes": 229198,
+      "md5": "f361861b3ff91839154867d44f55cd22",
+      "sha256": "a1be036406bd4424ac73473ead7a6d013412c076f029b6e24e5251412e88fcf7"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/342814.wav",
+      "path": "data/raw/fsd50k_help/audio/342814.wav",
+      "status": "downloaded",
+      "bytes": 192534,
+      "md5": "6c9363c3de0cbb4e51f087269b3a84df",
+      "sha256": "c2f010d0e6755b5001a9b7dc6df00635877a2abda109dc521949aa3d7586ece1"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/257920.wav",
+      "path": "data/raw/fsd50k_help/audio/257920.wav",
+      "status": "downloaded",
+      "bytes": 67134,
+      "md5": "1ef0e154307c93e99823ba075f833f41",
+      "sha256": "8b1d99415ef905124f424e317801e777fd528be1b67cf5f2c999f7b999412c2d"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/eval/143119.wav",
+      "path": "data/raw/fsd50k_help/audio/143119.wav",
+      "status": "downloaded",
+      "bytes": 264678,
+      "md5": "9680e52eb24450e7157e6cfb0d3d858e",
+      "sha256": "9af319edd493303599f26469631a4d2a0e392ff0e8080b6b57e7ce4cc90529f5"
+    },
+    {
+      "url": "https://huggingface.co/datasets/Fhrozen/FSD50k/resolve/ccf1acaff12f3f4a4c10052dddafbb6d22152c9b/clips/dev/167642.wav",
+      "path": "data/raw/fsd50k_help/audio/167642.wav",
+      "status": "downloaded",
+      "bytes": 70280,
+      "md5": "c8fb68ad3c240e794ae31cdeb104dde7",
+      "sha256": "8f3221578457af792d9e28729ae91b3d9a2e8515f0d7b406140ba64624e97bb4"
+    }
+  ]
+}

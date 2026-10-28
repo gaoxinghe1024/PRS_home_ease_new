@@ -1,0 +1,298 @@
+{
+  "selected": [
+    "tiny|hotwords|auto",
+    "rule_v2"
+  ],
+  "dev_ranked": [
+    {
+      "cfg": "base|hotwords|forced",
+      "method": "rule_v2",
+      "macro_f1": 0.9717783026925773,
+      "self_help_missed": 1,
+      "latency_median_s": 0.6396429500018712,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "tiny|prompt|forced",
+      "method": "rule_v2",
+      "macro_f1": 0.9688305158893394,
+      "self_help_missed": 3,
+      "latency_median_s": 0.3047207499985234,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "tiny|prompt|auto",
+      "method": "rule_v2",
+      "macro_f1": 0.9612740200975495,
+      "self_help_missed": 3,
+      "latency_median_s": 0.6050543500023196,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|hotwords|auto",
+      "method": "rule_v2",
+      "macro_f1": 0.9595133863426547,
+      "self_help_missed": 2,
+      "latency_median_s": 0.6183047499944223,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "base|prompt|forced",
+      "method": "rule_v2",
+      "macro_f1": 0.9571885491785368,
+      "self_help_missed": 2,
+      "latency_median_s": 0.6288854499944136,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "tiny|hotwords|auto_en_zh",
+      "method": "rule_v2",
+      "macro_f1": 0.9546171000716455,
+      "self_help_missed": 2,
+      "latency_median_s": 0.6120030000020051,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "base|none|forced",
+      "method": "rule_v2",
+      "macro_f1": 0.9535670181438207,
+      "self_help_missed": 5,
+      "latency_median_s": 0.6246653500056709,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "base|none|auto",
+      "method": "rule_v2",
+      "macro_f1": 0.9510477754320119,
+      "self_help_missed": 5,
+      "latency_median_s": 1.2050212499962072,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "base|none|auto_en_zh",
+      "method": "rule_v2",
+      "macro_f1": 0.9510477754320119,
+      "self_help_missed": 5,
+      "latency_median_s": 1.1984175000034156,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|prompt|auto_en_zh",
+      "method": "rule_v2",
+      "macro_f1": 0.9463477698771817,
+      "self_help_missed": 3,
+      "latency_median_s": 0.6290169499989133,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|hotwords|forced",
+      "method": "rule_v2",
+      "macro_f1": 0.9445110777944361,
+      "self_help_missed": 2,
+      "latency_median_s": 0.3373521500034258,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "tiny|none|forced",
+      "method": "rule_v2",
+      "macro_f1": 0.9399708821388394,
+      "self_help_missed": 7,
+      "latency_median_s": 0.32792214999790303,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "tiny|none|auto",
+      "method": "rule_v2",
+      "macro_f1": 0.9354046720931772,
+      "self_help_missed": 7,
+      "latency_median_s": 0.6004149000000325,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|none|auto_en_zh",
+      "method": "rule_v2",
+      "macro_f1": 0.9354046720931772,
+      "self_help_missed": 7,
+      "latency_median_s": 0.6000232000005781,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "base|prompt|auto_en_zh",
+      "method": "rule_v2",
+      "macro_f1": 0.9336988397296953,
+      "self_help_missed": 1,
+      "latency_median_s": 1.1967986000017845,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "base|prompt|auto",
+      "method": "rule_v2",
+      "macro_f1": 0.9287503876274248,
+      "self_help_missed": 3,
+      "latency_median_s": 1.2229350000052364,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "base|hotwords|auto",
+      "method": "rule_v2",
+      "macro_f1": 0.9132073081916343,
+      "self_help_missed": 3,
+      "latency_median_s": 1.2505008500011172,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "base|hotwords|auto_en_zh",
+      "method": "rule_v2",
+      "macro_f1": 0.9100437043020775,
+      "self_help_missed": 3,
+      "latency_median_s": 1.2814521999971475,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|prompt|forced",
+      "method": "rule_v1_t2s",
+      "macro_f1": 0.7530289514232423,
+      "self_help_missed": 10,
+      "latency_median_s": 0.3047207499985234,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "tiny|prompt|auto",
+      "method": "rule_v1_t2s",
+      "macro_f1": 0.7507177033492823,
+      "self_help_missed": 11,
+      "latency_median_s": 0.6050543500023196,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|hotwords|auto_en_zh",
+      "method": "rule_v1",
+      "macro_f1": 0.7500139236981341,
+      "self_help_missed": 10,
+      "latency_median_s": 0.6120030000020051,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|hotwords|auto_en_zh",
+      "method": "rule_v1_t2s",
+      "macro_f1": 0.7500139236981341,
+      "self_help_missed": 10,
+      "latency_median_s": 0.6120030000020051,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|hotwords|forced",
+      "method": "rule_v1",
+      "macro_f1": 0.7497283127047192,
+      "self_help_missed": 11,
+      "latency_median_s": 0.3373521500034258,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "tiny|hotwords|forced",
+      "method": "rule_v1_t2s",
+      "macro_f1": 0.7497283127047192,
+      "self_help_missed": 11,
+      "latency_median_s": 0.3373521500034258,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "tiny|hotwords|auto",
+      "method": "rule_v1",
+      "macro_f1": 0.7450305677488519,
+      "self_help_missed": 11,
+      "latency_median_s": 0.6183047499944223,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|hotwords|auto",
+      "method": "rule_v1_t2s",
+      "macro_f1": 0.7450305677488519,
+      "self_help_missed": 11,
+      "latency_median_s": 0.6183047499944223,
+      "oracle_language": false,
+      "eligible": true
+    },
+    {
+      "cfg": "tiny|prompt|forced",
+      "method": "rule_v1",
+      "macro_f1": 0.7428792213343857,
+      "self_help_missed": 11,
+      "latency_median_s": 0.3047207499985234,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "base|prompt|forced",
+      "method": "rule_v1_t2s",
+      "macro_f1": 0.7421840913673945,
+      "self_help_missed": 10,
+      "latency_median_s": 0.6288854499944136,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "base|hotwords|forced",
+      "method": "rule_v1",
+      "macro_f1": 0.7410959937088625,
+      "self_help_missed": 11,
+      "latency_median_s": 0.6396429500018712,
+      "oracle_language": true,
+      "eligible": false
+    },
+    {
+      "cfg": "base|hotwords|forced",
+      "method": "rule_v1_t2s",
+      "macro_f1": 0.7410959937088625,
+      "self_help_missed": 11,
+      "latency_median_s": 0.6396429500018712,
+      "oracle_language": true,
+      "eligible": false
+    }
+  ],
+  "grid": [
+    "tiny|none|forced",
+    "tiny|none|auto",
+    "tiny|none|auto_en_zh",
+    "tiny|hotwords|forced",
+    "tiny|hotwords|auto",
+    "tiny|hotwords|auto_en_zh",
+    "tiny|prompt|forced",
+    "tiny|prompt|auto",
+    "tiny|prompt|auto_en_zh",
+    "base|none|forced",
+    "base|none|auto",
+    "base|none|auto_en_zh",
+    "base|hotwords|forced",
+    "base|hotwords|auto",
+    "base|hotwords|auto_en_zh",
+    "base|prompt|forced",
+    "base|prompt|auto",
+    "base|prompt|auto_en_zh"
+  ]
+}

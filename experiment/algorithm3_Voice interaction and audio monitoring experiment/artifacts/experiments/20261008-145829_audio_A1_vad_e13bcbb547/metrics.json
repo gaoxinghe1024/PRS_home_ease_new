@@ -1,0 +1,135 @@
+{
+  "status": "completed",
+  "suite": "audio",
+  "name": "A1_vad",
+  "data_source": "LibriSpeech dev-clean-2 speech + ESC-50 non-speech (real clips, constructed mixtures)",
+  "headline": "energy F1 0.907; webrtc F1 0.899; silero F1 0.895",
+  "missing": [],
+  "metrics": {
+    "entries": [
+      {
+        "config": "energy",
+        "condition": "clean",
+        "precision": 0.9916839916839917,
+        "recall": 0.9883620540801878,
+        "f1": 0.9900202362626909,
+        "frames": 36783
+      },
+      {
+        "config": "energy",
+        "condition": "household_noise_10dB",
+        "precision": 0.8273645789250952,
+        "recall": 0.9604237027939821,
+        "f1": 0.8889425672795476,
+        "frames": 40814
+      },
+      {
+        "config": "energy",
+        "condition": "impact_sounds_in_gaps",
+        "precision": 0.8118343941017078,
+        "recall": 0.8871062144947496,
+        "f1": 0.8478028396097593,
+        "frames": 36266
+      },
+      {
+        "config": "silero",
+        "condition": "clean",
+        "precision": 1.0,
+        "recall": 0.8182132126946853,
+        "f1": 0.9000189933523267,
+        "frames": 36783
+      },
+      {
+        "config": "silero",
+        "condition": "household_noise_10dB",
+        "precision": 0.9974216054297956,
+        "recall": 0.8076450721522874,
+        "f1": 0.8925572162937075,
+        "frames": 40814
+      },
+      {
+        "config": "silero",
+        "condition": "impact_sounds_in_gaps",
+        "precision": 0.9882706515840881,
+        "recall": 0.815148906868652,
+        "f1": 0.8934002490472057,
+        "frames": 36266
+      },
+      {
+        "config": "webrtc",
+        "condition": "clean",
+        "precision": 0.9814018490647173,
+        "recall": 0.94578167627862,
+        "f1": 0.9632625784780965,
+        "frames": 36783
+      },
+      {
+        "config": "webrtc",
+        "condition": "household_noise_10dB",
+        "precision": 0.8337458745874587,
+        "recall": 0.9307645072152287,
+        "f1": 0.8795879878137242,
+        "frames": 40814
+      },
+      {
+        "config": "webrtc",
+        "condition": "impact_sounds_in_gaps",
+        "precision": 0.81241034093337,
+        "recall": 0.9164055775520744,
+        "f1": 0.8612800931918199,
+        "frames": 36266
+      },
+      {
+        "config": "energy",
+        "condition": "ALL",
+        "precision": 0.8705465113915818,
+        "recall": 0.9458441902574747,
+        "f1": 0.9066346347193854,
+        "frames": 113863
+      },
+      {
+        "config": "webrtc",
+        "condition": "ALL",
+        "precision": 0.8690082346514959,
+        "recall": 0.9309610034006095,
+        "f1": 0.8989184492619975,
+        "frames": 113863
+      },
+      {
+        "config": "silero",
+        "condition": "ALL",
+        "precision": 0.9952852491793092,
+        "recall": 0.8134301991785541,
+        "f1": 0.8952155290257906,
+        "frames": 113863
+      }
+    ]
+  },
+  "provenance": {
+    "run_id": "20261008-145829_audio_A1_vad_e13bcbb547",
+    "suite": "audio",
+    "name": "A1_vad",
+    "config_hash": "e13bcbb547",
+    "code_version": "354f1478138c",
+    "split_hash": null,
+    "seed": 42,
+    "data_source": "LibriSpeech dev-clean-2 speech + ESC-50 non-speech (real clips, constructed mixtures)",
+    "started_at": "2026-10-08T06:58:29Z",
+    "versions": {
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.22631-SP0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.14.1",
+      "mediapipe": "1.0.1",
+      "opencv-python": "5.0.0.93",
+      "onnxruntime": "1.30.0",
+      "faster-whisper": "1.2.1",
+      "silero-vad": "6.2.3"
+    },
+    "device": "AMD64",
+    "finished_at": "2026-10-08T06:58:48Z",
+    "seconds": 18.9
+  }
+}

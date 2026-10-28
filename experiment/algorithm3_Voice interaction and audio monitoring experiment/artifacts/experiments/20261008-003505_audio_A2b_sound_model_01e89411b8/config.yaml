@@ -1,0 +1,13 @@
+model_id: sound_events
+version: v2
+candidates:
+- mfcc_logmel_stats+rf
+- mfcc_logmel_stats+logreg
+- logmel_small_cnn
+- yamnet_embedding+logreg
+test_fold: 5
+seed: 42
+precision_target: 0.9
+mapping: esc50-vivae-homeease-v2
+window_s: 2.0
+normalization: rms

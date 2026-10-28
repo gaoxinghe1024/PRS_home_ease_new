@@ -1,0 +1,37 @@
+seed: 42
+n_dev: 150
+n_eval: 150
+probes_dev: 4
+n_noise_only: 100
+n_silence: 20
+fars:
+- 0.001
+- 0.01
+min_speech_s: 1.0
+min_asr_logprob: -1.0
+speaker_model: voxceleb_resnet34_LM.onnx
+asr: faster-whisper-tiny
+intent: rule_v2
+enroll_utterances: 3
+scenarios:
+- true_cancel_clean
+- true_cancel_noise5dB
+- other_person_same_words
+- other_person_noise5dB
+- visitor_on_behalf
+- tv_radio_speech
+- replay_of_enrolled_voice
+- household_noise_only
+- silence
+- enrolled_says_help
+snr_db: 5.0
+engine:
+  engine: piper:en_US-libritts_r-medium
+  piper_tts: 1.8.0
+  n_speakers: 904
+  sample_rate: 22050
+  model_revision: c10ece1aade47bb51c153c893d14e5bf8e5b7117
+  model_sha256: 10bb85e071d616fcf4071f369f1799d0491492ab3c5d552ec19fb548fac13195
+  model_bytes: 78580914
+  license_note: voice model trained on LibriTTS-R (CC BY 4.0); piper-tts is GPL-3.0
+partial: false

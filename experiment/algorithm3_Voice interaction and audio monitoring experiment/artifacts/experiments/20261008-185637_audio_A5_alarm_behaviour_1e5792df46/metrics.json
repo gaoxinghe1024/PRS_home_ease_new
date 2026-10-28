@@ -1,0 +1,90 @@
+{
+  "status": "completed",
+  "suite": "audio",
+  "name": "A5_alarm_behaviour",
+  "data_source": "headless system (virtual clock) + scripted inquiry outcomes",
+  "headline": "policy PASSED: voice replies never closed or downgraded an emergency",
+  "missing": [],
+  "metrics": {
+    "outcomes": [
+      {
+        "reply": "reassurance",
+        "inquiry_status": "RESPONDED",
+        "intent": "REASSURANCE",
+        "cancel_eligible": false,
+        "level_after": "EMERGENCY",
+        "status_after": "OPEN",
+        "notifications_before_inquiry": 1,
+        "closed_by_voice": false
+      },
+      {
+        "reply": "help",
+        "inquiry_status": "RESPONDED",
+        "intent": "HELP",
+        "cancel_eligible": false,
+        "level_after": "EMERGENCY",
+        "status_after": "OPEN",
+        "notifications_before_inquiry": 1,
+        "closed_by_voice": false
+      },
+      {
+        "reply": "no_response",
+        "inquiry_status": "NO_RESPONSE",
+        "intent": null,
+        "cancel_eligible": false,
+        "level_after": "EMERGENCY",
+        "status_after": "OPEN",
+        "notifications_before_inquiry": 1,
+        "closed_by_voice": false
+      },
+      {
+        "reply": "audio_failure",
+        "inquiry_status": "audio_unavailable",
+        "intent": null,
+        "cancel_eligible": false,
+        "level_after": "EMERGENCY",
+        "status_after": "OPEN",
+        "notifications_before_inquiry": 1,
+        "closed_by_voice": false
+      },
+      {
+        "reply": "reassurance_voiceprint_match",
+        "inquiry_status": "RESPONDED",
+        "intent": "REASSURANCE",
+        "cancel_eligible": true,
+        "level_after": "EMERGENCY",
+        "status_after": "OPEN",
+        "notifications_before_inquiry": 1,
+        "closed_by_voice": false
+      }
+    ],
+    "policy_ok": true
+  },
+  "provenance": {
+    "run_id": "20261008-185637_audio_A5_alarm_behaviour_1e5792df46",
+    "suite": "audio",
+    "name": "A5_alarm_behaviour",
+    "config_hash": "1e5792df46",
+    "code_version": "354f1478138c",
+    "split_hash": null,
+    "seed": 42,
+    "data_source": "headless system (virtual clock) + scripted inquiry outcomes",
+    "started_at": "2026-10-08T10:56:37Z",
+    "versions": {
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.22631-SP0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.14.1",
+      "mediapipe": "1.0.1",
+      "opencv-python": "5.0.0.93",
+      "onnxruntime": "1.30.0",
+      "faster-whisper": "1.2.1",
+      "silero-vad": "6.2.3"
+    },
+    "device": "AMD64",
+    "finished_at": "2026-10-08T10:56:42Z",
+    "seconds": 4.6
+  }
+}

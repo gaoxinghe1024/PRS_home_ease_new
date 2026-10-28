@@ -1,0 +1,1133 @@
+{
+  "status": "completed",
+  "suite": "audio",
+  "name": "A6_cancel_eligibility",
+  "data_source": "Piper libritts_r (904 synthetic voices) saying the phrase bank; ESC-50 household noise; LibriSpeech dev-clean-2 for a real-speech check",
+  "headline": "At speaker threshold FAR 0.1% (calibrated on 150 dev speakers): true-cancel 42.33% (254/600); other person saying the same words eligible 0.06% (50/89400) (intent-only 88.17% (78821/89400)); TV/radio 0.00% (1/44700); replay of the enrolled voice 4.33% (13/300); enrolled speaker saying HELP 0.00% (0/450). 150 eval speakers, synthetic clean speech.",
+  "missing": [],
+  "metrics": {
+    "partial": false,
+    "dev": {
+      "min_speech_s": 1.0,
+      "n_speakers": 150,
+      "n_probes": 600,
+      "probes_with_enough_speech": 204,
+      "calibrations": {
+        "far_0.1pct": {
+          "threshold": 0.6794503341184387,
+          "target_far": 0.001,
+          "achieved_far": 0.0009869719699960521,
+          "tar": 0.6372549019607843,
+          "n_genuine": 204,
+          "n_impostor": 30396,
+          "reliable": true,
+          "note": null
+        },
+        "far_1pct": {
+          "threshold": 0.6006120453344116,
+          "target_far": 0.01,
+          "achieved_far": 0.009968416896960127,
+          "tar": 0.9362745098039216,
+          "n_genuine": 204,
+          "n_impostor": 30396,
+          "reliable": true,
+          "note": null
+        }
+      },
+      "eer_dev": 0.0191637057507567,
+      "by_duration": [
+        {
+          "speech_s": "0-0.75",
+          "genuine": 104,
+          "impostor": 15496,
+          "eer": 0.08653846153846155
+        },
+        {
+          "speech_s": "0.75-1",
+          "genuine": 292,
+          "impostor": 43508,
+          "eer": 0.04435965799393213
+        },
+        {
+          "speech_s": "1-1.5",
+          "genuine": 152,
+          "impostor": 22648,
+          "eer": 0.01348904980572238
+        },
+        {
+          "speech_s": "1.5-2",
+          "genuine": 42,
+          "impostor": 6258,
+          "eer": 0.023809523809523822
+        },
+        {
+          "speech_s": ">=2",
+          "genuine": 10,
+          "impostor": 1490,
+          "eer": null
+        }
+      ],
+      "refused_enrollments": 0
+    },
+    "thresholds": {
+      "far_0.1pct": 0.6794503341184387,
+      "far_1pct": 0.6006120453344116
+    },
+    "eval_users": 150,
+    "eval_clips": 2370,
+    "refused_enrollments": {
+      "dev": 0,
+      "eval": 0
+    },
+    "speaker_layer": {
+      "all_lengths": {
+        "genuine": 600,
+        "impostor": 89400,
+        "eer": 0.026666666666666644
+      },
+      "by_duration": [
+        {
+          "speech_s": "0-0.75",
+          "genuine": 7,
+          "impostor": 1043,
+          "eer": null
+        },
+        {
+          "speech_s": "0.75-1",
+          "genuine": 123,
+          "impostor": 18327,
+          "eer": 0.032520325203252015
+        },
+        {
+          "speech_s": "1-1.5",
+          "genuine": 373,
+          "impostor": 55577,
+          "eer": 0.021681630890476283
+        },
+        {
+          "speech_s": "1.5-2",
+          "genuine": 86,
+          "impostor": 12814,
+          "eer": 0.011627906976744196
+        },
+        {
+          "speech_s": ">=2",
+          "genuine": 11,
+          "impostor": 1639,
+          "eer": null
+        }
+      ],
+      "with_enough_speech": {
+        "genuine": 470,
+        "impostor": 70030,
+        "eer": 0.023404255319148925,
+        "genuine_scores": {
+          "n": 470,
+          "mean": 0.7016303872808497,
+          "std": 0.07476233855490104,
+          "p1": 0.52367635846138,
+          "median": 0.7035827338695526,
+          "p99": 0.8527081894874573,
+          "p99.9": 0.8708479769229901
+        },
+        "impostor_scores": {
+          "n": 70030,
+          "mean": 0.2452746457822648,
+          "std": 0.1334523304323347,
+          "p1": 0.011369292549788952,
+          "median": 0.2193567082285881,
+          "p99": 0.5885661005973823,
+          "p99.9": 0.6700519157648138
+        }
+      },
+      "at_dev_thresholds": {
+        "far_0.1pct": {
+          "threshold": 0.6794503341184387,
+          "tar": {
+            "k": 292,
+            "n": 470,
+            "rate": 0.6212765957446809,
+            "wilson95": [
+              0.5766062789309173,
+              0.6639804487856867
+            ]
+          },
+          "far": {
+            "k": 56,
+            "n": 70030,
+            "rate": 0.0007996572897329716,
+            "wilson95": [
+              0.0006159034055377931,
+              0.0010381769269624877
+            ]
+          }
+        },
+        "far_1pct": {
+          "threshold": 0.6006120453344116,
+          "tar": {
+            "k": 420,
+            "n": 470,
+            "rate": 0.8936170212765957,
+            "wilson95": [
+              0.862480988263614,
+              0.9183706718692237
+            ]
+          },
+          "far": {
+            "k": 529,
+            "n": 70030,
+            "rate": 0.007553905469084678,
+            "wilson95": [
+              0.006939078574390449,
+              0.00822275712876481
+            ]
+          }
+        }
+      }
+    },
+    "scenarios": {
+      "true_cancel_clean": {
+        "source": "self_reas",
+        "kind": "own",
+        "should_cancel": true,
+        "clips": 600,
+        "trials": 600,
+        "intent_only": {
+          "k": 529,
+          "n": 600,
+          "rate": 0.8816666666666667,
+          "wilson95": [
+            0.853361127593803,
+            0.9051159299656631
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 401,
+          "n": 600,
+          "rate": 0.6683333333333333,
+          "wilson95": [
+            0.6296943661030318,
+            0.7048304496764707
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 254,
+            "n": 600,
+            "rate": 0.42333333333333334,
+            "wilson95": [
+              0.38440880935423183,
+              0.46323335375609387
+            ],
+            "identity_bootstrap95": [
+              0.38,
+              0.4617083333333333
+            ],
+            "voiceprint_only": {
+              "k": 292,
+              "n": 600,
+              "rate": 0.4866666666666667,
+              "wilson95": [
+                0.4468847203516202,
+                0.5266182645371322
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 360,
+            "n": 600,
+            "rate": 0.6,
+            "wilson95": [
+              0.5602835208349686,
+              0.6384440924993893
+            ],
+            "identity_bootstrap95": [
+              0.5532916666666666,
+              0.6466666666666666
+            ],
+            "voiceprint_only": {
+              "k": 420,
+              "n": 600,
+              "rate": 0.7,
+              "wilson95": [
+                0.662154057768196,
+                0.7353011689005197
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "true_cancel_noise5dB": {
+        "source": "self_reas_n5",
+        "kind": "own",
+        "should_cancel": true,
+        "clips": 300,
+        "trials": 300,
+        "intent_only": {
+          "k": 242,
+          "n": 300,
+          "rate": 0.8066666666666666,
+          "wilson95": [
+            0.7582152889916499,
+            0.8473634072764055
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 238,
+          "n": 300,
+          "rate": 0.7933333333333333,
+          "wilson95": [
+            0.7439440144288735,
+            0.8353051733057882
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 58,
+            "n": 300,
+            "rate": 0.19333333333333333,
+            "wilson95": [
+              0.15263659272359453,
+              0.24178471100834997
+            ],
+            "identity_bootstrap95": [
+              0.15,
+              0.24
+            ],
+            "voiceprint_only": {
+              "k": 67,
+              "n": 300,
+              "rate": 0.22333333333333333,
+              "wilson95": [
+                0.1798706282757476,
+                0.27379206965633285
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 128,
+            "n": 300,
+            "rate": 0.4266666666666667,
+            "wilson95": [
+              0.37197260006995525,
+              0.4832151029963794
+            ],
+            "identity_bootstrap95": [
+              0.37,
+              0.48
+            ],
+            "voiceprint_only": {
+              "k": 147,
+              "n": 300,
+              "rate": 0.49,
+              "wilson95": [
+                0.43391603364256914,
+                0.5463368349573855
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "other_person_same_words": {
+        "source": "self_reas",
+        "kind": "others",
+        "should_cancel": false,
+        "clips": 600,
+        "trials": 89400,
+        "intent_only": {
+          "k": 78821,
+          "n": 89400,
+          "rate": 0.8816666666666667,
+          "wilson95": [
+            0.8795328967414923,
+            0.8837676368677928
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 59749,
+          "n": 89400,
+          "rate": 0.6683333333333333,
+          "wilson95": [
+            0.6652398818643607,
+            0.6714123185484681
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 50,
+            "n": 89400,
+            "rate": 0.0005592841163310962,
+            "wilson95": [
+              0.000424286857673417,
+              0.0007372023819567511
+            ],
+            "identity_bootstrap95": [
+              0.0002685035292612061,
+              0.0010293391646890458
+            ],
+            "voiceprint_only": {
+              "k": 56,
+              "n": 89400,
+              "rate": 0.0006263982102908277,
+              "wilson95": [
+                0.0004824493049383297,
+                0.0008132623549507906
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 467,
+            "n": 89400,
+            "rate": 0.005223713646532438,
+            "wilson95": [
+              0.004771964625085898,
+              0.0057179828225414515
+            ],
+            "identity_bootstrap95": [
+              0.0037936240002852057,
+              0.007195093569478021
+            ],
+            "voiceprint_only": {
+              "k": 529,
+              "n": 89400,
+              "rate": 0.005917225950782997,
+              "wilson95": [
+                0.005435262503089468,
+                0.006441649953880388
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "other_person_noise5dB": {
+        "source": "self_reas_n5",
+        "kind": "others",
+        "should_cancel": false,
+        "clips": 300,
+        "trials": 44700,
+        "intent_only": {
+          "k": 36058,
+          "n": 44700,
+          "rate": 0.8066666666666666,
+          "wilson95": [
+            0.802979350551122,
+            0.8103012763201041
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 35462,
+          "n": 44700,
+          "rate": 0.7933333333333333,
+          "wilson95": [
+            0.7895544522601485,
+            0.79706179952972
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 1,
+            "n": 44700,
+            "rate": 2.237136465324385e-05,
+            "wilson95": [
+              3.949004523281854e-06,
+              0.00012672432892911657
+            ],
+            "identity_bootstrap95": [
+              0.0,
+              0.0001342166279332742
+            ],
+            "voiceprint_only": {
+              "k": 2,
+              "n": 44700,
+              "rate": 4.47427293064877e-05,
+              "wilson95": [
+                1.2269899119917463e-05,
+                0.00016314231869717503
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 96,
+            "n": 44700,
+            "rate": 0.002147651006711409,
+            "wilson95": [
+              0.001759166705398115,
+              0.002621700642700219
+            ],
+            "identity_bootstrap95": [
+              0.0011188673482606878,
+              0.0036043166568813286
+            ],
+            "voiceprint_only": {
+              "k": 107,
+              "n": 44700,
+              "rate": 0.002393736017897092,
+              "wilson95": [
+                0.001981480470718071,
+                0.0028915146053918985
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "visitor_on_behalf": {
+        "source": "visitor",
+        "kind": "others",
+        "should_cancel": false,
+        "clips": 300,
+        "trials": 44700,
+        "intent_only": {
+          "k": 39485,
+          "n": 44700,
+          "rate": 0.8833333333333333,
+          "wilson95": [
+            0.8803243024919124,
+            0.8862764810971203
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 39038,
+          "n": 44700,
+          "rate": 0.8733333333333333,
+          "wilson95": [
+            0.8702178619338116,
+            0.8763846403442029
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 35,
+            "n": 44700,
+            "rate": 0.0007829977628635347,
+            "wilson95": [
+              0.0005630779891273058,
+              0.001088717412724691
+            ],
+            "identity_bootstrap95": [
+              0.00035782896229871,
+              0.0014091626988543737
+            ],
+            "voiceprint_only": {
+              "k": 51,
+              "n": 44700,
+              "rate": 0.0011409395973154361,
+              "wilson95": [
+                0.0008679418455966342,
+                0.0014996757060904676
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 402,
+            "n": 44700,
+            "rate": 0.008993288590604026,
+            "wilson95": [
+              0.008159318982205349,
+              0.009911646981489367
+            ],
+            "identity_bootstrap95": [
+              0.006707856312998147,
+              0.012091523910590058
+            ],
+            "voiceprint_only": {
+              "k": 494,
+              "n": 44700,
+              "rate": 0.011051454138702461,
+              "wilson95": [
+                0.010123435311519382,
+                0.012063508013727192
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "tv_radio_speech": {
+        "source": "tv",
+        "kind": "others",
+        "should_cancel": false,
+        "clips": 300,
+        "trials": 44700,
+        "intent_only": {
+          "k": 35760,
+          "n": 44700,
+          "rate": 0.8,
+          "wilson95": [
+            0.7962660966252855,
+            0.803682342705262
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 35760,
+          "n": 44700,
+          "rate": 0.8,
+          "wilson95": [
+            0.7962660966252855,
+            0.803682342705262
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 1,
+            "n": 44700,
+            "rate": 2.237136465324385e-05,
+            "wilson95": [
+              3.949004523281854e-06,
+              0.00012672432892911657
+            ],
+            "identity_bootstrap95": [
+              0.0,
+              0.0001342164777831691
+            ],
+            "voiceprint_only": {
+              "k": 1,
+              "n": 44700,
+              "rate": 2.237136465324385e-05,
+              "wilson95": [
+                3.949004523281854e-06,
+                0.00012672432892911657
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 49,
+            "n": 44700,
+            "rate": 0.0010961968680089486,
+            "wilson95": [
+              0.0008293346704218276,
+              0.001448805112535886
+            ],
+            "identity_bootstrap95": [
+              0.0005371350794744048,
+              0.001901440372401549
+            ],
+            "voiceprint_only": {
+              "k": 52,
+              "n": 44700,
+              "rate": 0.0011633109619686801,
+              "wilson95": [
+                0.0008872898459581981,
+                0.0015250665900935977
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "replay_of_enrolled_voice": {
+        "source": "replay",
+        "kind": "own",
+        "should_cancel": false,
+        "clips": 300,
+        "trials": 300,
+        "intent_only": {
+          "k": 240,
+          "n": 300,
+          "rate": 0.8,
+          "wilson95": [
+            0.7510701139033206,
+            0.8413438280980382
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 166,
+          "n": 300,
+          "rate": 0.5533333333333333,
+          "wilson95": [
+            0.4967541991380484,
+            0.6085638349955265
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 13,
+            "n": 300,
+            "rate": 0.043333333333333335,
+            "wilson95": [
+              0.025496203603204263,
+              0.07271812912806098
+            ],
+            "identity_bootstrap95": [
+              0.023333333333333334,
+              0.06666666666666667
+            ],
+            "voiceprint_only": {
+              "k": 16,
+              "n": 300,
+              "rate": 0.05333333333333334,
+              "wilson95": [
+                0.03309162538404202,
+                0.08486983874726851
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 53,
+            "n": 300,
+            "rate": 0.17666666666666667,
+            "wilson95": [
+              0.13767606902581717,
+              0.2238333490393852
+            ],
+            "identity_bootstrap95": [
+              0.13333333333333333,
+              0.22
+            ],
+            "voiceprint_only": {
+              "k": 61,
+              "n": 300,
+              "rate": 0.20333333333333334,
+              "wilson95": [
+                0.16167315823454487,
+                0.25249527689744494
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "household_noise_only": {
+        "source": "noise",
+        "kind": "all",
+        "should_cancel": false,
+        "clips": 100,
+        "trials": 15000,
+        "intent_only": {
+          "k": 0,
+          "n": 15000,
+          "rate": 0.0,
+          "wilson95": [
+            2.710505431213761e-20,
+            0.0002560410928358508
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 0,
+          "n": 15000,
+          "rate": 0.0,
+          "wilson95": [
+            2.710505431213761e-20,
+            0.0002560410928358508
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 0,
+            "n": 15000,
+            "rate": 0.0,
+            "wilson95": [
+              2.710505431213761e-20,
+              0.0002560410928358508
+            ],
+            "identity_bootstrap95": [
+              0.0,
+              0.0
+            ],
+            "voiceprint_only": {
+              "k": 0,
+              "n": 15000,
+              "rate": 0.0,
+              "wilson95": [
+                2.710505431213761e-20,
+                0.0002560410928358508
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 0,
+            "n": 15000,
+            "rate": 0.0,
+            "wilson95": [
+              2.710505431213761e-20,
+              0.0002560410928358508
+            ],
+            "identity_bootstrap95": [
+              0.0,
+              0.0
+            ],
+            "voiceprint_only": {
+              "k": 0,
+              "n": 15000,
+              "rate": 0.0,
+              "wilson95": [
+                2.710505431213761e-20,
+                0.0002560410928358508
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "silence": {
+        "source": "silence",
+        "kind": "all",
+        "should_cancel": false,
+        "clips": 20,
+        "trials": 3000,
+        "intent_only": {
+          "k": 0,
+          "n": 3000,
+          "rate": 0.0,
+          "wilson95": [
+            1.0842021724855044e-19,
+            0.0012788956648046956
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 0,
+          "n": 3000,
+          "rate": 0.0,
+          "wilson95": [
+            1.0842021724855044e-19,
+            0.0012788956648046956
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 0,
+            "n": 3000,
+            "rate": 0.0,
+            "wilson95": [
+              1.0842021724855044e-19,
+              0.0012788956648046956
+            ],
+            "identity_bootstrap95": [
+              0.0,
+              0.0
+            ],
+            "voiceprint_only": {
+              "k": 0,
+              "n": 3000,
+              "rate": 0.0,
+              "wilson95": [
+                1.0842021724855044e-19,
+                0.0012788956648046956
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 0,
+            "n": 3000,
+            "rate": 0.0,
+            "wilson95": [
+              1.0842021724855044e-19,
+              0.0012788956648046956
+            ],
+            "identity_bootstrap95": [
+              0.0,
+              0.0
+            ],
+            "voiceprint_only": {
+              "k": 0,
+              "n": 3000,
+              "rate": 0.0,
+              "wilson95": [
+                1.0842021724855044e-19,
+                0.0012788956648046956
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      },
+      "enrolled_says_help": {
+        "source": "help",
+        "kind": "own",
+        "should_cancel": false,
+        "clips": 450,
+        "trials": 450,
+        "intent_only": {
+          "k": 0,
+          "n": 450,
+          "rate": 0.0,
+          "wilson95": [
+            8.673617379884035e-19,
+            0.008464627306090936
+          ]
+        },
+        "all_but_voiceprint": {
+          "k": 0,
+          "n": 450,
+          "rate": 0.0,
+          "wilson95": [
+            8.673617379884035e-19,
+            0.008464627306090936
+          ]
+        },
+        "operating_points": {
+          "far_0.1pct": {
+            "k": 0,
+            "n": 450,
+            "rate": 0.0,
+            "wilson95": [
+              8.673617379884035e-19,
+              0.008464627306090936
+            ],
+            "identity_bootstrap95": [
+              0.0,
+              0.0
+            ],
+            "voiceprint_only": {
+              "k": 282,
+              "n": 450,
+              "rate": 0.6266666666666667,
+              "wilson95": [
+                0.5810804808663531,
+                0.670108480216104
+              ]
+            },
+            "threshold": 0.6794503341184387
+          },
+          "far_1pct": {
+            "k": 0,
+            "n": 450,
+            "rate": 0.0,
+            "wilson95": [
+              8.673617379884035e-19,
+              0.008464627306090936
+            ],
+            "identity_bootstrap95": [
+              0.0,
+              0.0
+            ],
+            "voiceprint_only": {
+              "k": 377,
+              "n": 450,
+              "rate": 0.8377777777777777,
+              "wilson95": [
+                0.8008808428937311,
+                0.8689563866594874
+              ]
+            },
+            "threshold": 0.6006120453344116
+          }
+        }
+      }
+    },
+    "reasons": {
+      "true_cancel_clean": {
+        "sampled_trials": 600,
+        "eligible": 254,
+        "reason_counts": {
+          "speaker_mismatch": 273,
+          "too_short": 130,
+          "intent_not_reassurance": 71,
+          "low_asr_confidence": 1
+        }
+      },
+      "true_cancel_noise5dB": {
+        "sampled_trials": 300,
+        "eligible": 58,
+        "reason_counts": {
+          "speaker_mismatch": 233,
+          "intent_not_reassurance": 58,
+          "too_short": 4
+        }
+      },
+      "other_person_same_words": {
+        "sampled_trials": 3000,
+        "eligible": 1,
+        "reason_counts": {
+          "intent_not_reassurance": 377,
+          "speaker_mismatch": 2999,
+          "too_short": 649,
+          "low_asr_confidence": 9
+        }
+      },
+      "other_person_noise5dB": {
+        "sampled_trials": 3000,
+        "eligible": 1,
+        "reason_counts": {
+          "speaker_mismatch": 2999,
+          "intent_not_reassurance": 588,
+          "too_short": 33
+        }
+      },
+      "visitor_on_behalf": {
+        "sampled_trials": 3000,
+        "eligible": 0,
+        "reason_counts": {
+          "speaker_mismatch": 2998,
+          "intent_not_reassurance": 364,
+          "too_short": 25
+        }
+      },
+      "tv_radio_speech": {
+        "sampled_trials": 3000,
+        "eligible": 0,
+        "reason_counts": {
+          "speaker_mismatch": 3000,
+          "intent_not_reassurance": 637
+        }
+      },
+      "replay_of_enrolled_voice": {
+        "sampled_trials": 300,
+        "eligible": 13,
+        "reason_counts": {
+          "too_short": 85,
+          "speaker_mismatch": 284,
+          "intent_not_reassurance": 60,
+          "low_asr_confidence": 1
+        }
+      },
+      "household_noise_only": {
+        "sampled_trials": 3000,
+        "eligible": 0,
+        "reason_counts": {
+          "intent_not_reassurance": 3000,
+          "speaker_mismatch": 3000
+        }
+      },
+      "silence": {
+        "sampled_trials": 3000,
+        "eligible": 0,
+        "reason_counts": {
+          "too_short": 3000,
+          "intent_unavailable": 3000
+        }
+      },
+      "enrolled_says_help": {
+        "sampled_trials": 450,
+        "eligible": 0,
+        "reason_counts": {
+          "intent_not_reassurance": 450,
+          "too_short": 27,
+          "speaker_mismatch": 166
+        }
+      }
+    },
+    "gate_audit": {
+      "n": 199,
+      "mismatch": 0,
+      "threshold": 0.6794503341184387
+    },
+    "reliability": {
+      "dev_impostor_trials": 30396,
+      "dev_speakers": 150,
+      "eval_speakers": 150,
+      "far_0.1pct": {
+        "needs_impostor_trials": 10000,
+        "have_dev_impostor_trials": 30396,
+        "reliable": true,
+        "min_measurable_rate": 3.2899065666535074e-05
+      },
+      "far_1pct": {
+        "needs_impostor_trials": 1000,
+        "have_dev_impostor_trials": 30396,
+        "reliable": true,
+        "min_measurable_rate": 3.2899065666535074e-05
+      },
+      "note": "A false-accept rate of 0.1% needs at least 10,000 impostor trials to mean anything. Trials here are pairs of clips and enrolled users built from a limited set of speakers, so they are not independent: the identity-bootstrap intervals (which resample speakers) are the more honest ones, and they are wider than the Wilson intervals."
+    },
+    "real_speech_check": {
+      "status": "completed",
+      "speakers": 26,
+      "probes": 208,
+      "genuine_trials": 208,
+      "impostor_trials": 5200,
+      "eer": 0.0003846153846153846,
+      "genuine_scores": {
+        "n": 208,
+        "mean": 0.7435170883384837,
+        "std": 0.0750182647404779,
+        "p1": 0.5096298979245102,
+        "median": 0.7526323194099853,
+        "p99": 0.8526645934599292,
+        "p99.9": 0.8744835376636515
+      },
+      "impostor_scores": {
+        "n": 5200,
+        "mean": 0.09963536510214935,
+        "std": 0.1067759358929538,
+        "p1": -0.10428659761317109,
+        "median": 0.08626874694734854,
+        "p99": 0.3918739619868648,
+        "p99.9": 0.4866535150913007
+      },
+      "at_tts_dev_thresholds": {
+        "far_0.1pct": {
+          "threshold": 0.6794503341184387,
+          "tar": {
+            "k": 174,
+            "n": 208,
+            "rate": 0.8365384615384616,
+            "wilson95": [
+              0.7802662193028703,
+              0.8806049221537654
+            ]
+          },
+          "far": {
+            "k": 0,
+            "n": 5200,
+            "rate": 0.0,
+            "wilson95": [
+              0.0,
+              0.0007382238537006967
+            ]
+          }
+        },
+        "far_1pct": {
+          "threshold": 0.6006120453344116,
+          "tar": {
+            "k": 195,
+            "n": 208,
+            "rate": 0.9375,
+            "wilson95": [
+              0.8960177487024101,
+              0.9631147351912162
+            ]
+          },
+          "far": {
+            "k": 0,
+            "n": 5200,
+            "rate": 0.0,
+            "wilson95": [
+              0.0,
+              0.0007382238537006967
+            ]
+          }
+        }
+      }
+    }
+  },
+  "provenance": {
+    "run_id": "20261008-113720_audio_A6_cancel_eligibility_cac405cb21",
+    "suite": "audio",
+    "name": "A6_cancel_eligibility",
+    "config_hash": "cac405cb21",
+    "code_version": "4b77bcb56eef",
+    "split_hash": null,
+    "seed": 42,
+    "data_source": "Piper libritts_r (904 synthetic voices) saying the phrase bank; ESC-50 household noise; LibriSpeech dev-clean-2 for a real-speech check",
+    "started_at": "2026-10-08T03:37:20Z",
+    "versions": {
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.22631-SP0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.14.1",
+      "mediapipe": "1.0.1",
+      "opencv-python": "5.0.0.93",
+      "onnxruntime": "1.30.0",
+      "faster-whisper": "1.2.1",
+      "silero-vad": "6.2.3"
+    },
+    "device": "AMD64",
+    "finished_at": "2026-10-08T04:06:22Z",
+    "seconds": 1741.7
+  }
+}

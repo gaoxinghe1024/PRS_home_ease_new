@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "dataset": "vivae",
+    "license": "CC BY-NC 4.0",
+    "source": "https://zenodo.org/api/records/4066235/files/VIVAE.zip/content",
+    "doi": "10.5281/zenodo.4066235",
+    "archive_deleted": true,
+    "clips_extracted": 1085,
+    "clips_expected": 1085,
+    "citation": "Holz, Larrouy-Maestri, Poeppel (2022) Emotion 22(1):213-225, doi:10.1037/emo0001048",
+    "note": "acted non-speech vocalisations (studio); proxy for screams / pain-fear cries, not older-adult or household audio"
+  },
+  "accessed_at": "2026-10-07T15:14:00Z",
+  "files": [
+    {
+      "url": "https://zenodo.org/api/records/4066235/files/VIVAE.zip/content",
+      "path": "data/raw/vivae/VIVAE.zip",
+      "status": "downloaded",
+      "bytes": 93460357,
+      "md5": "62383077641fa90f5545e38d7f268e02",
+      "sha256": "1effb9cdd1e7d5819bfd9e9e6b02bf3fef64b9e52cbfb2b59b8d3cb0142eb2fc"
+    }
+  ]
+}

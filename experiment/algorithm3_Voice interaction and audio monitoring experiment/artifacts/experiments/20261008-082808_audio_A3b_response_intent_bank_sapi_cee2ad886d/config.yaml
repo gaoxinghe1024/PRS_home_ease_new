@@ -1,0 +1,37 @@
+seed: 42
+protocol: A3b_phrase_bank
+platform: Windows
+tts_backend: sapi
+grid:
+- tiny|none|forced
+- tiny|none|auto
+- tiny|none|auto_en_zh
+- tiny|hotwords|forced
+- tiny|hotwords|auto
+- tiny|hotwords|auto_en_zh
+- tiny|prompt|forced
+- tiny|prompt|auto
+- tiny|prompt|auto_en_zh
+- base|none|forced
+- base|none|auto
+- base|none|auto_en_zh
+- base|hotwords|forced
+- base|hotwords|auto
+- base|hotwords|auto_en_zh
+- base|prompt|forced
+- base|prompt|auto
+- base|prompt|auto_en_zh
+methods:
+- rule_v1
+- rule_v1_t2s
+- rule_v2
+- sup_legacy
+- sup_dev
+- combined
+baseline:
+- faster-whisper-tiny
+- none
+- auto
+- rule_v1
+latency_budget_s: 3.0
+dev_only: false

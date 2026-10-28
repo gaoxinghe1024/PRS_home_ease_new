@@ -1,0 +1,505 @@
+{
+  "status": "completed",
+  "suite": "audio",
+  "name": "A3_response_intent_sapi",
+  "data_source": "Windows SAPI TTS replies (synthetic voices; Mandarin proxy voice EMULATED) + LibriSpeech (TV speech proxy) + ESC-50 noise",
+  "headline": "faster-whisper-tiny + rule macro-F1 0.709; faster-whisper-tiny + supervised macro-F1 0.699; faster-whisper-base + rule macro-F1 0.709; faster-whisper-base + supervised macro-F1 0.694",
+  "missing": [],
+  "metrics": {
+    "entries": [
+      {
+        "config": "faster-whisper-tiny + rule",
+        "macro_f1": 0.7094017094017094,
+        "accuracy": 0.6428571428571429,
+        "n": 42,
+        "asr_latency_s_median": 0.2902461999983643,
+        "report": {
+          "labels": [
+            "HELP",
+            "REASSURANCE",
+            "OTHER",
+            "UNCERTAIN",
+            "NO_RESPONSE"
+          ],
+          "confusion": [
+            [
+              5,
+              0,
+              8,
+              0,
+              0
+            ],
+            [
+              0,
+              7,
+              7,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              12,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          ],
+          "per_class": {
+            "HELP": {
+              "precision": 1.0,
+              "recall": 0.38461538461538464,
+              "f1": 0.5555555555555556,
+              "support": 13
+            },
+            "REASSURANCE": {
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6666666666666666,
+              "support": 14
+            },
+            "OTHER": {
+              "precision": 0.4444444444444444,
+              "recall": 1.0,
+              "f1": 0.6153846153846153,
+              "support": 12
+            },
+            "UNCERTAIN": {
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "support": 0
+            },
+            "NO_RESPONSE": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 3
+            }
+          },
+          "macro_f1": 0.7094017094017094,
+          "accuracy": 0.6428571428571429,
+          "n": 42
+        }
+      },
+      {
+        "config": "faster-whisper-tiny + supervised",
+        "macro_f1": 0.698937728937729,
+        "accuracy": 0.5476190476190477,
+        "n": 42,
+        "asr_latency_s_median": 0.2902461999983643,
+        "report": {
+          "labels": [
+            "HELP",
+            "REASSURANCE",
+            "OTHER",
+            "UNCERTAIN",
+            "NO_RESPONSE"
+          ],
+          "confusion": [
+            [
+              8,
+              0,
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              11,
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              11,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          ],
+          "per_class": {
+            "HELP": {
+              "precision": 1.0,
+              "recall": 0.6153846153846154,
+              "f1": 0.761904761904762,
+              "support": 13
+            },
+            "REASSURANCE": {
+              "precision": 1.0,
+              "recall": 0.7857142857142857,
+              "f1": 0.88,
+              "support": 14
+            },
+            "OTHER": {
+              "precision": 1.0,
+              "recall": 0.08333333333333333,
+              "f1": 0.15384615384615385,
+              "support": 12
+            },
+            "UNCERTAIN": {
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "support": 0
+            },
+            "NO_RESPONSE": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 3
+            }
+          },
+          "macro_f1": 0.698937728937729,
+          "accuracy": 0.5476190476190477,
+          "n": 42
+        }
+      },
+      {
+        "config": "faster-whisper-base + rule",
+        "macro_f1": 0.7094017094017094,
+        "accuracy": 0.6428571428571429,
+        "n": 42,
+        "asr_latency_s_median": 0.5138798999978462,
+        "report": {
+          "labels": [
+            "HELP",
+            "REASSURANCE",
+            "OTHER",
+            "UNCERTAIN",
+            "NO_RESPONSE"
+          ],
+          "confusion": [
+            [
+              5,
+              0,
+              8,
+              0,
+              0
+            ],
+            [
+              0,
+              7,
+              7,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              12,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          ],
+          "per_class": {
+            "HELP": {
+              "precision": 1.0,
+              "recall": 0.38461538461538464,
+              "f1": 0.5555555555555556,
+              "support": 13
+            },
+            "REASSURANCE": {
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6666666666666666,
+              "support": 14
+            },
+            "OTHER": {
+              "precision": 0.4444444444444444,
+              "recall": 1.0,
+              "f1": 0.6153846153846153,
+              "support": 12
+            },
+            "UNCERTAIN": {
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "support": 0
+            },
+            "NO_RESPONSE": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 3
+            }
+          },
+          "macro_f1": 0.7094017094017094,
+          "accuracy": 0.6428571428571429,
+          "n": 42
+        }
+      },
+      {
+        "config": "faster-whisper-base + supervised",
+        "macro_f1": 0.6942307692307692,
+        "accuracy": 0.5476190476190477,
+        "n": 42,
+        "asr_latency_s_median": 0.5138798999978462,
+        "report": {
+          "labels": [
+            "HELP",
+            "REASSURANCE",
+            "OTHER",
+            "UNCERTAIN",
+            "NO_RESPONSE"
+          ],
+          "confusion": [
+            [
+              7,
+              0,
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              12,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              11,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          ],
+          "per_class": {
+            "HELP": {
+              "precision": 1.0,
+              "recall": 0.5384615384615384,
+              "f1": 0.7000000000000001,
+              "support": 13
+            },
+            "REASSURANCE": {
+              "precision": 1.0,
+              "recall": 0.8571428571428571,
+              "f1": 0.923076923076923,
+              "support": 14
+            },
+            "OTHER": {
+              "precision": 1.0,
+              "recall": 0.08333333333333333,
+              "f1": 0.15384615384615385,
+              "support": 12
+            },
+            "UNCERTAIN": {
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "support": 0
+            },
+            "NO_RESPONSE": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 3
+            }
+          },
+          "macro_f1": 0.6942307692307692,
+          "accuracy": 0.5476190476190477,
+          "n": 42
+        }
+      }
+    ],
+    "per_bucket": [
+      {
+        "asr": "faster-whisper-tiny",
+        "bucket": "ambient_noise_5dB",
+        "n": 16,
+        "rule_correct": 10,
+        "supervised_correct": 10
+      },
+      {
+        "asr": "faster-whisper-tiny",
+        "bucket": "no_response",
+        "n": 3,
+        "rule_correct": 3,
+        "supervised_correct": 3
+      },
+      {
+        "asr": "faster-whisper-tiny",
+        "bucket": "proxy_answer",
+        "n": 2,
+        "rule_correct": 0,
+        "supervised_correct": 0
+      },
+      {
+        "asr": "faster-whisper-tiny",
+        "bucket": "self_call_for_help",
+        "n": 6,
+        "rule_correct": 2,
+        "supervised_correct": 3
+      },
+      {
+        "asr": "faster-whisper-tiny",
+        "bucket": "self_other",
+        "n": 4,
+        "rule_correct": 4,
+        "supervised_correct": 0
+      },
+      {
+        "asr": "faster-whisper-tiny",
+        "bucket": "self_response",
+        "n": 6,
+        "rule_correct": 3,
+        "supervised_correct": 5
+      },
+      {
+        "asr": "faster-whisper-tiny",
+        "bucket": "tv_says_help",
+        "n": 1,
+        "rule_correct": 1,
+        "supervised_correct": 1
+      },
+      {
+        "asr": "faster-whisper-tiny",
+        "bucket": "tv_speech",
+        "n": 4,
+        "rule_correct": 4,
+        "supervised_correct": 1
+      },
+      {
+        "asr": "faster-whisper-base",
+        "bucket": "ambient_noise_5dB",
+        "n": 16,
+        "rule_correct": 9,
+        "supervised_correct": 9
+      },
+      {
+        "asr": "faster-whisper-base",
+        "bucket": "no_response",
+        "n": 3,
+        "rule_correct": 3,
+        "supervised_correct": 3
+      },
+      {
+        "asr": "faster-whisper-base",
+        "bucket": "proxy_answer",
+        "n": 2,
+        "rule_correct": 0,
+        "supervised_correct": 0
+      },
+      {
+        "asr": "faster-whisper-base",
+        "bucket": "self_call_for_help",
+        "n": 6,
+        "rule_correct": 2,
+        "supervised_correct": 3
+      },
+      {
+        "asr": "faster-whisper-base",
+        "bucket": "self_other",
+        "n": 4,
+        "rule_correct": 4,
+        "supervised_correct": 0
+      },
+      {
+        "asr": "faster-whisper-base",
+        "bucket": "self_response",
+        "n": 6,
+        "rule_correct": 4,
+        "supervised_correct": 6
+      },
+      {
+        "asr": "faster-whisper-base",
+        "bucket": "tv_says_help",
+        "n": 1,
+        "rule_correct": 1,
+        "supervised_correct": 1
+      },
+      {
+        "asr": "faster-whisper-base",
+        "bucket": "tv_speech",
+        "n": 4,
+        "rule_correct": 4,
+        "supervised_correct": 1
+      }
+    ]
+  },
+  "provenance": {
+    "run_id": "20261008-082700_audio_A3_response_intent_sapi_9fe9479c15",
+    "suite": "audio",
+    "name": "A3_response_intent_sapi",
+    "config_hash": "9fe9479c15",
+    "code_version": "6699be206b2f",
+    "split_hash": null,
+    "seed": 42,
+    "data_source": "Windows SAPI TTS replies (synthetic voices; Mandarin proxy voice EMULATED) + LibriSpeech (TV speech proxy) + ESC-50 noise",
+    "started_at": "2026-10-08T00:27:00Z",
+    "versions": {
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.22631-SP0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.14.1",
+      "mediapipe": "1.0.1",
+      "opencv-python": "5.0.0.93",
+      "onnxruntime": "1.30.0",
+      "faster-whisper": "1.2.1",
+      "silero-vad": "6.2.3"
+    },
+    "device": "AMD64",
+    "finished_at": "2026-10-08T00:28:08Z",
+    "seconds": 67.3
+  }
+}

@@ -1,0 +1,4079 @@
+{
+ "mapping_version": "esc50-vivae-homeease-v2",
+ "seed": 0,
+ "hf_repo": "Fhrozen/FSD50k",
+ "hf_revision": "ccf1acaff12f3f4a4c10052dddafbb6d22152c9b",
+ "zenodo_record": "4060432",
+ "quotas": {
+  "Screaming": 130,
+  "Thump_and_thud": 25,
+  "Knock": 20,
+  "Shatter": 25,
+  "Laughter": 30,
+  "Giggle": 10,
+  "Cough": 20,
+  "Sneeze": 15
+ },
+ "size_band_bytes": [
+  30000,
+  300000
+ ],
+ "max_per_uploader": 8,
+ "clips": [
+  {
+   "id": "348310",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "redafs",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Zombie Monster Scream",
+   "bytes": 100078,
+   "sha256": "f5051f1e6482c412ddfe0f565b8bee619e41776543d309727835578ed5b5594a"
+  },
+  {
+   "id": "68058",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Crowd",
+    "Human_group_actions",
+    "Shout",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Robinhood76",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "00916 children scream 1.wav",
+   "bytes": 216168,
+   "sha256": "407f434ee70650388153b591ca7bc3f26a4133c8fe8fc0a06c770cf7128920f5"
+  },
+  {
+   "id": "161360",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "dream4dreamtheater",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Girly scream",
+   "bytes": 71502,
+   "sha256": "f4581507be0e281b9aca061d2f0fd8115353f382ea1ed448e9098e0bd50b284c"
+  },
+  {
+   "id": "321971",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "xtrgamr",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "AHHHHHHH GIBBERISH.wav",
+   "bytes": 250958,
+   "sha256": "55e78879f51d273bb2ba4347e64574d3bb485b59f56bb1fec0db45de32173769"
+  },
+  {
+   "id": "89362",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "pandaplague",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "4.mp3",
+   "bytes": 156750,
+   "sha256": "7d6c9592508a5a9c8963c0f77f0e608fca210c2652b18d67fd034af79eaafb15"
+  },
+  {
+   "id": "394282",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "seachangeau",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "lady scream echoed.wav",
+   "bytes": 270362,
+   "sha256": "291ccc70f144d91d0c93988fd03f0bbf472c8e4bde3616458a5dc4f12795fa47"
+  },
+  {
+   "id": "323080",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Shout",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "LiamG_SFX",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Battle Cry 2",
+   "bytes": 160034,
+   "sha256": "a27c11e42b9af912cec375a2d7b1e1ad94de5b0a7754fd2d1ec2dc653a0e4653"
+  },
+  {
+   "id": "202037",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "thestigmata",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "Man die",
+   "bytes": 125642,
+   "sha256": "41660e6857b395618866f4d0a57a1106137a83826ce28aa3f70b839e33dc1086"
+  },
+  {
+   "id": "175385",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "DigitalDominic",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Scream",
+   "bytes": 237160,
+   "sha256": "21770f7e4e2e42c474198b607b0f74814395137fc4335027bb6cbf1e23d49eca"
+  },
+  {
+   "id": "316398",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "LittleRobotSoundFactory",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Dinosaur_07.wav",
+   "bytes": 77988,
+   "sha256": "2c341d431e8e6437c5c8469b474c81068688af3b8407de2b558e8961bcdd6820"
+  },
+  {
+   "id": "209164",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "LukeSharples",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Aahu.wav",
+   "bytes": 41354,
+   "sha256": "fd9a08b647f9fb6ebb45dcd61ea0c126ff0207808d7b7dde767c746d6bb48f37"
+  },
+  {
+   "id": "180310",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "jorickhoofd",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Sad cry 5",
+   "bytes": 175238,
+   "sha256": "4c6b8bd47a330ccb5c7af235c8e8d27288f91693192494bfb05f6dd8d1cca747"
+  },
+  {
+   "id": "180344",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "jorickhoofd",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Short scared scream 3",
+   "bytes": 63930,
+   "sha256": "867f93d8dc4589d9b9674f28dcea8cc01ba5dc12ed8c08d443f356ab42793a47"
+  },
+  {
+   "id": "381894",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "marsebastia",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Crazy Scream",
+   "bytes": 223566,
+   "sha256": "7d0a6ccd745a4d0e8742d78833417f11e225b90a6a738074fa4ee97754801ca3"
+  },
+  {
+   "id": "344029",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Reitanna",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "cracky scream.wav",
+   "bytes": 57428,
+   "sha256": "06a09ea3dca5e6c250c44d85f6765732c9f124fe374de4a6b31dc4c57cec0fed"
+  },
+  {
+   "id": "64940",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Syna-Max",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "wilhelm_scream.wav",
+   "bytes": 106130,
+   "sha256": "3662b1e1d014bb862fc10f09e3d4f9d870f0f4133e610ca343f4a651b61fca81"
+  },
+  {
+   "id": "222674",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Mir_Francs",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Crit_4_.mp3",
+   "bytes": 88526,
+   "sha256": "f6804ed32d9c486cdee1dbc32deef1832f1c5221d3acee15db21d2b785240b09"
+  },
+  {
+   "id": "125131",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "thanvannispen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "cell_scream_low.aif",
+   "bytes": 162908,
+   "sha256": "c870c27a3297205d0ee31d8189284f554e511086272b9e0547f243ef5765aea3"
+  },
+  {
+   "id": "427774",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "felipe.j",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "32-grito.wav",
+   "bytes": 293336,
+   "sha256": "83cfc0b92d05d0eebaf4de0730a6476a93ce8698e05cd8887376ea5d06f32ee2"
+  },
+  {
+   "id": "353291",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "J.Zazvurek",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Woman Scream 4",
+   "bytes": 143148,
+   "sha256": "e76fb5953fc75c2fc7b0b741339c06b60293029e2c752a4e3379482d418ee73a"
+  },
+  {
+   "id": "222535",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "AlbertTrepat",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Male Screaming Out Loud",
+   "bytes": 115278,
+   "sha256": "92efc65954e51805fa49de6e9e1776a4614113c7d1eba656892829196f75f8bd"
+  },
+  {
+   "id": "343954",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Reitanna",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "SCREAMAH.wav",
+   "bytes": 63566,
+   "sha256": "e45e51c6b5eb9eefaa6a6ffa71964ebb392f58aee2f8dcc6552de5acde7885a3"
+  },
+  {
+   "id": "222545",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "queen_westeros",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "WOMAN SCREAM",
+   "bytes": 191524,
+   "sha256": "e15810ea206b26bad552c1638051985b9b7fe4662be9d502ba1b903f9b043783"
+  },
+  {
+   "id": "66949",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Robinhood76",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "00733 girl folk scream 3.wav",
+   "bytes": 117760,
+   "sha256": "75035d63f587165f998508c3e5e7746b30195a5aeac8733fd929f608470a98ef"
+  },
+  {
+   "id": "270446",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "LittleRobotSoundFactory",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Scream_Male_01.wav",
+   "bytes": 157284,
+   "sha256": "99e2c4d434ca41c37b709a6ad97b3a5873cb4784d3f37b4c392d4d99ff97b2cc"
+  },
+  {
+   "id": "353287",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "J.Zazvurek",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Child`s scream 5",
+   "bytes": 77694,
+   "sha256": "1ddf006e14f8fd22a280acca5f654693844ed155ac3b7e30027690277edb7cba"
+  },
+  {
+   "id": "315828",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "benjaminharveydesign",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "shriek 3 and laugh.aiff",
+   "bytes": 166212,
+   "sha256": "828fb1ec82347484876806e38bb8ff6dbdfb05c93785f2a5d50f10398f958c90"
+  },
+  {
+   "id": "220311",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Shout",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Ellenskellington",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "manshout.wav",
+   "bytes": 119886,
+   "sha256": "656a3cb5e938cadf7c630726a3c602ecd8aaab3675b8b25f12fd74c9a2c894a9"
+  },
+  {
+   "id": "426195",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "giraffestudio",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "Sams scream.wav",
+   "bytes": 207606,
+   "sha256": "eec959871f51e28bfb5e1223cbecc545b35f6238fa689836686347a4d123b6f2"
+  },
+  {
+   "id": "219856",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "claracarpintero",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Scream",
+   "bytes": 105552,
+   "sha256": "f5e42be04b2894ae58c08133186272b9e2452aa3f5d72bb73be25d28618498c2"
+  },
+  {
+   "id": "220658",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "marionagm90",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream.wav",
+   "bytes": 64592,
+   "sha256": "ea56a1eff3e6415283c2ad902523d1f94f63d255f34936cf62bae9036b875496"
+  },
+  {
+   "id": "219867",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "estefaniabonnin",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Scream!!!",
+   "bytes": 148586,
+   "sha256": "fa0900c494a80f955649bcf5278b7eb7e2ed5118866ed105fb373e0ac96b2979"
+  },
+  {
+   "id": "63641",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "vtownpunks",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Screaming 9.wav",
+   "bytes": 59128,
+   "sha256": "8e0f9caf06d67ba24cb85f412b2ce30a5a3f4c1bcbf930b6ab2a2a0c7aafa2ad"
+  },
+  {
+   "id": "340940",
+   "split": "eval",
+   "labels": [
+    "Screech",
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Chesshunter",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "screech.wav",
+   "bytes": 278606,
+   "sha256": "93d86d1664547f18ad209b2225935e3cd30e8fa31f975ade39b559aa5e57ff34"
+  },
+  {
+   "id": "220049",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Shout",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "clavellmorenet",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "crits seguits ascendents.wav",
+   "bytes": 179918,
+   "sha256": "ce9bf384dae56903174aa3116f3cc4ed68eace04cdbbd1e2c14a562115989c6e"
+  },
+  {
+   "id": "270474",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "LittleRobotSoundFactory",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Scream_Male_03.wav",
+   "bytes": 132378,
+   "sha256": "aece3eb649dc55ccfecf86b223b59e6a07c1695f73266e31ab378cb4ed239844"
+  },
+  {
+   "id": "220045",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "clavellmorenet",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "crit grupal.wav",
+   "bytes": 229222,
+   "sha256": "6533a9516f9c27da182d29b869e3450dd353a51ab1ae337adceaea81827fbd9f"
+  },
+  {
+   "id": "420018",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "cvila24",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Crit Claudia Vila #666moviescreams.m4a",
+   "bytes": 214990,
+   "sha256": "fa6118875480841f5d2f7130dc72e7cff294ebc5050c4ca9e65a9f2cc8664efc"
+  },
+  {
+   "id": "91294",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Robinhood76",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "01503 baby scream 3.wav",
+   "bytes": 209200,
+   "sha256": "8589697bfcf1fb47a414dea5cd25fedf7065575113d169e3894cbc82cc073608"
+  },
+  {
+   "id": "340889",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Shout",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "passAirmangrace",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "WomanScream_stereo_bip.wav",
+   "bytes": 65614,
+   "sha256": "94a8860ab34dd4fc202cd4d738142506dcafc59c6d5854c923dc816d66f77126"
+  },
+  {
+   "id": "33443",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "dobroide",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "20070407.slaughter.00.wav",
+   "bytes": 181800,
+   "sha256": "a48dbef5230742ac48472d0f1ca5e41991aa01cd6536096bcec64fc3a24090d6"
+  },
+  {
+   "id": "203594",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "insanity54",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "man scream.ogg",
+   "bytes": 85966,
+   "sha256": "eac8df5bdd066dbb43c79e5628299a21b180c8e2bfcdac256414c9424b10f3c0"
+  },
+  {
+   "id": "21324",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "cdrk",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream_02.flac",
+   "bytes": 297550,
+   "sha256": "c31844268d0d80b67abee9619d9a716b4ab3166cc2dde3d874c96f722bdf46c6"
+  },
+  {
+   "id": "180309",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "jorickhoofd",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Sad cry 10",
+   "bytes": 254756,
+   "sha256": "57659403e06cdbab68b95e26afa8e5da1dab2a432cfb2bd70ed818fe90db710d"
+  },
+  {
+   "id": "221150",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "irenearandapares",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream_girl",
+   "bytes": 146520,
+   "sha256": "8113008a015a86d7c08eba72ed43acbcbfbcd39204f7234e2b357701e6004b8a"
+  },
+  {
+   "id": "219882",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "pablocandel",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Voldemort Imitation Scream.mp3",
+   "bytes": 163918,
+   "sha256": "7bf2d545bfec8d64bdd3473512de5e219b4d698a2b2b27277a73e1c2427736e9"
+  },
+  {
+   "id": "382991",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "JúliaLN",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Scream_girl.mp3",
+   "bytes": 124968,
+   "sha256": "454fa11c5f8a1354c7dde661d1c8441d33d3cd151cdab7523e925737eec6e8f7"
+  },
+  {
+   "id": "235595",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Gasp",
+    "Human_voice",
+    "Breathing",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "tcrocker68",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Girl_Two_Screams.wav",
+   "bytes": 209026,
+   "sha256": "3954d7d0559c99ec4575cc66a6fdc296993af15be20358f592e1c6722fca6c22"
+  },
+  {
+   "id": "84353",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "creativeheroes",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "helmutscream_short.wav",
+   "bytes": 152830,
+   "sha256": "ebf4f5b7934a2c08aac25876db093a72fa33566bc99c726c5135c215614d5b75"
+  },
+  {
+   "id": "221151",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "irenearandapares",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "woman scream",
+   "bytes": 188846,
+   "sha256": "c2a0a5058443309665d94f2d87e464c670b99a771c84bf9c1dcb64d4c7d586b1"
+  },
+  {
+   "id": "351630",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "arnaud coutancier",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "Boooo !.wav",
+   "bytes": 209816,
+   "sha256": "909c858347eefc4fa3b89265777543062ff9e713c87a0ee5235f2eb6d9936a31"
+  },
+  {
+   "id": "323083",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Shout",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "LiamG_SFX",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Battle Cry 5",
+   "bytes": 166698,
+   "sha256": "fc6735e10bc7111d4e859aa0f910d9fcd2d249c4311b02d967429a21c89c87c6"
+  },
+  {
+   "id": "168777",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Robinhood76",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "03792 children screaming.wav",
+   "bytes": 197310,
+   "sha256": "2ed799067ff8b5bf84de548105324f0dfc7036b09d3c66091be93b8a2f2fd18a"
+  },
+  {
+   "id": "278108",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Crowd",
+    "Human_voice",
+    "Human_group_actions"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Mafon2",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Girl Scream",
+   "bytes": 119890,
+   "sha256": "fff1d441e5a2e82ba07748e7c5bd41597202ba54f8c09dbdde9fab43f5001025"
+  },
+  {
+   "id": "110139",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Ryding",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Scary scream 1.wav",
+   "bytes": 125726,
+   "sha256": "ee5c76cc480b5fd1b224642a6a48a27a60be784e3849f8b6f31697f4af0efdde"
+  },
+  {
+   "id": "220291",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "GabrielaUPF",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "screaming_male_horror.mp3",
+   "bytes": 214522,
+   "sha256": "f2fc09cf6043d1ed1ade5cdb59bd7a4781db59846043ffdfee7183d4b88cbe53"
+  },
+  {
+   "id": "241472",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Reitanna",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "OH GOD WAH!.wav",
+   "bytes": 186448,
+   "sha256": "54372219a45196402680ade9575c27e1eeb9138f83194510977cb5f324ac799a"
+  },
+  {
+   "id": "220649",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "marionagm90",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream.wav",
+   "bytes": 116812,
+   "sha256": "c9a5f3affd6a59b26ab13d437fa5c8d009abecdbb6b3bf3214393553e15e71de"
+  },
+  {
+   "id": "166619",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "J.Zazvurek",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Child's scream 2",
+   "bytes": 59820,
+   "sha256": "4aeb7eef8a5f4564b6d58476c66a56620f786735b9cb4638af5284f594be074c"
+  },
+  {
+   "id": "219657",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "annatabernero",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Little Girl Yelling",
+   "bytes": 141390,
+   "sha256": "cb429165e8955fdc9aea6d0461ab6d7334e0a90a08e7d09e9fc6f1fba95202c0"
+  },
+  {
+   "id": "345933",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "christerljung",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "nooo1.wav",
+   "bytes": 117366,
+   "sha256": "38af39732dcf2bfc9a7880bec74cae554cff1d7d5368a443eb89094c36fe0952"
+  },
+  {
+   "id": "156901",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "dfasas",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "Screaming.wav",
+   "bytes": 227378,
+   "sha256": "f62ad4ba8e1d58a1e22ba0346c904e1af6935b4d257943dad55ad64dec76572f"
+  },
+  {
+   "id": "344056",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Reitanna",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "yell inhale.wav",
+   "bytes": 90754,
+   "sha256": "4746f12af2230fa85a2ead3e2c7177ecf29854838ce35f627eff5953c916c095"
+  },
+  {
+   "id": "332451",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "ryandeschamps",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "ouchie.mp3",
+   "bytes": 241742,
+   "sha256": "4bca0e48c7feccf9eaad268155e087e8d498ce938966f638778513b4a52c7aba"
+  },
+  {
+   "id": "104029",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "RutgerMuller",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Scream2_Hissy.aif",
+   "bytes": 231604,
+   "sha256": "f2a23f04bec99d28e1d60400350c4713f1dae054e0af7092c64f817922cb2b02"
+  },
+  {
+   "id": "400183",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "tomattka",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Girl Screaming_01.wav",
+   "bytes": 136122,
+   "sha256": "baa39e027081a92ed3660adcc3acae9c52a479a2a641f9178a72b277b30a8b4b"
+  },
+  {
+   "id": "125130",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "thanvannispen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "cell_scream5.aif",
+   "bytes": 162910,
+   "sha256": "6a5b489c9d9ee9b4d7606710f3e6b04fe81b588af507d0c77369acbc4d8c828d"
+  },
+  {
+   "id": "406843",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "JVoltio1127",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "16-Grito-consolidated.wav",
+   "bytes": 82870,
+   "sha256": "c1bbdd0e5e1440a48cb073d4760a6de999fbf5cd902c3522d45c82a921805dbe"
+  },
+  {
+   "id": "220306",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Ellenskellington",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "twopeoplescreaming.wav",
+   "bytes": 201806,
+   "sha256": "cc73ccc82089225366e04cbfed9cb67b3bf09eeaaf1807f124550d1c187fed10"
+  },
+  {
+   "id": "345450",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Artmasterrich",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Male_Death_03",
+   "bytes": 161870,
+   "sha256": "77099db33db12fa1cb806cd78d1ee17c49473f915c15d71fff2bc2de4c7c8910"
+  },
+  {
+   "id": "220365",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "AlSarcoli007",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Scream 01.wav",
+   "bytes": 153456,
+   "sha256": "1eaedd269efd33a6d9865a00612932cf10af3becfb4807697986079bf445b2b2"
+  },
+  {
+   "id": "220302",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "GabrielaUPF",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "screaming_woman_horror.mp3",
+   "bytes": 183422,
+   "sha256": "6fd00e86c2caddd4091ace623c9ea1a2230d40ea6c46428c9601c31fb3e5d330"
+  },
+  {
+   "id": "432875",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Shout",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "xtrgamr",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "LFS_Vox8.wav",
+   "bytes": 49230,
+   "sha256": "2f8c0c52141e28c973d0b9cc60366dc0f5c39223ddbdf3a46cb6a72888cc2f16"
+  },
+  {
+   "id": "387409",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "gumballworld",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "baby scream cranky loop.wav",
+   "bytes": 91730,
+   "sha256": "46b5a401f7b5816ec5e1258e00af4d1c7e8fda02dbbd94cb2ecf24f9f7be6a57"
+  },
+  {
+   "id": "222669",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Mir_Francs",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Crit_3_.mp3",
+   "bytes": 147274,
+   "sha256": "09fe7a12be2d63f4b7d47a98388f48899deb1cc0673db95a8418601691628737"
+  },
+  {
+   "id": "219693",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "mariateresa_garcia",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "woman-screaming.wav",
+   "bytes": 173162,
+   "sha256": "9312becc8ee09b8e8dac02c2d5d71f044690b8884fa41ee7e7e93e3293db9ebc"
+  },
+  {
+   "id": "9433",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "thanvannispen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "woman_Susanne_screams_AA.aiff",
+   "bytes": 176478,
+   "sha256": "12fbab9df5894f5ccde9da87043ddaae1439b760ec81daf7d7af40e151835227"
+  },
+  {
+   "id": "316411",
+   "split": "dev",
+   "labels": [
+    "Screech",
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "LittleRobotSoundFactory",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Dinosaur_11.wav",
+   "bytes": 101508,
+   "sha256": "746ce642b76d9da8fc4a2d1964fcf982f4790481cc7a1a0fa3ca9d6ed26ecf4c"
+  },
+  {
+   "id": "344028",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Reitanna",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "cracky ah.wav",
+   "bytes": 84046,
+   "sha256": "4437c9927583b0ab1dfbb87f33d3fae064173712e41bfa2fe6891058211a4708"
+  },
+  {
+   "id": "220814",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "EricSueiro",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "woman scream.wav",
+   "bytes": 75958,
+   "sha256": "8da36e65e97fd6c123a5da56ed2cab5165da7132f0d2b7ca37e4054e7692b582"
+  },
+  {
+   "id": "166621",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "J.Zazvurek",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Child's scream 4",
+   "bytes": 177888,
+   "sha256": "a41ff3293332d1c0f763a5bd0ebc14c944301ece80173b32067e0d28ae8b25ac"
+  },
+  {
+   "id": "9704",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Lithe-Fider",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "FL_Scream 2.wav",
+   "bytes": 72400,
+   "sha256": "92c9c8848444cb0aa0baae3d9a6740d5144b9e9034e95ac831bd670e6c9c5041"
+  },
+  {
+   "id": "82418",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Vampirella17",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Jeanette - Scream 2.wav",
+   "bytes": 275262,
+   "sha256": "25a1a3287d0c97a8a9f353952f8839d004173cb1780a0f5f7fe85fd83a62df0e"
+  },
+  {
+   "id": "34281",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "hello_flowers",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Flowers_Like to Scream 01.wav",
+   "bytes": 140304,
+   "sha256": "25093f7ca67f534c2cdb0f2fc579c3f836b8e491d9cf62976cf423d566ca3acc"
+  },
+  {
+   "id": "30277",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "thanvannispen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream_group_short2.aif",
+   "bytes": 176478,
+   "sha256": "7a9b23954cf569e649323d4c5879d73669878cbc7a190c68956045c9fd9ffa47"
+  },
+  {
+   "id": "220293",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "GabrielaUPF",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "screaming_male_painIII.mp3",
+   "bytes": 198870,
+   "sha256": "740c801ca236746d1b417bb94bb1bf5af7225b174d645ba35e0ae1e91696ce5e"
+  },
+  {
+   "id": "77148",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "DjCHAOS",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Human Death Scream.mp3",
+   "bytes": 161358,
+   "sha256": "d1b630a70bd3d594f235fd01af96332557b2a759fe2bd414654465e04a20aed2"
+  },
+  {
+   "id": "180341",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "jorickhoofd",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Short scared scream 2",
+   "bytes": 92322,
+   "sha256": "4c194f05a2d35357f8adcd4bb8453f8f78d29aabde121ccf3a40e3292d59c400"
+  },
+  {
+   "id": "221153",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "irenearandapares",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "girl scream",
+   "bytes": 92056,
+   "sha256": "6408ba4e67b9edda1e8ea76b1f121cd957efaee54582f42e6e25169da06d35e6"
+  },
+  {
+   "id": "220822",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "EricSueiro",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Woman yelling high pitched 2.wav",
+   "bytes": 66326,
+   "sha256": "e38d16edde8e1becc6ce24dba2417668dfbd61dd6677d033267785684bcc65ce"
+  },
+  {
+   "id": "220818",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "EricSueiro",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Man frightened yelling.wav",
+   "bytes": 75958,
+   "sha256": "59df6f933f67ccaa81de5f974189777ec25e13ffd6de48bea8eabffb3f1d2aa4"
+  },
+  {
+   "id": "220694",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Pep_Molina",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Loud scream.mp3",
+   "bytes": 243510,
+   "sha256": "ca3bc96df86dcc2809989530488b3e73932ccac3b290921353a218b179de1c0d"
+  },
+  {
+   "id": "353086",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "GreatNate98",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Weirdo Scream.wav",
+   "bytes": 247288,
+   "sha256": "c6d89db5a9e664d46d4b40fc213c49725603a932e69e34a49919af9724f68e31"
+  },
+  {
+   "id": "31635",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "UncleSigmund",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "talkbottle1.wav",
+   "bytes": 231604,
+   "sha256": "7c82f40cf318c72efdd553c1d7e880e6984b86434de2140cbac99aab7fb241e3"
+  },
+  {
+   "id": "381803",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "juliabosque",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream2_bosque_julia.mp3",
+   "bytes": 71502,
+   "sha256": "9cb8db19a692f64c720384f157979b018b6388bc7e842c5c673b63ec9a19be78"
+  },
+  {
+   "id": "222589",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "queen_westeros",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "MAN SCREAM",
+   "bytes": 147906,
+   "sha256": "b3e8c9d097939c579c5826e5677a39c76cf99851df61a6a6e4e96b86fca2609a"
+  },
+  {
+   "id": "344037",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Reitanna",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "disgusting squeal.wav",
+   "bytes": 74830,
+   "sha256": "f35286376cf7560c8039a5876718536a50ee5fc91a3b3f8253bfd03631a3758b"
+  },
+  {
+   "id": "67324",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Robinhood76",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "00730 reedy folk scream.wav",
+   "bytes": 193452,
+   "sha256": "4a8be652422547ed36bd30b808b0336b4526b0e1110708937853ca01c70739dc"
+  },
+  {
+   "id": "219665",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "saraonsins",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "boy's scream.wav",
+   "bytes": 186670,
+   "sha256": "c6c6bc7e7e20f066f730aa1e6e80562baeb19f986c31f58a3c2c536918231253"
+  },
+  {
+   "id": "34283",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "hello_flowers",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Flowers_Like to Scream 03.wav",
+   "bytes": 53064,
+   "sha256": "ecfb2cdc87992433c739b0fb923f117eac5cc0009ed6783b9fccf193c55de7ec"
+  },
+  {
+   "id": "353295",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "J.Zazvurek",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Woman Scream 3",
+   "bytes": 92140,
+   "sha256": "490f49f7ceb9393dca756eabea39e287154f2ba47151b2423885b4990b184653"
+  },
+  {
+   "id": "316409",
+   "split": "dev",
+   "labels": [
+    "Screech",
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "LittleRobotSoundFactory",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Dinosaur_13.wav",
+   "bytes": 50794,
+   "sha256": "1b3ca67e2f6c39927504d1a847a7c6dcc6b825494d048cf33a00eff709b1f91e"
+  },
+  {
+   "id": "219653",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "irenearandapares",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Female Scream.wav",
+   "bytes": 99700,
+   "sha256": "e1bb25d1ad9e3ca17ce79587c07866201f22c4eace57b6fe75729475e6870bac"
+  },
+  {
+   "id": "368824",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "klankbeeld",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "man screaming HEY breaking voice.wav",
+   "bytes": 75882,
+   "sha256": "505c3ff548f546ce21758e31d0421accbaa12d373f609068f29de15db76ac9fd"
+  },
+  {
+   "id": "220646",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "ritola27",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "grito_mujer4.wav",
+   "bytes": 123172,
+   "sha256": "1703a55250c39cd1f343fbc37bc93643aed4adbd7ec862f09b2e9eea67d21e4b"
+  },
+  {
+   "id": "400182",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "tomattka",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Girl Screaming_04.wav",
+   "bytes": 194216,
+   "sha256": "294d281e1e4a42cf12a7db8b370c4840649591fef007a417b72f6811a070af3e"
+  },
+  {
+   "id": "220289",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "GabrielaUPF",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "screaming_male_painII.mp3",
+   "bytes": 111550,
+   "sha256": "43e9952b326fe82953e9810d678397a4ea5056c2ea025b338f44c1e8c6ccfac4"
+  },
+  {
+   "id": "315833",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "benjaminharveydesign",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "shriek 8.aiff",
+   "bytes": 167766,
+   "sha256": "b1d58691e87b1e14d4701bb6a2fc07edc8d48bc76034ee0fa28af9f7a90e23e1"
+  },
+  {
+   "id": "63632",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "vtownpunks",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Screaming 1.wav",
+   "bytes": 102576,
+   "sha256": "aaea2b2313d3c835c1717f7b7dbe2ece567639ba74995a7ae85abe442f3d8e28"
+  },
+  {
+   "id": "406088",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Yin_Yang_Jake007",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Loud Female Scream.wav",
+   "bytes": 232206,
+   "sha256": "7f9f9254f2355d0daf0a0a63421bc526c1017d63b81a1266463504e14296a312"
+  },
+  {
+   "id": "163728",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Shout",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Corsica_S",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "yell 2.wav",
+   "bytes": 125910,
+   "sha256": "31d400df673de3691dd94a4a3772ea632765c96520c9057086f0776480c23b88"
+  },
+  {
+   "id": "144338",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "JPolito",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream.wav",
+   "bytes": 127506,
+   "sha256": "9d517c4cb8c7d4e4b7a5f08b0168d442507b1ae36b06232a46ee0b6d74aa1999"
+  },
+  {
+   "id": "221152",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "irenearandapares",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "woman scream",
+   "bytes": 143700,
+   "sha256": "f74ff7cf82386d4a8608946ab730143b482c107088b1230d9365b30b4980cfce"
+  },
+  {
+   "id": "343948",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Reitanna",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "OHVD!!.wav",
+   "bytes": 53582,
+   "sha256": "bc7b1b87a6ac91688eb7de26c9b7eb279d50da83fb6f77ecf05aaeda1a56ae17"
+  },
+  {
+   "id": "402861",
+   "split": "eval",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "jacksonacademyashmore",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Gurgled Scream",
+   "bytes": 136630,
+   "sha256": "b98abf339792bb3ccd118200c4f04b458a5d77218d8710e027c3d78cf3f47967"
+  },
+  {
+   "id": "9434",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "thanvannispen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "woman_Susanne_screams_AAH.aiff",
+   "bytes": 209554,
+   "sha256": "8d401c1194de0c5f464cad25667eedbcfce00f4f8e25a77d1b9ad30911c29c7d"
+  },
+  {
+   "id": "219658",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "annatabernero",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Little Girl Scream",
+   "bytes": 141390,
+   "sha256": "34e7b62d0691ffd7a8415ac229d27dfa239d4a8ea633f273fbde80d06275fa53"
+  },
+  {
+   "id": "353296",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "J.Zazvurek",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Woman Scream 1",
+   "bytes": 221870,
+   "sha256": "788211329a795c4cde6fe314b1dbe238a95bbb7f34120b2bc51738336f1c2cad"
+  },
+  {
+   "id": "168725",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "11linda",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "quick female scream",
+   "bytes": 123982,
+   "sha256": "86811fb954a94057d1cbfd897dd7f549e1bf3c31a00342db02d3b1c56e0586ef"
+  },
+  {
+   "id": "241515",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Reitanna",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "scream.wav",
+   "bytes": 164430,
+   "sha256": "733274f319b082c2b06162b06f17d1870d5bc10f1829c70f1b1ba2a0d216aeb9"
+  },
+  {
+   "id": "9429",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Crying_and_sobbing",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "thanvannispen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "women_scream_AAA.aiff",
+   "bytes": 253654,
+   "sha256": "4f4ce0dfef671b2f326bf7e61fe1ddc84377faba4d74513a94b428f38fff3786"
+  },
+  {
+   "id": "179315",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "jorickhoofd",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Male Scream 9",
+   "bytes": 282226,
+   "sha256": "2b86da035921442de186ec1aa10b195faa2fc6d32eda93cee3039b68ac23442b"
+  },
+  {
+   "id": "222530",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "AlbertTrepat",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Male screaming",
+   "bytes": 115278,
+   "sha256": "ae9080530c6914403d05a0dacbfbe971ec755f829eb916d02c55fd1693a988ac"
+  },
+  {
+   "id": "320247",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "nicktermer",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Scream.wav",
+   "bytes": 160326,
+   "sha256": "0443730da35ede0e136ee62375a740a098da5317aa15e9a1efcc2a48c64cf061"
+  },
+  {
+   "id": "30276",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "thanvannispen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream_group_short.aif",
+   "bytes": 264678,
+   "sha256": "072db6efd8ea9aa023f424873a3155b6e098601d9952fc3f8ffcbeb9747db378"
+  },
+  {
+   "id": "58803",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Syna-Max",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "ray_scream_2.wav",
+   "bytes": 65616,
+   "sha256": "531626c8f63f6f9729ef645538f759b323cb225b557938280d76dc6b93cb4977"
+  },
+  {
+   "id": "250550",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "Corsica_S",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "run.wav",
+   "bytes": 176478,
+   "sha256": "3344bcad680692c19b66b0e60f50bb5cf16139be38940cfdf70eed21e0b1e929"
+  },
+  {
+   "id": "169811",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Yell",
+    "Human_voice",
+    "Shout"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "missozzy",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Female scream 02",
+   "bytes": 173888,
+   "sha256": "cf8da9607ecdd7f2167d1b8a82a87aebf7dbe58c373782d19052cdfc6f63de04"
+  },
+  {
+   "id": "220663",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "marionagm90",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "scream.wav",
+   "bytes": 118862,
+   "sha256": "2260f9fe433ca74d34c69fadabde655f6de900cc3ddd0a31ef639ae5a525b550"
+  },
+  {
+   "id": "180350",
+   "split": "dev",
+   "labels": [
+    "Screaming",
+    "Human_voice"
+   ],
+   "subtype": "Screaming",
+   "homeease_class": "HELP",
+   "uploader": "jorickhoofd",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Scream \"Noooh!\" ",
+   "bytes": 129346,
+   "sha256": "7a18153373df8f6a81d29afc078e84448c81d6a8b8c1a2e050e2c4b6dae611da"
+  },
+  {
+   "id": "412125",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "Coolshows101sound",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Grassy thud",
+   "bytes": 50912,
+   "sha256": "19d11f60e3dacd8d7821155825528ee0c0701f254d334c73fcc80b101677d6f9"
+  },
+  {
+   "id": "345440",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "Artmasterrich",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Thud_01",
+   "bytes": 39070,
+   "sha256": "043495bd2e8cceda42577fda4c5e7784947879749a28aaec27c6675521d0a427"
+  },
+  {
+   "id": "13874",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "adcbicycle",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "22.wav",
+   "bytes": 150094,
+   "sha256": "fa20241f58bd6158a2a148e4f3207a932d1540ba4aecb48510c9146b81707533"
+  },
+  {
+   "id": "164582",
+   "split": "dev",
+   "labels": [
+    "Tap",
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "Adam_N",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Thump 4.wav",
+   "bytes": 66596,
+   "sha256": "7bc3fda20319ae8c943213b02da175ece7fea71d8f604624338c3078563c4b32"
+  },
+  {
+   "id": "13882",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "adcbicycle",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "30.wav",
+   "bytes": 58444,
+   "sha256": "55ac43bcae5ed388fffcd2cf2247f18c6f667505d9b7c5a108c775571ad4b1a7"
+  },
+  {
+   "id": "57785",
+   "split": "eval",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "uair01",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "train_toilet_seat.wav",
+   "bytes": 104084,
+   "sha256": "3a2a6a6aa60acee5a8ed6d51979b8557dd75f8c392e0a0badac4947981d6f373"
+  },
+  {
+   "id": "244976",
+   "split": "eval",
+   "labels": [
+    "Bird",
+    "Thump_and_thud",
+    "Wild_animals",
+    "Animal"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "ani_music",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Wing Flap (Flag Flapping) 4a",
+   "bytes": 64656,
+   "sha256": "a65fdc586c796c60dca758bb2a63e698e83bd6a6e0b8e06c80cc925f4f7f9187"
+  },
+  {
+   "id": "13854",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "adcbicycle",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "2.wav",
+   "bytes": 97870,
+   "sha256": "c0c9b18d0bda3ad426f27b8373aee9c224e1353dccb3fff05e97b340e3f24ae7"
+  },
+  {
+   "id": "13511",
+   "split": "eval",
+   "labels": [
+    "Dishes_and_pots_and_pans",
+    "Thump_and_thud",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "Traveler",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Spatula.aif",
+   "bytes": 293124,
+   "sha256": "7c65a4bf140e9bbbf01f35bb80142ff9dcda6aeef53c9ff0faf30f6861c4a304"
+  },
+  {
+   "id": "337354",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "eardeer",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "BS_Hit_15.wav",
+   "bytes": 56120,
+   "sha256": "33c0a7afb21687f44fd674e4596cbd22d17a7900bc25d69361f98be41229e85d"
+  },
+  {
+   "id": "363186",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "LittleLuigi",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "#1 Thump-2.wav",
+   "bytes": 130638,
+   "sha256": "9e69706c88717a52419fb95e12b2ec649c2069fadeb3c5d29205c18c18145011"
+  },
+  {
+   "id": "336488",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "Faulkin",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "GlassHit_01.wav",
+   "bytes": 119424,
+   "sha256": "15114c78f5e3139d6df8ac8353752b6c12fbc352dcfc2a323f8d7e1b983aec47"
+  },
+  {
+   "id": "10752",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "batchku",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "breathump_Ab_1.L.aif",
+   "bytes": 64740,
+   "sha256": "1f86186574ca2c96808f231be28e914532d74be498ee24839b48ce1e09a23089"
+  },
+  {
+   "id": "369084",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "newagesoup",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "VSH-43-fist-kick-short.wav",
+   "bytes": 94710,
+   "sha256": "140f1c1908fec580be23275c66662ad67f1352ef1b1f76c29736e717923e6032"
+  },
+  {
+   "id": "353396",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "TechGeekMusic",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Kick - Proper Bottom.wav",
+   "bytes": 39426,
+   "sha256": "ab40eb4650385bb470b1a9df9b261db1191488b744c9dbb7854698b02d5e041d"
+  },
+  {
+   "id": "320909",
+   "split": "dev",
+   "labels": [
+    "Dishes_and_pots_and_pans",
+    "Thump_and_thud",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "suzenako",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "pottery-cacharros.wav",
+   "bytes": 141900,
+   "sha256": "d34d0b57f4660591a8ab9678fb8878a951ab9574264f0915e44361f553243124"
+  },
+  {
+   "id": "321805",
+   "split": "eval",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "LloydEvans09",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "PVC_pipe_hit_1.wav",
+   "bytes": 69892,
+   "sha256": "b2b8bcaa9bb9242b74120d78c371513a3448551efbdfd01c6b1b96ecf306baaf"
+  },
+  {
+   "id": "383750",
+   "split": "eval",
+   "labels": [
+    "Slam",
+    "Car",
+    "Thump_and_thud",
+    "Motor_vehicle_(road)",
+    "Vehicle",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "Jay_You",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "cardoor close 1",
+   "bytes": 34682,
+   "sha256": "299225ba31df40467799a911d22ddc717e3d8a5ae4d1a5721a39ff27fa851466"
+  },
+  {
+   "id": "349269",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "Adam_N",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Clatter wood_06.wav",
+   "bytes": 120332,
+   "sha256": "d299fc2db3823d0575be6b52972d7f70064392758b6388b4bd4d4c0605aa878d"
+  },
+  {
+   "id": "324677",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "140084",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "HittingBoxingBag.wav",
+   "bytes": 73536,
+   "sha256": "239bd312b8c50e586f8dc1faf12fe6e8c3313542d3f3af7f38e9df169a9b893d"
+  },
+  {
+   "id": "10762",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "batchku",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "breathump_Bb_2.L.aif",
+   "bytes": 59174,
+   "sha256": "3c00a206553ff99c422d62d46978bb94fd8a11b47d3275a6b7a693b9d998e394"
+  },
+  {
+   "id": "117042",
+   "split": "eval",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "joedeshon",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "power_door_click_01.wav",
+   "bytes": 96846,
+   "sha256": "07fc2cf9ff51eda0bd0810f150e2ea9d0d3b36fb93aa2dfabd1f754bd69b7c28"
+  },
+  {
+   "id": "348243",
+   "split": "dev",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "newagesoup",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "PUNCH-BOXING-02.wav",
+   "bytes": 113004,
+   "sha256": "102dc566fb3851c674de15925172816cab809f165eb1e964e70c090a0e6844b2"
+  },
+  {
+   "id": "65734",
+   "split": "eval",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "Erdie",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "bow02.wav",
+   "bytes": 66210,
+   "sha256": "0be82b53e0db2c63d062756eb2bae0e93152e018de96c730e2ad24ad0c1e525b"
+  },
+  {
+   "id": "389999",
+   "split": "eval",
+   "labels": [
+    "Thump_and_thud"
+   ],
+   "subtype": "Thump_and_thud",
+   "homeease_class": "IMPACT",
+   "uploader": "morganveilleux",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "thump- cloth",
+   "bytes": 252522,
+   "sha256": "eb5bf6a143589ea6ba817ac217a1494253e56b952eb142ef744a3abb005b245a"
+  },
+  {
+   "id": "193849",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Ligidium",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Door Knock - 33.wav",
+   "bytes": 214482,
+   "sha256": "9f92cecdefb437c61672586e185aa6e842f1490b2b80f9b2a83fb8957ed22fcf"
+  },
+  {
+   "id": "148950",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Adam_N",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Knock_rhythmic.wav",
+   "bytes": 288156,
+   "sha256": "d977c1c146a8a4e222580b02c3ad6e75dbe6890f486bce23271f058a627aecdc"
+  },
+  {
+   "id": "193850",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Ligidium",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Door Knock - 34.wav",
+   "bytes": 218578,
+   "sha256": "e1bf86ce1569d05b44ef0e3db49cd6750a1e9875603ff336f6c8cf3ba0b6f32f"
+  },
+  {
+   "id": "148947",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Wood",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Adam_N",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Knock_5.wav",
+   "bytes": 102050,
+   "sha256": "e658a8557b7985ca52bed6484e0614b9829080cd0ff6dddc70bc91e1c14aed02"
+  },
+  {
+   "id": "193864",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Ligidium",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Door Knock - 45.wav",
+   "bytes": 201002,
+   "sha256": "bf783bdf533c7cb36fa4aa642b227f6819a49cae4ebe57fb51e8e01af824a515"
+  },
+  {
+   "id": "193854",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Wood",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Ligidium",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Door Knock - 21.wav",
+   "bytes": 200682,
+   "sha256": "575bf0810af61d2bd9c8efabd3f470a86f44c2f9937a96a9d1b87fb92f268fc7"
+  },
+  {
+   "id": "347944",
+   "split": "eval",
+   "labels": [
+    "Knock",
+    "Wood",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "grizzlypwn",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Knocking on wooden door",
+   "bytes": 72588,
+   "sha256": "d5d3d5a8400395a6c7702bfe0355774715d9839979b544974a92b1c8d2fa8a76"
+  },
+  {
+   "id": "85253",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Robinhood76",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "01404 knocking to gate 3.wav",
+   "bytes": 185734,
+   "sha256": "236a61567a467c21b3236af18ec7a9231333ceb455207aee84e4d386bf1926b3"
+  },
+  {
+   "id": "193870",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Ligidium",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Door Knock - 41.wav",
+   "bytes": 273600,
+   "sha256": "80d71bf15d9e46a1e2d9c3985e9ebbdf1305f0035585ef5e0559108fceb54b6d"
+  },
+  {
+   "id": "396280",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "pfranzen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Rapping on a light metal door",
+   "bytes": 97040,
+   "sha256": "929f890c75876c9e4df548db5a8d5c10a0a311f8fb1f31c52cc6b888f0347334"
+  },
+  {
+   "id": "209222",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "mark646",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Tür klopfen 02.WAV",
+   "bytes": 171466,
+   "sha256": "d1992a303283fc962f22e6d76ce1980366254a9a096804e1efc2ff3c3a9c7c71"
+  },
+  {
+   "id": "349285",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Wood",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Adam_N",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Knocking_03.wav",
+   "bytes": 132032,
+   "sha256": "0e10a969b4242756539a5a501f69535a89a573ee41a272ef4391c3ac494dfe00"
+  },
+  {
+   "id": "190023",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Wood",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Aiwha",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Hit on wood - 7",
+   "bytes": 30190,
+   "sha256": "6d936986975c487f42138bbbe8ee991dbc7bddc311ae35ae7cb78a3f5d8dbb27"
+  },
+  {
+   "id": "114042",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "EdgardEdition",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "FollowedThuds6.wav",
+   "bytes": 91756,
+   "sha256": "fc13404eacc34d962ef0cf4a9700ad71a6d51c67ed436907e6f959c27d147aad"
+  },
+  {
+   "id": "193841",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Wood",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Ligidium",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Door Knock - 6.wav",
+   "bytes": 193686,
+   "sha256": "bd25733ee3ccc9033c5cb24e61be2884bb0009391358178e90f3d4508346c70f"
+  },
+  {
+   "id": "265003",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "sethlind",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "two knocks.wav",
+   "bytes": 69824,
+   "sha256": "74471303fd25847f5e3688b5bf804335aa1b4a1e0b05b7113ca0fd84b58b43c8"
+  },
+  {
+   "id": "329924",
+   "split": "eval",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Uzbazur345",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Knocking on Door.wav",
+   "bytes": 76518,
+   "sha256": "9175f38a5e68313f25c373f6aa2cf9aa45174d7fca3b72b3f72cd252c960163d"
+  },
+  {
+   "id": "182023",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Omar Alvarado",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Eight_knocks_on_bathroom2_door.wav",
+   "bytes": 275258,
+   "sha256": "d7e1d8537db0f9355c196cdf265f304ba78bfd6cd25c2b4d00374fa1c189cca2"
+  },
+  {
+   "id": "336391",
+   "split": "dev",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "ghaelen",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "door knocking pounding.wav",
+   "bytes": 223566,
+   "sha256": "95e5c911e8e79c57219cb64b8a294a4b5e706449cf7810fd7811991e230d4b65"
+  },
+  {
+   "id": "352673",
+   "split": "eval",
+   "labels": [
+    "Knock",
+    "Door",
+    "Domestic_sounds_and_home_sounds"
+   ],
+   "subtype": "Knock",
+   "homeease_class": "IMPACT",
+   "uploader": "Xenluo",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "OWI_Four Knocks.wav",
+   "bytes": 148594,
+   "sha256": "32eca67789fcaf1b6c6419e07b8d6514c0d2818cddda7547ac5f2cd169d24605"
+  },
+  {
+   "id": "141563",
+   "split": "eval",
+   "labels": [
+    "Shatter",
+    "Crushing",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "avrahamy",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Glass Break",
+   "bytes": 164618,
+   "sha256": "65447a968807975f2edbc27e3197baba007f307647c73335fef6a019d9651bf1"
+  },
+  {
+   "id": "245410",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Chink_and_clink",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "Spankous",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "breaking glass.wav",
+   "bytes": 243358,
+   "sha256": "a19d9ef9f07ae6d98d00fc796eee0fbcb7fc6ee9032f62c930e8bc8158b8bc14"
+  },
+  {
+   "id": "219845",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Crushing",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "qubodup",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Glass Shatter 2",
+   "bytes": 209064,
+   "sha256": "fb142f506e7767c314bcf4c001ccede34870e89ec138d5bbfd13bed3cacc380a"
+  },
+  {
+   "id": "216282",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "RSilveira_88",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Breaking_Glass_12.wav",
+   "bytes": 264642,
+   "sha256": "6e02dc18db7e47108f68ae38b79c9dfa1acd76a7323a73c4feb634aed533eb81"
+  },
+  {
+   "id": "368328",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "JohanDeecke",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Glass Hit (16).wav",
+   "bytes": 35366,
+   "sha256": "145d99869bf8e7e8f3ee535634e984dab89aa9b66f67b87d96748512d0d8ee8c"
+  },
+  {
+   "id": "126878",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "bulbastre",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "breaking glass 2.wav",
+   "bytes": 184038,
+   "sha256": "8f88939e01c71ba4d7d1293f2be478c9a6885a2462f0d83c82faff3ef3a16bbf"
+  },
+  {
+   "id": "145558",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "Black Snow",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Glass Break 01.wav",
+   "bytes": 144480,
+   "sha256": "341a6dbf50df115191c81e3170bb94ce7a5eff855904a68c4e32b835d7d70742"
+  },
+  {
+   "id": "233606",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "Agaxly",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Breaking Glass #2.wav",
+   "bytes": 176478,
+   "sha256": "ad919cef2c13f2fe80f319a4f899bda4341a5687218d86c72b7c069f5f5669a9"
+  },
+  {
+   "id": "255182",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Crushing",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "klankbeeld",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "breaking window 004 141113_0451.wav",
+   "bytes": 167304,
+   "sha256": "b6abe2dd519b4fdba5749389072c36909463fc5e3f2b63e057485a3b3da59758"
+  },
+  {
+   "id": "212698",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "dasebr",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Breaking a glass bottle",
+   "bytes": 203292,
+   "sha256": "14e8e3509052f74a45f0ffc6318858761c9d4e7c8d29a4bbc3ca7bb357cab6e8"
+  },
+  {
+   "id": "159462",
+   "split": "eval",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "GR3AVE5Y",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "SamGreaves-GlassSmash-01.wav",
+   "bytes": 186702,
+   "sha256": "f41f37ce94525706e3ae260cee8a85fc6f64f889c092a309dc41a7c4b1a8d0f3"
+  },
+  {
+   "id": "977",
+   "split": "eval",
+   "labels": [
+    "Shatter",
+    "Chink_and_clink",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "RHumphries",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "RBH Glass_Break 01.wav",
+   "bytes": 120936,
+   "sha256": "ad006a690927e42f5dde329a377c4ee4f091b2eccb48030674add5847fc7c7c2"
+  },
+  {
+   "id": "346173",
+   "split": "eval",
+   "labels": [
+    "Shatter",
+    "Rattle",
+    "Chink_and_clink",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "VSokorelos",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Glass Break 001.wav",
+   "bytes": 196686,
+   "sha256": "d918d71c38b53c377183b3d53d0a419b49b53fdb13c335cf50da1e0368f30e2f"
+  },
+  {
+   "id": "216292",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "RSilveira_88",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Breaking_Glass_02.wav",
+   "bytes": 264642,
+   "sha256": "5d333b319d10c0eea99197bde2263c20acc2a283f3bac3091f15460960d5ba91"
+  },
+  {
+   "id": "88941",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "lsprice",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "los26.aif",
+   "bytes": 71578,
+   "sha256": "ea616576227ce954992965a3b91db0a4a1147042d64b9bcc460ba3f82f7c0339"
+  },
+  {
+   "id": "213158",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "arnaud coutancier",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "broken bottle-verre-07.wav",
+   "bytes": 143294,
+   "sha256": "cddd9ec17aa2c827b24990c96cfce4a7f73b749ec44ebfbf84f5de43d2e249bf"
+  },
+  {
+   "id": "406257",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "ChrisReierson",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "bottle break outside",
+   "bytes": 207824,
+   "sha256": "58d0d53a36ddeb6268fd0343001cda8a3d08f725009ccd923a32789457cdd548"
+  },
+  {
+   "id": "368342",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "JohanDeecke",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Glass Hit (31).wav",
+   "bytes": 77962,
+   "sha256": "d02aab80417b065f1fca2ffaf959364259cf6eb87d03de7ba3e48dc88ef72e1b"
+  },
+  {
+   "id": "368330",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "JohanDeecke",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Glass Hit (14).wav",
+   "bytes": 37466,
+   "sha256": "52354f21ecbce01948a906d7e974ce07e0387123fab5b37c8ec6846e119b1e40"
+  },
+  {
+   "id": "209996",
+   "split": "eval",
+   "labels": [
+    "Shatter",
+    "Chink_and_clink",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "creapersound",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Glass Crash",
+   "bytes": 100136,
+   "sha256": "d5e8fe53296df55e532576c6388c0e013a180f3689bc7c198cfd1e91d9231835"
+  },
+  {
+   "id": "203379",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Crushing",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "C_Rogers",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "glass_shard_bounce.ogg",
+   "bytes": 69070,
+   "sha256": "9a8217b4b1f1d1f1a4f5e9270fc89f04388b657ca547e586cfb0124da63ac6b8"
+  },
+  {
+   "id": "174750",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "sgarrison2127",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "accidental glass breaking.aif",
+   "bytes": 249068,
+   "sha256": "28f879f41c1d30831ad958784cc21b1b376b65a173be7a894e4e944a44bb9a23"
+  },
+  {
+   "id": "315646",
+   "split": "eval",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "TheSoundcatcher",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Glas_Window_Drop_Slices_On_Floor_01.clip.wav",
+   "bytes": 162136,
+   "sha256": "76501d7af5ea950e3c362236c058b20f35bfcacac23fd01a4a5f53ca9e8c4a54"
+  },
+  {
+   "id": "204134",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "Craxic",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "glass10.flac",
+   "bytes": 164942,
+   "sha256": "0d88781f4eb1182a7b6fc5f5112f1026c07a91b92338bc2da006b0e0779342b1"
+  },
+  {
+   "id": "88935",
+   "split": "dev",
+   "labels": [
+    "Shatter",
+    "Glass"
+   ],
+   "subtype": "Shatter",
+   "homeease_class": "ABNORMAL",
+   "uploader": "lsprice",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "los20.aif",
+   "bytes": 67200,
+   "sha256": "fa16bac905378e0e593ba6a02b4a91010de9523b125af0663b36b2e3ee00dff8"
+  },
+  {
+   "id": "429076",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "BluePaint",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "Weird laugh 2",
+   "bytes": 260752,
+   "sha256": "857d5df57a0d7b47c7f0b179b174b552d20be8f6d2e16e90dcb8e364bcb9477d"
+  },
+  {
+   "id": "196065",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "arnaud coutancier",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "Children's laughter  #16 rires d'enfants.wav",
+   "bytes": 239310,
+   "sha256": "7e9a2a2e4c0df4fc144ca66d106dd5e9fc6a2237c0106eee1431cde15cc37254"
+  },
+  {
+   "id": "9547",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "thanvannispen",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "male_Alphons_laughing.aiff",
+   "bytes": 198528,
+   "sha256": "af1dada71afa49a0b46f1545d82626e7c3e71e9b4b25272724144d6738f7b57f"
+  },
+  {
+   "id": "193673",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "Chobiboko",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "real small laugh.wav",
+   "bytes": 262168,
+   "sha256": "2ccba813477baf7ad320c1245ad4fa7f2edf4c578b64a2ffa3226e52a272e39c"
+  },
+  {
+   "id": "364484",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "Samusasi",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Risa_Quisquillosa_s.wav",
+   "bytes": 185488,
+   "sha256": "51b0f1da26ac695bde4d8dcae93b53e2fa7fce4de0c494c09dfc378963e0d85a"
+  },
+  {
+   "id": "154529",
+   "split": "dev",
+   "labels": [
+    "Chuckle_and_chortle",
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "ecfike",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Chuckle 2.wav",
+   "bytes": 73842,
+   "sha256": "500b405b6070697a29ef0cf6367083429b88a195b4fb6271ccc31fe53bbe841b"
+  },
+  {
+   "id": "25281",
+   "split": "eval",
+   "labels": [
+    "Crowd",
+    "Laughter",
+    "Human_group_actions",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "freesound",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Sighs2_ses1.wav",
+   "bytes": 154666,
+   "sha256": "21eaaa1abfd70cfa560605b90313258735610518570d99a854db15eb0df49aa8"
+  },
+  {
+   "id": "161367",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "dream4dreamtheater",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Ha OWW!!",
+   "bytes": 126798,
+   "sha256": "4424e139c0da097017006d2b1ddb144464063f89ecedd485539d8334e517cd05"
+  },
+  {
+   "id": "347912",
+   "split": "eval",
+   "labels": [
+    "Giggle",
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "reasanka",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "scary laughing sound effect 2 Rea.wav",
+   "bytes": 259144,
+   "sha256": "a601723d6c5075134e10fd633bfa2dc41194b96f82a98e9df37449558eb2bcd4"
+  },
+  {
+   "id": "92389",
+   "split": "dev",
+   "labels": [
+    "Giggle",
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "sandyrb",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "CLOSE FEMALE LAUGH 030.wav",
+   "bytes": 183674,
+   "sha256": "ccbc02ad19395769e2be75ffef184ffc51c6155570442f45cc0b406a7b39d286"
+  },
+  {
+   "id": "383237",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "n3n3",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "radu-laugh.wav",
+   "bytes": 138222,
+   "sha256": "5a41d745de442934929589b81a34793729f8586e3104576895bbeb0dbf866b45"
+  },
+  {
+   "id": "364485",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "Samusasi",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Risa_Malevola_s.wav",
+   "bytes": 282202,
+   "sha256": "72946375485dc64eb22a07e0c1fbb22e925b63c5e4193b8f0ebd5b1cd5b2a193"
+  },
+  {
+   "id": "319148",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "Robinhood76",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "05938 cartoon croaking bird laughter.wav",
+   "bytes": 125596,
+   "sha256": "3117184a915a29491fe88dd865b379309b1adb4b38a3f08be0b2c374c9575ceb"
+  },
+  {
+   "id": "16201",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "andriala",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "man&woman.laughing.wav",
+   "bytes": 219102,
+   "sha256": "193c4ce18bae2505468c8271e6dbb2dbb0c9fe7ab4d0298b95f67a8974d651a3"
+  },
+  {
+   "id": "239582",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "ryanconway",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Laughing Quietly 2",
+   "bytes": 136194,
+   "sha256": "af6b837c496e19e8ba42e9713c168f463189dc05bedbc52e1092d0eb62540db8"
+  },
+  {
+   "id": "198262",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "unfa",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Laughter 16",
+   "bytes": 183376,
+   "sha256": "2113ae08dfa69235b3c6c6ab83da00066287b9322478714fdcbbd3f4feb757cb"
+  },
+  {
+   "id": "99977",
+   "split": "eval",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "milton.",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "bonus laughing.wav",
+   "bytes": 150018,
+   "sha256": "74cd977426092cd20ae7b9e9cb762abfd7a2933565eb8606da2105fd26051aa0"
+  },
+  {
+   "id": "411082",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "Iceofdoom",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "\"Hehehe\" - Little Male Laugh",
+   "bytes": 155266,
+   "sha256": "8dd356349ad8f7815f53140545f21cfcac977b15a3ae680d4757f89538cb8a38"
+  },
+  {
+   "id": "172923",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "SkinnySoundGuy",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Funny Laugh.wav",
+   "bytes": 220578,
+   "sha256": "92e0dba2ed9aa13f1c8675f2f07d6cbefc85920ef3dd48b95f67133da5a403ae"
+  },
+  {
+   "id": "152912",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "fmaudio",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "female_short_laugh_02",
+   "bytes": 222286,
+   "sha256": "8248a2744f460e99e83d24cbe4e2b0fdd54ac594b0348bdc2562c55d6fa527a1"
+  },
+  {
+   "id": "178419",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "thenudo",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "7 Yr Old Laughing Echo",
+   "bytes": 161358,
+   "sha256": "5c05f3513d53ebd84226a87e7a403a92526e22540d6eb509d28e95606c2932c1"
+  },
+  {
+   "id": "59031",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "FannyLH",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "SonoKids-Omni.22.wav",
+   "bytes": 263078,
+   "sha256": "5b988f7c6d860979768b6f97bcda9f6609063532a2db1d1058c189d17f234d76"
+  },
+  {
+   "id": "139983",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "SoundTechnik",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Hehehe.mp3",
+   "bytes": 71502,
+   "sha256": "1ad8507b289bbdd947465a1cefbaca2666dde245a251567c7efe587cf3c63e71"
+  },
+  {
+   "id": "319687",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "Robinhood76",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "05998 merry male laughter.wav",
+   "bytes": 60822,
+   "sha256": "104328161a54f754511ff378b2d7d3e500789b7e2359834dc58bdbe202d05858"
+  },
+  {
+   "id": "239586",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "ryanconway",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Short Evil Laugh 3",
+   "bytes": 179446,
+   "sha256": "0e2f200acbd9fbf3b366535a92938c99f7598d212110b47fd505af20255952dd"
+  },
+  {
+   "id": "325462",
+   "split": "eval",
+   "labels": [
+    "Giggle",
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "insanity54",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "laugh001.ogg",
+   "bytes": 64462,
+   "sha256": "baffd67bebfbe1291c573b22c5ab79f8bb0fe7a17d4132d51ea8bbed0f3da5b7"
+  },
+  {
+   "id": "198253",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "unfa",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Laughter 07",
+   "bytes": 213070,
+   "sha256": "274ab62fd616b24441f12e5e1d995629b8c0cb62220f541f76268ee3d820dd6f"
+  },
+  {
+   "id": "30043",
+   "split": "dev",
+   "labels": [
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "Corsica_S",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "small group laugh 6.flac",
+   "bytes": 285468,
+   "sha256": "07ad804db05fbac210047b05f1877f9c816a66d7f58510c7535a7510b7d1e86a"
+  },
+  {
+   "id": "431610",
+   "split": "eval",
+   "labels": [
+    "Chuckle_and_chortle",
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "prucanada",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Laugh.wav",
+   "bytes": 124902,
+   "sha256": "069887f215ec1d5274e1d2cd960f9159275dc08866bf305685629c8f37fb06e0"
+  },
+  {
+   "id": "242240",
+   "split": "dev",
+   "labels": [
+    "Chuckle_and_chortle",
+    "Laughter",
+    "Human_voice"
+   ],
+   "subtype": "Laughter",
+   "homeease_class": "DAILY",
+   "uploader": "ehohnke",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "ShortSoftChuckle2.wav",
+   "bytes": 155118,
+   "sha256": "7598094bb25e7a39a1bfb44de2e9237a12cf15b3948497d06a7381a48f595e71"
+  },
+  {
+   "id": "77157",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "Kyster",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "cough.wav",
+   "bytes": 168024,
+   "sha256": "c9e072d02fcd974b585bec99f1410d0350fcd62e862f08826b10e00a1b3f9605"
+  },
+  {
+   "id": "326096",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "1980supra",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Cough cough",
+   "bytes": 93262,
+   "sha256": "d7118c29c37089cecca93b0c3707440f7cea67f3d48716b99c24710fcb6a55dc"
+  },
+  {
+   "id": "19123",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "Fratz",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "cough8.aiff",
+   "bytes": 38526,
+   "sha256": "61f545761046180cb0d67e6ee83c9334080df6780c91de783382323745b0849f"
+  },
+  {
+   "id": "383335",
+   "split": "eval",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "DeezSoundzTho",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "cough gag.wav",
+   "bytes": 48974,
+   "sha256": "7791ebad99617adfc46efc729c88fa4d2fa8e779c362c1397a6424fb075b6b59"
+  },
+  {
+   "id": "19804",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "LG",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Cough12.wav",
+   "bytes": 57392,
+   "sha256": "d20c763df7239f7bb3344d622cf9df11cc36ef8748353b3d0e111f8fb469f29f"
+  },
+  {
+   "id": "41386",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "sandyrb",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "DB COUGH 002.wav",
+   "bytes": 101234,
+   "sha256": "577180c64a4c134c0291f2006e32394c714f0c451294004f2f6db775fd7ecce3"
+  },
+  {
+   "id": "204604",
+   "split": "eval",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "pikachu09",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Cough",
+   "bytes": 213070,
+   "sha256": "d85b107218f21ff79eac79c6c8c07dc8858bdbd314a22fb26f3941b38cd606ed"
+  },
+  {
+   "id": "21314",
+   "split": "eval",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "zippi1",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "sound-cough2.wav",
+   "bytes": 138318,
+   "sha256": "fdd6a77f626b97e5ec45637a678eb4261c8b26d0f29c9a44d02a7117ebf4baea"
+  },
+  {
+   "id": "331057",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "n_audioman",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Cough_05.wav",
+   "bytes": 166234,
+   "sha256": "82a043677f2cca88f5c3988db3b1552f2f23882424d122d1d78c187c0df0e4a5"
+  },
+  {
+   "id": "98676",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "TheWah",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "distant cough.mp3",
+   "bytes": 191310,
+   "sha256": "657dbbf6452cc273155d4e182e13cab66f9a7959bb46340985475bcaefbcc171"
+  },
+  {
+   "id": "432266",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "DEYIL",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "MONO-013.wav",
+   "bytes": 210466,
+   "sha256": "1e87898ff162bb1c6cc35abdfe5ac510e56909da7657be70d23a37b1ff03d4c9"
+  },
+  {
+   "id": "259513",
+   "split": "eval",
+   "labels": [
+    "Breathing",
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "fattirewhitey",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Throat clear 2.mp3",
+   "bytes": 267342,
+   "sha256": "c460aa81c2a3155371fdb9b1e15f81ce35ae9494056cd7a1c686adf8035e4cd1"
+  },
+  {
+   "id": "323532",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "yugi16dm",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "wheezy coughing",
+   "bytes": 135318,
+   "sha256": "9398a8cd1561fb18c644b349bf10977f23b6e89a802ee83d678aba003ebbf1d3"
+  },
+  {
+   "id": "19124",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "Fratz",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "cough9.aiff",
+   "bytes": 54946,
+   "sha256": "53990e5c884582031d9bfe060a0558f1ab8889ee501fec16b7524f86fe478a93"
+  },
+  {
+   "id": "109639",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "vinjatovix",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "FX - tos 3.wav",
+   "bytes": 277202,
+   "sha256": "99df6cafbb6aa0d6afe5ad68895bff43c32bd95ddc4cdbb3858b95af2f50bd9b"
+  },
+  {
+   "id": "387398",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "gumballworld",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "baby cough loop.wav",
+   "bytes": 173102,
+   "sha256": "94ca78aaa5bbf73ed623415d10a6ca3d2d9943b99492e9062ff92553c1efca7a"
+  },
+  {
+   "id": "258256",
+   "split": "eval",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "joedeshon",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "cough.wav",
+   "bytes": 167072,
+   "sha256": "62f3bdb4b0f4d2b11edb1d133334ff2fe65e83fe758f0f00ec057f8643deea89"
+  },
+  {
+   "id": "254467",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "wjoojoo",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "marvie_cough1.flac",
+   "bytes": 210026,
+   "sha256": "df2cbe8484768741d1a1ddef4bccf28628e60af84a7c146218ddf8fa8455c9c2"
+  },
+  {
+   "id": "149042",
+   "split": "dev",
+   "labels": [
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "Zabuhailo",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "manCough2.wav",
+   "bytes": 178390,
+   "sha256": "e1a374fe0fc92954399525413e601d36aadd7cc0b5794e4e1fac8bfa1683b9b7"
+  },
+  {
+   "id": "272029",
+   "split": "dev",
+   "labels": [
+    "Human_voice",
+    "Cough",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Cough",
+   "homeease_class": "DAILY",
+   "uploader": "aldenroth2",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Male cough",
+   "bytes": 77332,
+   "sha256": "e026fdaef895ea836389b74257f88831de2682d0f24bfd0e84dd2bd74ab7b227"
+  },
+  {
+   "id": "180924",
+   "split": "eval",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "sbarncar",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "GREAT_SNEEZE.aif",
+   "bytes": 148520,
+   "sha256": "cba3a4b922d517089659ea0d3c8ddece1eddf3488274405d9ae1e1a0713897ef"
+  },
+  {
+   "id": "26143",
+   "split": "dev",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "WIM",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "hatsjoe.wav",
+   "bytes": 205216,
+   "sha256": "156e738f1b9da670bcacbd644a120c0806a1261e08920560e6e0de6b82b3307d"
+  },
+  {
+   "id": "185415",
+   "split": "dev",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "unfa",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Sneeze Shot",
+   "bytes": 171598,
+   "sha256": "896ef7551718eaa7f86cfe43fc4f767ea22747c605f98978ef3c842ba8a4856a"
+  },
+  {
+   "id": "365710",
+   "split": "eval",
+   "labels": [
+    "Sneeze",
+    "Human_voice",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "BiancaBothaPure",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "Sneezing",
+   "bytes": 291138,
+   "sha256": "8228c441c7f582c14723c3839dd1e05643c11301ff36b48b8f461ab298cb469f"
+  },
+  {
+   "id": "325643",
+   "split": "eval",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "Hourofmidnight",
+   "license": "http://creativecommons.org/licenses/by-nc/3.0/",
+   "title": "Sneezing",
+   "bytes": 299948,
+   "sha256": "514fda7e5ebca65a0e5e18f6623b184631dc19aa4cfec679c7e9d1fcb754a7c5"
+  },
+  {
+   "id": "81883",
+   "split": "eval",
+   "labels": [
+    "Sneeze",
+    "Breathing",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "stevenpam",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "sneeze.wav",
+   "bytes": 210630,
+   "sha256": "ac47a0dda9b0129ab4ac4c1d804996a26c204d80c70db47b9b85c677d2e80ea3"
+  },
+  {
+   "id": "180048",
+   "split": "dev",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "unfa",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Sneeze",
+   "bytes": 70932,
+   "sha256": "60d7667ac6754eacfe77051ee9d1fb4ac62d4dc8068b32920a76d7535a5a4901"
+  },
+  {
+   "id": "349902",
+   "split": "eval",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "Trogg",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Male Sneeze.wav",
+   "bytes": 68104,
+   "sha256": "2afce70a4e6ebb9bd6f240b8c3c61d7286438a8518cfe5dc7c12ed59361a6aa6"
+  },
+  {
+   "id": "184436",
+   "split": "dev",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "unfa",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Distored Sneeze 1",
+   "bytes": 218446,
+   "sha256": "4fbf3de40d4cb437f90b7c0971db2bf6d67b5b3f9b987fb3ed9ecf1c677ada2e"
+  },
+  {
+   "id": "339414",
+   "split": "eval",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "robiso32",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Sneeze01.wav",
+   "bytes": 217120,
+   "sha256": "a1ffffd31ad72f5b930c71ae6a9d9c67edeacd3f10a33f55a9bccece70706a60"
+  },
+  {
+   "id": "121784",
+   "split": "dev",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "Manicciola",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "SNEEZE_02.WAV",
+   "bytes": 229198,
+   "sha256": "a1be036406bd4424ac73473ead7a6d013412c076f029b6e24e5251412e88fcf7"
+  },
+  {
+   "id": "342814",
+   "split": "dev",
+   "labels": [
+    "Sneeze",
+    "Human_voice",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "LittleRainySeasons",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "Sneeze.mp3",
+   "bytes": 192534,
+   "sha256": "c2f010d0e6755b5001a9b7dc6df00635877a2abda109dc521949aa3d7586ece1"
+  },
+  {
+   "id": "257920",
+   "split": "dev",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "erikschenkel",
+   "license": "http://creativecommons.org/licenses/by/3.0/",
+   "title": "sneeze 2.wav",
+   "bytes": 67134,
+   "sha256": "8b1d99415ef905124f424e317801e777fd528be1b67cf5f2c999f7b999412c2d"
+  },
+  {
+   "id": "143119",
+   "split": "eval",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "1pjladd2",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Sneezer.wav",
+   "bytes": 264678,
+   "sha256": "9af319edd493303599f26469631a4d2a0e392ff0e8080b6b57e7ce4cc90529f5"
+  },
+  {
+   "id": "167642",
+   "split": "dev",
+   "labels": [
+    "Sneeze",
+    "Respiratory_sounds"
+   ],
+   "subtype": "Sneeze",
+   "homeease_class": "DAILY",
+   "uploader": "SoundCollectah",
+   "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+   "title": "Sneeze 01.aiff",
+   "bytes": 70280,
+   "sha256": "8f3221578457af792d9e28729ae91b3d9a2e8515f0d7b406140ba64624e97bb4"
+  }
+ ]
+}
