@@ -1,0 +1,11 @@
+Data is inside:
+1. data/raw/vivae: 1,085 VIVAE vocalisation clips (audio/) and the download record (DOWNLOAD_LOG.json). Used for the HELP class and same-corpus negatives of experiments A2 and A2b.
+2. data/raw/fsd50k_help: 265 FSD50K clips (audio/), selection.json (source clip, uploader, licence of each clip) and DOWNLOAD_LOG.json. Used for the HELP class (screams) and negatives of A2 and A2b.
+3. data/raw/esc50: download record, licence and metadata (meta/esc50.csv) only. The audio is not copied; fetch it with: python -m homeease data download --dataset esc50
+4. data/raw/librispeech_mini: download record only. The audio is not copied; fetch it with: python -m homeease data download --dataset librispeech_mini
+5. data/manifests: vivae.jsonl and fsd50k_help.jsonl, the class (HELP / IMPACT / ABNORMAL / DAILY / negative) and the group of every VIVAE and FSD50K clip.
+6. data/synthetic/audio_scenes: the six scripted demo scenes (wav plus sidecar json) used by the end-to-end replay.
+7. config/audio_phrases.yaml: the 312-phrase reply bank (dev / test split by paraphrase family). config/audio_unseen_probe.yaml: 35 phrases written afterwards for a hold-out check of the reply rules.
+8. models/audio_sound/sound_events/v2: the trained sound-event model and its meta.json. models/audio/MODELS.json: repository, revision and sha256 of the pretrained models (Whisper, WeSpeaker, YAMNet, Piper), which are fetched with: python -m homeease models fetch --audio --audio-tts
+9. artifacts/experiments: one folder per run (config, metrics.json, report.md, per-clip tables; no audio) for A1, A2, A2b, A3, A3b, A4, A5 and A6, plus post_review_analyses.json.
+10. docs/system_test.md: input and returned value of the tests on the integrated system.

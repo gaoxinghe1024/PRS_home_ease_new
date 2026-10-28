@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "dataset": "librispeech_mini",
+    "license": "CC BY 4.0",
+    "source": "https://www.openslr.org/resources/31/dev-clean-2.tar.gz"
+  },
+  "accessed_at": "2026-10-07T14:14:53Z",
+  "files": [
+    {
+      "url": "https://www.openslr.org/resources/31/dev-clean-2.tar.gz",
+      "path": "data/raw/librispeech_mini/dev-clean-2.tar.gz",
+      "status": "downloaded",
+      "bytes": 126046265
+    }
+  ]
+}

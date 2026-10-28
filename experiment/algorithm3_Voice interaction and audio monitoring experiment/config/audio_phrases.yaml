@@ -1,0 +1,351 @@
+# Phrase bank for the spoken-reply experiments (A3b) and for intent training/evaluation.
+# schema_version 1. Original text written for this project; no quotes from real shows, no real people.
+#
+# Fields
+#   id            unique id: <role>-<lang>-<intent>-<nnn>
+#   text          what is said (the TTS input; punctuation is ignored by the intent code)
+#   lang          en | zh
+#   intent        HELP | REASSURANCE | OTHER   = what the WORDS mean, whoever says them
+#   speaker_role  self (the monitored person) | visitor (another person present) | tv (TV or radio speech)
+#   family        paraphrase family; a family lives in exactly ONE split (no near-duplicate across splits)
+#   split         dev (develop and choose settings) | test (report once)
+#
+# Labelling conventions
+#   * Mixed sentences ("I'm fine but I can't get up") are HELP: any help cue wins over reassurance.
+#   * Negated wellbeing ("I'm not okay") is HELP; negated pain ("I'm not hurt", "\u4e00\u70b9\u513f\u4e5f\u4e0d\u75bc") is REASSURANCE.
+#   * Bare yes / no, hesitation, questions, requests and off-topic talk are OTHER (no context-dependent reading of "yes").
+#   * A visitor or TV line carries the same label as its words; whether it came from the monitored person is a separate question
+#     (speaker verification, later step) and is NOT encoded in `intent`.
+# Validation: homeease.ml.audio.phrases.load_phrase_bank (schema, unique ids/texts, family-split rule, count rules).
+schema_version: 1
+entries:
+  # ---- self / en / HELP
+  - {id: self-en-help-001, text: "Help", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f01, split: dev}
+  - {id: self-en-help-002, text: "Help me", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f01, split: dev}
+  - {id: self-en-help-003, text: "I fell down", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f02, split: dev}
+  - {id: self-en-help-004, text: "I have fallen", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f02, split: dev}
+  - {id: self-en-help-005, text: "I can't get up", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f03, split: dev}
+  - {id: self-en-help-006, text: "I'm stuck on the floor", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f03, split: dev}
+  - {id: self-en-help-007, text: "I'm not okay", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f04, split: dev}
+  - {id: self-en-help-008, text: "I'm not feeling fine", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f04, split: dev}
+  - {id: self-en-help-009, text: "Call an ambulance", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f05, split: dev}
+  - {id: self-en-help-010, text: "Please call the ambulance", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f05, split: dev}
+  - {id: self-en-help-011, text: "Ow", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f06, split: dev}
+  - {id: self-en-help-012, text: "Ouch, it hurts", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f06, split: dev}
+  - {id: self-en-help-013, text: "I'm fine but I can't get up", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f07, split: dev}
+  - {id: self-en-help-014, text: "I'm okay, but I fell and it hurts", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f07, split: dev}
+  - {id: self-en-help-015, text: "Somebody, anybody, help", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f08, split: test}
+  - {id: self-en-help-016, text: "Please, can anyone help me", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f08, split: test}
+  - {id: self-en-help-017, text: "I slipped in the bathroom", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f09, split: test}
+  - {id: self-en-help-018, text: "I took a bad fall", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f09, split: test}
+  - {id: self-en-help-019, text: "I can't stand on my feet", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f10, split: test}
+  - {id: self-en-help-020, text: "I can't move my legs", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f10, split: test}
+  - {id: self-en-help-021, text: "I don't feel well at all", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f11, split: test}
+  - {id: self-en-help-022, text: "I'm not alright, something is wrong", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f11, split: test}
+  - {id: self-en-help-023, text: "Quick, get an ambulance", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f12, split: test}
+  - {id: self-en-help-024, text: "Call my daughter, I need a doctor", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f12, split: test}
+  - {id: self-en-help-025, text: "Aiyo, my back", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f13, split: test}
+  - {id: self-en-help-026, text: "Argh, it really hurts", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f13, split: test}
+  - {id: self-en-help-027, text: "I'm all right, but I need someone to help me up", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f14, split: test}
+  - {id: self-en-help-028, text: "It's nothing serious, but I can't walk", lang: en, intent: HELP, speaker_role: self, family: self-en-help-f14, split: test}
+  # ---- self / en / REASSURANCE
+  - {id: self-en-reas-001, text: "I'm okay", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f01, split: dev}
+  - {id: self-en-reas-002, text: "I am fine", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f01, split: dev}
+  - {id: self-en-reas-003, text: "No problem, I'm alright", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f02, split: dev}
+  - {id: self-en-reas-004, text: "I'm good, thank you", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f02, split: dev}
+  - {id: self-en-reas-005, text: "Don't worry about me", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f03, split: dev}
+  - {id: self-en-reas-006, text: "No need to worry", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f03, split: dev}
+  - {id: self-en-reas-007, text: "I'm okay lah", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f04, split: dev}
+  - {id: self-en-reas-008, text: "Can, can, no problem lah", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f04, split: dev}
+  - {id: self-en-reas-009, text: "Fine", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f05, split: dev}
+  - {id: self-en-reas-010, text: "Okay", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f05, split: dev}
+  - {id: self-en-reas-011, text: "I'm not hurt", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f06, split: dev}
+  - {id: self-en-reas-012, text: "Nothing hurts, I'm fine", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f06, split: dev}
+  - {id: self-en-reas-013, text: "All good here", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f07, split: dev}
+  - {id: self-en-reas-014, text: "No worries, I'm good", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f07, split: dev}
+  - {id: self-en-reas-015, text: "I'm doing fine", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f08, split: test}
+  - {id: self-en-reas-016, text: "I'm alright, really", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f08, split: test}
+  - {id: self-en-reas-017, text: "Thanks, I'm okay now", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f09, split: test}
+  - {id: self-en-reas-018, text: "Yes I'm okay, thank you for checking", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f09, split: test}
+  - {id: self-en-reas-019, text: "Please, don't you worry", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f10, split: test}
+  - {id: self-en-reas-020, text: "Nothing to worry about", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f10, split: test}
+  - {id: self-en-reas-021, text: "Sure lah, I'm all right", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f11, split: test}
+  - {id: self-en-reas-022, text: "Don't fuss lah, I'm alright", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f11, split: test}
+  - {id: self-en-reas-023, text: "Yes, fine", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f12, split: test}
+  - {id: self-en-reas-024, text: "Okay, thanks", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f12, split: test}
+  - {id: self-en-reas-025, text: "I didn't get hurt", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f13, split: test}
+  - {id: self-en-reas-026, text: "I'm unhurt, everything is fine", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f13, split: test}
+  - {id: self-en-reas-027, text: "It's all good, I'm okay", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f14, split: test}
+  - {id: self-en-reas-028, text: "Everything's fine here", lang: en, intent: REASSURANCE, speaker_role: self, family: self-en-reas-f14, split: test}
+  # ---- self / en / OTHER
+  - {id: self-en-othe-001, text: "Um", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f01, split: dev}
+  - {id: self-en-othe-002, text: "Hmm, let me think", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f01, split: dev}
+  - {id: self-en-othe-003, text: "Yes", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f02, split: dev}
+  - {id: self-en-othe-004, text: "Yeah", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f02, split: dev}
+  - {id: self-en-othe-005, text: "No", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f03, split: dev}
+  - {id: self-en-othe-006, text: "Nope", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f03, split: dev}
+  - {id: self-en-othe-007, text: "What time is it", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f04, split: dev}
+  - {id: self-en-othe-008, text: "Who is at the door", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f04, split: dev}
+  - {id: self-en-othe-009, text: "I'm watching the news", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f05, split: dev}
+  - {id: self-en-othe-010, text: "The weather is nice today", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f05, split: dev}
+  - {id: self-en-othe-011, text: "Sorry, what did you say", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f06, split: dev}
+  - {id: self-en-othe-012, text: "I can't hear you", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f06, split: dev}
+  - {id: self-en-othe-013, text: "Please turn on the light", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f07, split: dev}
+  - {id: self-en-othe-014, text: "Where are my glasses", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f07, split: dev}
+  - {id: self-en-othe-015, text: "Uh, hello", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f08, split: test}
+  - {id: self-en-othe-016, text: "Err, one moment", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f08, split: test}
+  - {id: self-en-othe-017, text: "Yes, please", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f09, split: test}
+  - {id: self-en-othe-018, text: "Yes, of course", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f09, split: test}
+  - {id: self-en-othe-019, text: "Nope, not today", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f10, split: test}
+  - {id: self-en-othe-020, text: "Nah", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f10, split: test}
+  - {id: self-en-othe-021, text: "Is it going to rain", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f11, split: test}
+  - {id: self-en-othe-022, text: "What are we having for dinner", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f11, split: test}
+  - {id: self-en-othe-023, text: "The cat is on the sofa", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f12, split: test}
+  - {id: self-en-othe-024, text: "I'm making some tea", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f12, split: test}
+  - {id: self-en-othe-025, text: "Huh? Pardon", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f13, split: test}
+  - {id: self-en-othe-026, text: "Say that again", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f13, split: test}
+  - {id: self-en-othe-027, text: "Pass me the remote", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f14, split: test}
+  - {id: self-en-othe-028, text: "Can you close the window", lang: en, intent: OTHER, speaker_role: self, family: self-en-othe-f14, split: test}
+  # ---- self / zh / HELP
+  - {id: self-zh-help-001, text: "\u6551\u547d", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f01, split: dev}
+  - {id: self-zh-help-002, text: "\u6551\u547d\u554a", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f01, split: dev}
+  - {id: self-zh-help-003, text: "\u6211\u6454\u5012\u4e86", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f02, split: dev}
+  - {id: self-zh-help-004, text: "\u6211\u8dcc\u5012\u4e86", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f02, split: dev}
+  - {id: self-zh-help-005, text: "\u6211\u8d77\u4e0d\u6765\u4e86", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f03, split: dev}
+  - {id: self-zh-help-006, text: "\u6211\u7ad9\u4e0d\u8d77\u6765", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f03, split: dev}
+  - {id: self-zh-help-007, text: "\u6211\u4e0d\u592a\u597d", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f04, split: dev}
+  - {id: self-zh-help-008, text: "\u6211\u4e0d\u884c\u4e86", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f04, split: dev}
+  - {id: self-zh-help-009, text: "\u53eb\u6551\u62a4\u8f66", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f05, split: dev}
+  - {id: self-zh-help-010, text: "\u5feb\u6253\u7535\u8bdd\u53eb\u6551\u62a4\u8f66", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f05, split: dev}
+  - {id: self-zh-help-011, text: "\u54ce\u54df", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f06, split: dev}
+  - {id: self-zh-help-012, text: "\u597d\u75db\u554a", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f06, split: dev}
+  - {id: self-zh-help-013, text: "\u6211\u6ca1\u4e8b\uff0c\u4f46\u662f\u6211\u8d77\u4e0d\u6765", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f07, split: dev}
+  - {id: self-zh-help-014, text: "\u6ca1\u5173\u7cfb\uff0c\u4e0d\u8fc7\u6211\u597d\u50cf\u6454\u4f24\u4e86", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f07, split: dev}
+  - {id: self-zh-help-015, text: "\u5feb\u6765\u5e2e\u5e2e\u6211", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f08, split: test}
+  - {id: self-zh-help-016, text: "\u8c01\u6765\u5e2e\u5e2e\u6211", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f08, split: test}
+  - {id: self-zh-help-017, text: "\u6211\u5728\u6d74\u5ba4\u6ed1\u5012\u4e86", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f09, split: test}
+  - {id: self-zh-help-018, text: "\u6211\u4e0d\u5c0f\u5fc3\u6454\u4e86\u4e00\u8de4", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f09, split: test}
+  - {id: self-zh-help-019, text: "\u6211\u52a8\u4e0d\u4e86\u4e86", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f10, split: test}
+  - {id: self-zh-help-020, text: "\u6211\u722c\u4e0d\u8d77\u6765", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f10, split: test}
+  - {id: self-zh-help-021, text: "\u6211\u8eab\u4f53\u5f88\u4e0d\u8212\u670d", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f11, split: test}
+  - {id: self-zh-help-022, text: "\u6211\u611f\u89c9\u4e0d\u5bf9\u52b2", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f11, split: test}
+  - {id: self-zh-help-023, text: "\u5feb\u53eb\u6025\u6551\u8f66", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f12, split: test}
+  - {id: self-zh-help-024, text: "\u8bf7\u6253\u7535\u8bdd\u7ed9\u6211\u5973\u513f\uff0c\u6211\u8981\u53bb\u533b\u9662", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f12, split: test}
+  - {id: self-zh-help-025, text: "\u54ce\u5440\uff0c\u597d\u75bc", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f13, split: test}
+  - {id: self-zh-help-026, text: "\u554a\uff0c\u6211\u7684\u8170", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f13, split: test}
+  - {id: self-zh-help-027, text: "\u6211\u6ca1\u95ee\u9898\uff0c\u4e0d\u8fc7\u9700\u8981\u6709\u4eba\u6276\u6211\u8d77\u6765", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f14, split: test}
+  - {id: self-zh-help-028, text: "\u4e0d\u8981\u7d27\uff0c\u53ef\u662f\u6211\u8d70\u4e0d\u4e86\u8def", lang: zh, intent: HELP, speaker_role: self, family: self-zh-help-f14, split: test}
+  # ---- self / zh / REASSURANCE
+  - {id: self-zh-reas-001, text: "\u6211\u6ca1\u4e8b", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f01, split: dev}
+  - {id: self-zh-reas-002, text: "\u6211\u5f88\u597d", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f01, split: dev}
+  - {id: self-zh-reas-003, text: "\u6ca1\u4e8b\u5566", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f02, split: dev}
+  - {id: self-zh-reas-004, text: "\u6ca1\u4e8b\u6ca1\u4e8b\u5566", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f02, split: dev}
+  - {id: self-zh-reas-005, text: "\u4e0d\u7528\u62c5\u5fc3\u6211", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f03, split: dev}
+  - {id: self-zh-reas-006, text: "\u522b\u62c5\u5fc3", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f03, split: dev}
+  - {id: self-zh-reas-007, text: "\u6211\u8fd8\u597d", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f04, split: dev}
+  - {id: self-zh-reas-008, text: "\u633a\u597d\u7684", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f04, split: dev}
+  - {id: self-zh-reas-009, text: "\u6ca1\u95ee\u9898", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f05, split: dev}
+  - {id: self-zh-reas-010, text: "\u6ca1\u5173\u7cfb", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f05, split: dev}
+  - {id: self-zh-reas-011, text: "\u8c22\u8c22\uff0c\u6211\u6ca1\u6709\u53d7\u4f24", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f06, split: dev}
+  - {id: self-zh-reas-012, text: "\u6211\u4e00\u70b9\u90fd\u4e0d\u75db", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f06, split: dev}
+  - {id: self-zh-reas-013, text: "\u6211\u597d\u597d\u7684", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f07, split: dev}
+  - {id: self-zh-reas-014, text: "\u4e00\u5207\u90fd\u597d", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f07, split: dev}
+  - {id: self-zh-reas-015, text: "\u6211\u771f\u7684\u6ca1\u4e8b", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f08, split: test}
+  - {id: self-zh-reas-016, text: "\u6211\u8eab\u4f53\u6ca1\u95ee\u9898", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f08, split: test}
+  - {id: self-zh-reas-017, text: "\u653e\u5fc3\u5427\uff0c\u6ca1\u4ec0\u4e48\u4e8b", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f09, split: test}
+  - {id: self-zh-reas-018, text: "\u4f60\u4e0d\u7528\u64cd\u5fc3", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f09, split: test}
+  - {id: self-zh-reas-019, text: "\u6ca1\u4e8b\u5566\uff0c\u522b\u7d27\u5f20", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f10, split: test}
+  - {id: self-zh-reas-020, text: "OK\u5566\uff0c\u6ca1\u4e8b\u7684", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f10, split: test}
+  - {id: self-zh-reas-021, text: "\u8fd8\u597d\u5566", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f11, split: test}
+  - {id: self-zh-reas-022, text: "\u6ca1\u4ec0\u4e48\u5927\u4e0d\u4e86", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f11, split: test}
+  - {id: self-zh-reas-023, text: "\u6211\u6ca1\u6454\u4f24", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f12, split: test}
+  - {id: self-zh-reas-024, text: "\u4e00\u70b9\u513f\u4e5f\u4e0d\u75bc", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f12, split: test}
+  - {id: self-zh-reas-025, text: "\u4e00\u5207\u6b63\u5e38\uff0c\u4e0d\u7528\u62c5\u5fc3", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f13, split: test}
+  - {id: self-zh-reas-026, text: "\u6837\u6837\u90fd\u4e0d\u9519", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f13, split: test}
+  - {id: self-zh-reas-027, text: "\u8c22\u8c22\u5173\u5fc3\uff0c\u6211\u6ca1\u4e8b", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f14, split: test}
+  - {id: self-zh-reas-028, text: "\u6211\u81ea\u5df1\u53ef\u4ee5\uff0c\u6ca1\u95ee\u9898", lang: zh, intent: REASSURANCE, speaker_role: self, family: self-zh-reas-f14, split: test}
+  # ---- self / zh / OTHER
+  - {id: self-zh-othe-001, text: "\u55ef", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f01, split: dev}
+  - {id: self-zh-othe-002, text: "\u5443\uff0c\u8ba9\u6211\u60f3\u60f3", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f01, split: dev}
+  - {id: self-zh-othe-003, text: "\u662f", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f02, split: dev}
+  - {id: self-zh-othe-004, text: "\u5bf9", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f02, split: dev}
+  - {id: self-zh-othe-005, text: "\u4e0d", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f03, split: dev}
+  - {id: self-zh-othe-006, text: "\u4e0d\u662f", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f03, split: dev}
+  - {id: self-zh-othe-007, text: "\u51e0\u70b9\u4e86", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f04, split: dev}
+  - {id: self-zh-othe-008, text: "\u8c01\u5728\u95e8\u53e3", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f04, split: dev}
+  - {id: self-zh-othe-009, text: "\u6211\u5728\u770b\u65b0\u95fb", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f05, split: dev}
+  - {id: self-zh-othe-010, text: "\u4eca\u5929\u5929\u6c14\u4e0d\u9519", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f05, split: dev}
+  - {id: self-zh-othe-011, text: "\u4f60\u8bf4\u4ec0\u4e48", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f06, split: dev}
+  - {id: self-zh-othe-012, text: "\u6211\u542c\u4e0d\u89c1", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f06, split: dev}
+  - {id: self-zh-othe-013, text: "\u8bf7\u628a\u706f\u6253\u5f00", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f07, split: dev}
+  - {id: self-zh-othe-014, text: "\u6211\u7684\u773c\u955c\u5728\u54ea\u91cc", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f07, split: dev}
+  - {id: self-zh-othe-015, text: "\u5582\uff0c\u4f60\u597d", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f08, split: test}
+  - {id: self-zh-othe-016, text: "\u7b49\u4e00\u4e0b\uff0c\u6211\u60f3\u4e00\u60f3", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f08, split: test}
+  - {id: self-zh-othe-017, text: "\u597d\u7684", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f09, split: test}
+  - {id: self-zh-othe-018, text: "\u662f\u7684\uff0c\u8c22\u8c22", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f09, split: test}
+  - {id: self-zh-othe-019, text: "\u4e0d\u5bf9", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f10, split: test}
+  - {id: self-zh-othe-020, text: "\u4e0d\u77e5\u9053", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f10, split: test}
+  - {id: self-zh-othe-021, text: "\u4eca\u5929\u5403\u4ec0\u4e48", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f11, split: test}
+  - {id: self-zh-othe-022, text: "\u5916\u9762\u4e0b\u96e8\u4e86\u5417", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f11, split: test}
+  - {id: self-zh-othe-023, text: "\u732b\u5728\u6c99\u53d1\u4e0a", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f12, split: test}
+  - {id: self-zh-othe-024, text: "\u6211\u5728\u6ce1\u8336", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f12, split: test}
+  - {id: self-zh-othe-025, text: "\u4ec0\u4e48\uff1f\u518d\u8bf4\u4e00\u904d", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f13, split: test}
+  - {id: self-zh-othe-026, text: "\u8bf7\u518d\u8bf4\u4e00\u6b21", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f13, split: test}
+  - {id: self-zh-othe-027, text: "\u628a\u9065\u63a7\u5668\u62ff\u7ed9\u6211", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f14, split: test}
+  - {id: self-zh-othe-028, text: "\u8bf7\u628a\u7a97\u6237\u5173\u4e0a", lang: zh, intent: OTHER, speaker_role: self, family: self-zh-othe-f14, split: test}
+  # ---- visitor / en / HELP
+  - {id: vis-en-help-001, text: "She fell down!", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f01, split: dev}
+  - {id: vis-en-help-002, text: "Grandma has fallen", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f01, split: dev}
+  - {id: vis-en-help-003, text: "He can't get up, please help", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f02, split: dev}
+  - {id: vis-en-help-004, text: "She's on the floor and she's hurt", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f02, split: dev}
+  - {id: vis-en-help-005, text: "Call an ambulance, he's hurt", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f03, split: dev}
+  - {id: vis-en-help-006, text: "We need an ambulance here", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f03, split: dev}
+  - {id: vis-en-help-007, text: "I found her on the floor", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f04, split: test}
+  - {id: vis-en-help-008, text: "He slipped in the kitchen, come quickly", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f04, split: test}
+  - {id: vis-en-help-009, text: "She says she can't move her leg", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f05, split: test}
+  - {id: vis-en-help-010, text: "Uncle can't stand, he's in pain", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f05, split: test}
+  - {id: vis-en-help-011, text: "Somebody call a doctor", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f06, split: test}
+  - {id: vis-en-help-012, text: "Please get help, she isn't okay", lang: en, intent: HELP, speaker_role: visitor, family: vis-en-help-f06, split: test}
+  # ---- visitor / en / REASSURANCE
+  - {id: vis-en-reas-001, text: "She's fine, just resting", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f01, split: dev}
+  - {id: vis-en-reas-002, text: "He's okay, don't worry", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f01, split: dev}
+  - {id: vis-en-reas-003, text: "Nothing happened, she's alright", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f02, split: dev}
+  - {id: vis-en-reas-004, text: "He's all right, it was nothing", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f02, split: dev}
+  - {id: vis-en-reas-005, text: "No need to worry, she's fine", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f03, split: dev}
+  - {id: vis-en-reas-006, text: "Grandpa is okay, he's sleeping", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f03, split: dev}
+  - {id: vis-en-reas-007, text: "Don't worry about her, she's okay", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f04, split: test}
+  - {id: vis-en-reas-008, text: "She is doing fine", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f04, split: test}
+  - {id: vis-en-reas-009, text: "He didn't fall, he's just sitting", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f05, split: test}
+  - {id: vis-en-reas-010, text: "Everything is under control here", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f05, split: test}
+  - {id: vis-en-reas-011, text: "She's alright, we are having tea", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f06, split: test}
+  - {id: vis-en-reas-012, text: "Auntie is fine, only tired", lang: en, intent: REASSURANCE, speaker_role: visitor, family: vis-en-reas-f06, split: test}
+  # ---- visitor / en / OTHER
+  - {id: vis-en-othe-001, text: "Who are you looking for", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f01, split: dev}
+  - {id: vis-en-othe-002, text: "I'm here to read the meter", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f01, split: dev}
+  - {id: vis-en-othe-003, text: "Would you like some tea", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f02, split: dev}
+  - {id: vis-en-othe-004, text: "Dinner will be ready soon", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f02, split: dev}
+  - {id: vis-en-othe-005, text: "She is asleep right now", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f03, split: dev}
+  - {id: vis-en-othe-006, text: "He went out to the market", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f03, split: dev}
+  - {id: vis-en-othe-007, text: "Can I come in", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f04, split: test}
+  - {id: vis-en-othe-008, text: "I'm a friend of the family", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f04, split: test}
+  - {id: vis-en-othe-009, text: "The bus was late today", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f05, split: test}
+  - {id: vis-en-othe-010, text: "Do you want the window open", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f05, split: test}
+  - {id: vis-en-othe-011, text: "The doctor's visit is next week", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f06, split: test}
+  - {id: vis-en-othe-012, text: "She likes the morning programmes", lang: en, intent: OTHER, speaker_role: visitor, family: vis-en-othe-f06, split: test}
+  # ---- visitor / zh / HELP
+  - {id: vis-zh-help-001, text: "\u5979\u6454\u5012\u4e86\uff01", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f01, split: dev}
+  - {id: vis-zh-help-002, text: "\u5976\u5976\u8dcc\u5012\u4e86", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f01, split: dev}
+  - {id: vis-zh-help-003, text: "\u4ed6\u8d77\u4e0d\u6765\uff0c\u5feb\u6765\u5e2e\u5fd9", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f02, split: dev}
+  - {id: vis-zh-help-004, text: "\u5979\u8eba\u5728\u5730\u4e0a\uff0c\u53d7\u4f24\u4e86", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f02, split: dev}
+  - {id: vis-zh-help-005, text: "\u5feb\u53eb\u6551\u62a4\u8f66\uff0c\u4ed6\u53d7\u4f24\u4e86", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f03, split: dev}
+  - {id: vis-zh-help-006, text: "\u6211\u4eec\u9700\u8981\u6551\u62a4\u8f66", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f03, split: dev}
+  - {id: vis-zh-help-007, text: "\u6211\u53d1\u73b0\u5979\u5012\u5728\u5730\u4e0a", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f04, split: test}
+  - {id: vis-zh-help-008, text: "\u4ed6\u5728\u53a8\u623f\u6ed1\u5012\u4e86\uff0c\u5feb\u6765", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f04, split: test}
+  - {id: vis-zh-help-009, text: "\u5979\u8bf4\u817f\u52a8\u4e0d\u4e86", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f05, split: test}
+  - {id: vis-zh-help-010, text: "\u5927\u53d4\u7ad9\u4e0d\u8d77\u6765\uff0c\u5f88\u75db", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f05, split: test}
+  - {id: vis-zh-help-011, text: "\u5feb\u627e\u533b\u751f\u6765", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f06, split: test}
+  - {id: vis-zh-help-012, text: "\u8bf7\u5e2e\u5e2e\u5fd9\uff0c\u5979\u4e0d\u592a\u5bf9\u52b2", lang: zh, intent: HELP, speaker_role: visitor, family: vis-zh-help-f06, split: test}
+  # ---- visitor / zh / REASSURANCE
+  - {id: vis-zh-reas-001, text: "\u5979\u6ca1\u4e8b\uff0c\u53ea\u662f\u5728\u4f11\u606f", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f01, split: dev}
+  - {id: vis-zh-reas-002, text: "\u4ed6\u5f88\u597d\uff0c\u4e0d\u7528\u62c5\u5fc3", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f01, split: dev}
+  - {id: vis-zh-reas-003, text: "\u4ec0\u4e48\u4e8b\u4e5f\u6ca1\u6709\uff0c\u5979\u5f88\u597d", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f02, split: dev}
+  - {id: vis-zh-reas-004, text: "\u4ed6\u6ca1\u5173\u7cfb\uff0c\u6ca1\u4e8b\u7684", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f02, split: dev}
+  - {id: vis-zh-reas-005, text: "\u4e0d\u7528\u62c5\u5fc3\uff0c\u5979\u633a\u597d\u7684", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f03, split: dev}
+  - {id: vis-zh-reas-006, text: "\u7237\u7237\u6ca1\u4e8b\uff0c\u5728\u7761\u89c9", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f03, split: dev}
+  - {id: vis-zh-reas-007, text: "\u522b\u62c5\u5fc3\u5979\uff0c\u5979\u6ca1\u4e8b", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f04, split: test}
+  - {id: vis-zh-reas-008, text: "\u5979\u597d\u597d\u7684", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f04, split: test}
+  - {id: vis-zh-reas-009, text: "\u4ed6\u6ca1\u6709\u6454\u5012\uff0c\u53ea\u662f\u5750\u7740", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f05, split: test}
+  - {id: vis-zh-reas-010, text: "\u8fd9\u91cc\u4e00\u5207\u90fd\u6b63\u5e38", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f05, split: test}
+  - {id: vis-zh-reas-011, text: "\u5979\u6ca1\u4e8b\uff0c\u6211\u4eec\u5728\u559d\u8336", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f06, split: test}
+  - {id: vis-zh-reas-012, text: "\u963f\u59e8\u6ca1\u4e8b\uff0c\u5c31\u662f\u7d2f\u4e86", lang: zh, intent: REASSURANCE, speaker_role: visitor, family: vis-zh-reas-f06, split: test}
+  # ---- visitor / zh / OTHER
+  - {id: vis-zh-othe-001, text: "\u4f60\u627e\u8c01", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f01, split: dev}
+  - {id: vis-zh-othe-002, text: "\u6211\u662f\u6765\u6284\u6c34\u8868\u7684", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f01, split: dev}
+  - {id: vis-zh-othe-003, text: "\u8981\u4e0d\u8981\u559d\u8336", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f02, split: dev}
+  - {id: vis-zh-othe-004, text: "\u665a\u996d\u9a6c\u4e0a\u597d", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f02, split: dev}
+  - {id: vis-zh-othe-005, text: "\u5979\u73b0\u5728\u7761\u7740\u4e86", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f03, split: dev}
+  - {id: vis-zh-othe-006, text: "\u4ed6\u53bb\u5e02\u573a\u4e86", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f03, split: dev}
+  - {id: vis-zh-othe-007, text: "\u6211\u53ef\u4ee5\u8fdb\u6765\u5417", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f04, split: test}
+  - {id: vis-zh-othe-008, text: "\u6211\u662f\u8fd9\u5bb6\u7684\u670b\u53cb", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f04, split: test}
+  - {id: vis-zh-othe-009, text: "\u4eca\u5929\u516c\u4ea4\u8f66\u6765\u665a\u4e86", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f05, split: test}
+  - {id: vis-zh-othe-010, text: "\u4f60\u8981\u5f00\u7a97\u5417", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f05, split: test}
+  - {id: vis-zh-othe-011, text: "\u533b\u751f\u4e0b\u5468\u6765\u770b\u5979", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f06, split: test}
+  - {id: vis-zh-othe-012, text: "\u5979\u559c\u6b22\u770b\u65e9\u4e0a\u7684\u8282\u76ee", lang: zh, intent: OTHER, speaker_role: visitor, family: vis-zh-othe-f06, split: test}
+  # ---- tv / en / HELP
+  - {id: tv-en-help-001, text: "Help! Somebody help us!", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f01, split: dev}
+  - {id: tv-en-help-002, text: "Please, someone help him", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f01, split: dev}
+  - {id: tv-en-help-003, text: "Call an ambulance, hurry!", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f02, split: dev}
+  - {id: tv-en-help-004, text: "Get a doctor, quickly", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f02, split: dev}
+  - {id: tv-en-help-005, text: "He's collapsed, he can't get up!", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f03, split: dev}
+  - {id: tv-en-help-006, text: "She fell from the ladder", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f03, split: dev}
+  - {id: tv-en-help-007, text: "Over here, we need help!", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f04, split: test}
+  - {id: tv-en-help-008, text: "Is anyone out there? Help us!", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f04, split: test}
+  - {id: tv-en-help-009, text: "Send an ambulance to the harbour", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f05, split: test}
+  - {id: tv-en-help-010, text: "The paramedics must come now", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f05, split: test}
+  - {id: tv-en-help-011, text: "The old man has fallen on the stairs", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f06, split: test}
+  - {id: tv-en-help-012, text: "She is hurt, she can't stand", lang: en, intent: HELP, speaker_role: tv, family: tv-en-help-f06, split: test}
+  # ---- tv / en / REASSURANCE
+  - {id: tv-en-reas-001, text: "It's all right, I'm fine", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f01, split: dev}
+  - {id: tv-en-reas-002, text: "Don't worry, nobody is hurt", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f01, split: dev}
+  - {id: tv-en-reas-003, text: "Everything is okay now", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f02, split: dev}
+  - {id: tv-en-reas-004, text: "They are safe and well", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f02, split: dev}
+  - {id: tv-en-reas-005, text: "No problem, we are fine here", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f03, split: dev}
+  - {id: tv-en-reas-006, text: "He said he is okay", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f03, split: dev}
+  - {id: tv-en-reas-007, text: "Relax, I'm not hurt at all", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f04, split: test}
+  - {id: tv-en-reas-008, text: "She's all right, it was just a scratch", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f04, split: test}
+  - {id: tv-en-reas-009, text: "The situation is under control", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f05, split: test}
+  - {id: tv-en-reas-010, text: "The passengers are unharmed", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f05, split: test}
+  - {id: tv-en-reas-011, text: "I'm doing fine, thank you for asking", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f06, split: test}
+  - {id: tv-en-reas-012, text: "There is nothing to worry about", lang: en, intent: REASSURANCE, speaker_role: tv, family: tv-en-reas-f06, split: test}
+  # ---- tv / en / OTHER
+  - {id: tv-en-othe-001, text: "Tomorrow will be cloudy with scattered showers", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f01, split: dev}
+  - {id: tv-en-othe-002, text: "Temperatures stay around thirty degrees", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f01, split: dev}
+  - {id: tv-en-othe-003, text: "The city council approved the new bus timetable", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f02, split: dev}
+  - {id: tv-en-othe-004, text: "The market closed slightly higher today", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f02, split: dev}
+  - {id: tv-en-othe-005, text: "Stir the sauce slowly for five minutes", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f03, split: dev}
+  - {id: tv-en-othe-006, text: "Add a pinch of salt to the rice", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f03, split: dev}
+  - {id: tv-en-othe-007, text: "A cold front moves in from the north tonight", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f04, split: test}
+  - {id: tv-en-othe-008, text: "Expect strong winds along the coast", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f04, split: test}
+  - {id: tv-en-othe-009, text: "The museum opens a new exhibition on Friday", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f05, split: test}
+  - {id: tv-en-othe-010, text: "Schools will reopen on Monday", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f05, split: test}
+  - {id: tv-en-othe-011, text: "This offer is available for a limited time", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f06, split: test}
+  - {id: tv-en-othe-012, text: "Our shop is open until nine every evening", lang: en, intent: OTHER, speaker_role: tv, family: tv-en-othe-f06, split: test}
+  # ---- tv / zh / HELP
+  - {id: tv-zh-help-001, text: "\u6551\u547d\u554a\uff0c\u5feb\u6765\u4eba\uff01", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f01, split: dev}
+  - {id: tv-zh-help-002, text: "\u8c01\u6765\u6551\u6551\u4ed6", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f01, split: dev}
+  - {id: tv-zh-help-003, text: "\u5feb\u53eb\u6551\u62a4\u8f66\uff0c\u5feb\u70b9", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f02, split: dev}
+  - {id: tv-zh-help-004, text: "\u5feb\u8bf7\u533b\u751f\u6765", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f02, split: dev}
+  - {id: tv-zh-help-005, text: "\u4ed6\u5012\u4e0b\u4e86\uff0c\u8d77\u4e0d\u6765\u4e86", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f03, split: dev}
+  - {id: tv-zh-help-006, text: "\u5979\u4ece\u68af\u5b50\u4e0a\u6454\u4e0b\u6765\u4e86", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f03, split: dev}
+  - {id: tv-zh-help-007, text: "\u8fd9\u91cc\u9700\u8981\u5e2e\u52a9\uff01", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f04, split: test}
+  - {id: tv-zh-help-008, text: "\u5916\u9762\u6709\u4eba\u5417\uff0c\u6551\u6551\u6211\u4eec", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f04, split: test}
+  - {id: tv-zh-help-009, text: "\u9a6c\u4e0a\u6d3e\u6551\u62a4\u8f66\u5230\u7801\u5934", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f05, split: test}
+  - {id: tv-zh-help-010, text: "\u533b\u62a4\u4eba\u5458\u5fc5\u987b\u9a6c\u4e0a\u8d76\u5230", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f05, split: test}
+  - {id: tv-zh-help-011, text: "\u8001\u4eba\u5728\u697c\u68af\u4e0a\u6454\u5012\u4e86", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f06, split: test}
+  - {id: tv-zh-help-012, text: "\u5979\u53d7\u4f24\u4e86\uff0c\u7ad9\u4e0d\u8d77\u6765", lang: zh, intent: HELP, speaker_role: tv, family: tv-zh-help-f06, split: test}
+  # ---- tv / zh / REASSURANCE
+  - {id: tv-zh-reas-001, text: "\u6ca1\u4e8b\u7684\uff0c\u6211\u5f88\u597d", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f01, split: dev}
+  - {id: tv-zh-reas-002, text: "\u522b\u62c5\u5fc3\uff0c\u6ca1\u6709\u4eba\u53d7\u4f24", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f01, split: dev}
+  - {id: tv-zh-reas-003, text: "\u73b0\u5728\u4e00\u5207\u90fd\u597d\u4e86", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f02, split: dev}
+  - {id: tv-zh-reas-004, text: "\u4ed6\u4eec\u5e73\u5b89\u65e0\u4e8b", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f02, split: dev}
+  - {id: tv-zh-reas-005, text: "\u6ca1\u95ee\u9898\uff0c\u6211\u4eec\u8fd9\u91cc\u5f88\u597d", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f03, split: dev}
+  - {id: tv-zh-reas-006, text: "\u4ed6\u8bf4\u4ed6\u6ca1\u4e8b", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f03, split: dev}
+  - {id: tv-zh-reas-007, text: "\u653e\u677e\u70b9\uff0c\u6211\u4e00\u70b9\u90fd\u6ca1\u53d7\u4f24", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f04, split: test}
+  - {id: tv-zh-reas-008, text: "\u5979\u6ca1\u4e8b\uff0c\u53ea\u662f\u64e6\u7834\u4e86\u76ae", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f04, split: test}
+  - {id: tv-zh-reas-009, text: "\u60c5\u51b5\u5df2\u7ecf\u5f97\u5230\u63a7\u5236", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f05, split: test}
+  - {id: tv-zh-reas-010, text: "\u4e58\u5ba2\u90fd\u5b89\u7136\u65e0\u6059", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f05, split: test}
+  - {id: tv-zh-reas-011, text: "\u6211\u633a\u597d\u7684\uff0c\u8c22\u8c22\u5173\u5fc3", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f06, split: test}
+  - {id: tv-zh-reas-012, text: "\u6ca1\u6709\u4ec0\u4e48\u597d\u62c5\u5fc3\u7684", lang: zh, intent: REASSURANCE, speaker_role: tv, family: tv-zh-reas-f06, split: test}
+  # ---- tv / zh / OTHER
+  - {id: tv-zh-othe-001, text: "\u660e\u5929\u591a\u4e91\uff0c\u6709\u96f6\u661f\u9635\u96e8", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f01, split: dev}
+  - {id: tv-zh-othe-002, text: "\u6c14\u6e29\u4fdd\u6301\u5728\u4e09\u5341\u5ea6\u5de6\u53f3", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f01, split: dev}
+  - {id: tv-zh-othe-003, text: "\u5e02\u8bae\u4f1a\u901a\u8fc7\u4e86\u65b0\u7684\u516c\u4ea4\u65f6\u523b\u8868", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f02, split: dev}
+  - {id: tv-zh-othe-004, text: "\u4eca\u5929\u80a1\u5e02\u6536\u76d8\u7565\u6709\u4e0a\u6da8", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f02, split: dev}
+  - {id: tv-zh-othe-005, text: "\u9171\u6c41\u8981\u6162\u6162\u6405\u4e94\u5206\u949f", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f03, split: dev}
+  - {id: tv-zh-othe-006, text: "\u7c73\u996d\u91cc\u52a0\u4e00\u5c0f\u64ae\u76d0", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f03, split: dev}
+  - {id: tv-zh-othe-007, text: "\u4eca\u665a\u5317\u65b9\u51b7\u950b\u5357\u4e0b", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f04, split: test}
+  - {id: tv-zh-othe-008, text: "\u6cbf\u6d77\u5730\u533a\u6709\u5927\u98ce", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f04, split: test}
+  - {id: tv-zh-othe-009, text: "\u535a\u7269\u9986\u5468\u4e94\u63a8\u51fa\u65b0\u5c55\u89c8", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f05, split: test}
+  - {id: tv-zh-othe-010, text: "\u5b66\u6821\u5468\u4e00\u6062\u590d\u4e0a\u8bfe", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f05, split: test}
+  - {id: tv-zh-othe-011, text: "\u6b64\u4f18\u60e0\u9650\u65f6\u4f9b\u5e94", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f06, split: test}
+  - {id: tv-zh-othe-012, text: "\u672c\u5e97\u6bcf\u665a\u8425\u4e1a\u5230\u4e5d\u70b9", lang: zh, intent: OTHER, speaker_role: tv, family: tv-zh-othe-f06, split: test}

@@ -1,0 +1,40 @@
+seed: 42
+asr:
+- faster-whisper-tiny
+- faster-whisper-base
+test_phrases:
+  HELP:
+    en:
+    - Help, I fell
+    - Please help me
+    - I cannot stand up
+    zh:
+    - "\u6551\u6551\u6211"
+    - "\u6211\u8D77\u4E0D\u6765\u4E86"
+    - "\u5FEB\u5E2E\u5E2E\u6211"
+  REASSURANCE:
+    en:
+    - I'm okay, really
+    - I am fine
+    - Don't worry, I'm alright
+    zh:
+    - "\u6211\u6CA1\u4E8B\u7684"
+    - "\u6211\u5F88\u597D\uFF0C\u4E0D\u7528\u62C5\u5FC3"
+    - "\u6CA1\u4E8B\u6CA1\u4E8B"
+  OTHER:
+    en:
+    - Can you turn off the light
+    - I'm watching television
+    zh:
+    - "\u4ECA\u5929\u7684\u65B0\u95FB\u5F88\u6709\u610F\u601D"
+    - "\u6211\u5728\u770B\u7535\u89C6"
+voices:
+  self:
+  - Zira
+  - Huihui
+  proxy:
+  - David
+  - Huihui (emulated, resampling x0.84)
+  tv: David
+platform: Windows
+tts_backend: sapi

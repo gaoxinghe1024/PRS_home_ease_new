@@ -1,0 +1,46 @@
+# HOLD-OUT PROBE for the reply-intent rule (rule_v2): wording that the lexicon author never saw.
+#
+# Written by a reviewer (one person, text only, no ASR, none of these phrases is in config/audio_phrases.yaml: scripts/f3_review_analyses.py asserts it)
+# AFTER the lexicon and the phrase bank were frozen. It is a small, hand-picked probe, not a random sample of replies, and it says nothing about speech
+# recognition errors: it asks only "does the rule read the words correctly".
+#
+# DO NOT TUNE THE LEXICON ON THIS FILE. The moment a cue is added because one of these phrases failed, the probe stops being unseen and the
+# numbers in docs/results.md section 3.2 stop meaning anything. If it is ever used for tuning, write a NEW probe and say so.
+schema_version: 1
+help:  # a call for help or an admission of harm: the rule should say HELP
+  - "I think I've broken my hip"
+  - "My leg gave way and I can't move it"
+  - "Please come quickly"
+  - "I've had a fall in the bathroom"
+  - "I slid off the chair"
+  - "Can somebody come please"
+  - "I'm in a lot of trouble here"
+  - "My back is killing me"
+  - "I can't breathe properly"
+  - "I feel faint"
+  - "Get my son"
+  - "I hit my head on the table"
+  - "I blacked out for a bit"
+  - "Send somebody over"
+  - "I'm bleeding"
+  - "It's my chest, it's tight"
+  - "I need to get to the hospital"
+  - "I tumbled down the stairs"
+  - "Mum! Come quick!"
+  - "I can't feel my arm"
+reassurance:  # the words reassure: the rule should say REASSURANCE (and above all never HELP-silent: HELP is the escalation direction)
+  - "Nothing to be alarmed about"
+  - "I just sat down on the floor, all good"
+  - "All is well here"
+  - "No need to be concerned"
+  - "I'm in one piece"
+  - "I'm quite alright, thank you"
+  - "I'm perfectly OK dear"
+  - "Don't you fret"
+  - "It was just a stumble, nothing broken"
+  - "I'm not injured"
+  - "It's a false alarm"
+  - "I knocked a cup over, that's all"
+  - "Everything is under control"
+  - "Not to worry"
+  - "I'm good, thanks for asking"

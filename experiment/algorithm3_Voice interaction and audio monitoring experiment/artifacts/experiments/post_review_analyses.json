@@ -1,0 +1,502 @@
+{
+  "a2b_two_attempts": {
+    "first": {
+      "help_cutoff": 0.99,
+      "run": "20261008-002335_audio_A2b_sound_model_2b3d962b34",
+      "test_help_recall": 0.06097560975609756,
+      "test_macro_f1": 0.5390516989091055
+    },
+    "second": {
+      "help_cutoff": 0.42,
+      "run": "20261008-003505_audio_A2b_sound_model_01e89411b8",
+      "test_help_recall": 0.6097560975609756,
+      "test_macro_f1": 0.6582450608080377
+    },
+    "status": "completed"
+  },
+  "a6_clip_level": {
+    "enrolled_says_help": {
+      "clips": 450,
+      "eligible_k": 0,
+      "trials": 450,
+      "trials_per_clip": 1.0,
+      "wilson_on_clips": [
+        8.673617379884035e-19,
+        0.008464627306090936
+      ],
+      "wilson_on_trials": [
+        8.673617379884035e-19,
+        0.008464627306090936
+      ]
+    },
+    "household_noise_only": {
+      "clips": 100,
+      "eligible_k": 0,
+      "trials": 15000,
+      "trials_per_clip": 150.0,
+      "wilson_on_clips": [
+        0.0,
+        0.03699480747600191
+      ],
+      "wilson_on_trials": [
+        2.710505431213761e-20,
+        0.0002560410928358508
+      ]
+    },
+    "noise_transcripts": {
+      "clips": 100,
+      "responded": 100,
+      "with_a_transcript": 48
+    },
+    "real_speech": {
+      "eer": 0.0003846153846153846,
+      "eer_resolution": 0.004807692307692308,
+      "far_k_zero_wilson_on_trials": [
+        0.0,
+        0.0007382238537006967
+      ],
+      "far_points": {
+        "far_0.1pct": {
+          "far": {
+            "k": 0,
+            "n": 5200,
+            "rate": 0.0,
+            "wilson95": [
+              0.0,
+              0.0007382238537006967
+            ]
+          },
+          "tar": {
+            "k": 173,
+            "n": 208,
+            "rate": 0.8317307692307693,
+            "wilson95": [
+              0.7749787860010531,
+              0.8764513391490591
+            ]
+          },
+          "threshold": 0.6815605769620666
+        },
+        "far_1pct": {
+          "far": {
+            "k": 0,
+            "n": 5200,
+            "rate": 0.0,
+            "wilson95": [
+              0.0,
+              0.0007382238537006967
+            ]
+          },
+          "tar": {
+            "k": 195,
+            "n": 208,
+            "rate": 0.9375,
+            "wilson95": [
+              0.8960177487024101,
+              0.9631147351912162
+            ]
+          },
+          "threshold": 0.6052210340963134
+        }
+      },
+      "far_zero_wilson_on_probes": [
+        0.0,
+        0.01813430412157008
+      ],
+      "genuine_trials": 208,
+      "impostor_trials": 5200,
+      "probes": 208,
+      "speakers": 26
+    },
+    "run": "20261008-185642_audio_A6_cancel_eligibility_cac405cb21",
+    "silence": {
+      "clips": 20,
+      "eligible_k": 0,
+      "trials": 3000,
+      "trials_per_clip": 150.0,
+      "wilson_on_clips": [
+        0.0,
+        0.16113012549493322
+      ],
+      "wilson_on_trials": [
+        1.0842021724855044e-19,
+        0.0012788956648046956
+      ]
+    },
+    "status": "completed"
+  },
+  "a6_lexicon": {
+    "clips": {
+      "help": {
+        "full": {
+          "HELP": 405,
+          "OTHER": 45,
+          "REASSURANCE": 0,
+          "UNCERTAIN": 0
+        },
+        "n": 450,
+        "without_test_only_cues": {
+          "HELP": 328,
+          "OTHER": 122,
+          "REASSURANCE": 0,
+          "UNCERTAIN": 0
+        }
+      },
+      "replay": {
+        "full": {
+          "HELP": 1,
+          "OTHER": 55,
+          "REASSURANCE": 235,
+          "UNCERTAIN": 9
+        },
+        "n": 300,
+        "without_test_only_cues": {
+          "HELP": 1,
+          "OTHER": 55,
+          "REASSURANCE": 235,
+          "UNCERTAIN": 9
+        }
+      },
+      "self_reas": {
+        "full": {
+          "HELP": 2,
+          "OTHER": 54,
+          "REASSURANCE": 531,
+          "UNCERTAIN": 13
+        },
+        "n": 600,
+        "without_test_only_cues": {
+          "HELP": 2,
+          "OTHER": 54,
+          "REASSURANCE": 531,
+          "UNCERTAIN": 13
+        }
+      },
+      "tv": {
+        "full": {
+          "HELP": 2,
+          "OTHER": 64,
+          "REASSURANCE": 234,
+          "UNCERTAIN": 0
+        },
+        "n": 300,
+        "without_test_only_cues": {
+          "HELP": 2,
+          "OTHER": 64,
+          "REASSURANCE": 234,
+          "UNCERTAIN": 0
+        }
+      },
+      "visitor": {
+        "full": {
+          "HELP": 0,
+          "OTHER": 38,
+          "REASSURANCE": 262,
+          "UNCERTAIN": 0
+        },
+        "n": 300,
+        "without_test_only_cues": {
+          "HELP": 0,
+          "OTHER": 73,
+          "REASSURANCE": 227,
+          "UNCERTAIN": 0
+        }
+      }
+    },
+    "cues_fired": 51,
+    "cues_only_test": 13,
+    "help_phrases_distinct": 14,
+    "run": "20261008-185642_audio_A6_cancel_eligibility_cac405cb21",
+    "saved_intent_equals_rescored": true,
+    "status": "completed"
+  },
+  "a6_resampling": {
+    "dev_threshold": {
+      "bootstrap95": [
+        0.6650936613546142,
+        0.6998383412824402
+      ],
+      "dev_impostor_trials": 32035,
+      "dev_probes": 600,
+      "draws": 500,
+      "eval_far_at_high": 0.00040239713723179513,
+      "eval_far_at_low": 0.0012215627380250922,
+      "independent_dev_probes": 215,
+      "point": 0.6815605769620666,
+      "recomputed_point": 0.6815605769620666
+    },
+    "eval_far": {
+      "draws": 2000,
+      "k": 55,
+      "n": 69583,
+      "rate": 0.0007904229481338833,
+      "speaker_bootstrap95": [
+        0.00039173952519258864,
+        0.0013442247429771995
+      ],
+      "speakers_resampled": 148,
+      "target_inside_speaker_bootstrap": true,
+      "users_resampled": 150,
+      "wilson_on_trials": [
+        0.0006073617543014282,
+        0.001028602709416954
+      ]
+    },
+    "min_speech_s": 1.0,
+    "run": "20261008-185642_audio_A6_cancel_eligibility_cac405cb21",
+    "speech_length": {
+      "dev_median_s": 0.9,
+      "dev_probes": 600,
+      "dev_share_ge_min": 0.35833333333333334,
+      "eval_clips": 600,
+      "eval_median_s": 1.14,
+      "eval_share_ge_min": 0.7783333333333333
+    },
+    "status": "completed"
+  },
+  "asr_determinism": {
+    "clips": 40,
+    "clips_that_differ_default_decoding": 13,
+    "clips_that_differ_temperature_0": 0,
+    "examples_default": [
+      [
+        "Ah, ah, ah, ah...",
+        "EEEEEEEEEEEEEEEEEEEEEEEEEE",
+        "AAAAAAAA!",
+        "Aaaaahhhhhh"
+      ],
+      [
+        "Aaaaah!",
+        "You",
+        "Ah-ah!",
+        "Oh"
+      ],
+      [
+        "Hahahaha",
+        "Oh",
+        "Ha ha ha ha ha ha ha!",
+        "Ha ha ha ha ha ha ha ha ha. Oh."
+      ]
+    ],
+    "input": "ESC-50 DAILY clips of the A3b test pool (5 s, padded), identical samples every call, one process",
+    "model": "faster-whisper-tiny",
+    "repeats": 4,
+    "status": "completed"
+  },
+  "duplicate_effect": {
+    "delta": -0.0010807011901665664,
+    "dropped_by_class": {
+      "ABNORMAL": 3,
+      "DAILY": 10,
+      "IMPACT": 1
+    },
+    "dropped_clips": 14,
+    "macro_f1_all": 0.6772218115241968,
+    "macro_f1_duplicates_out": 0.6761411103340302,
+    "random_drop_deltas": {
+      "max": 0.0022931431902580846,
+      "mean": -0.00026401912328835597,
+      "min": -0.00305192834756296,
+      "n": 8
+    },
+    "status": "completed"
+  },
+  "freesound_overlap": {
+    "clips_in_cross_fold_pairs_by_fold": {
+      "1": 2,
+      "2": 5,
+      "3": 3,
+      "4": 6,
+      "5": 6
+    },
+    "cross_fold_pairs": 11,
+    "help_pairs": 0,
+    "pairs": 14,
+    "status": "completed",
+    "test_fold_clips_with_a_training_sibling": 6,
+    "test_fold_windows": 466
+  },
+  "help_prevalence": {
+    "at_prevalence": [
+      {
+        "precision": 0.5747705136195029,
+        "prevalence": 0.176
+      },
+      {
+        "precision": 0.24985035005075085,
+        "prevalence": 0.05
+      },
+      {
+        "precision": 0.060081485514729346,
+        "prevalence": 0.01
+      },
+      {
+        "precision": 0.006294739368283562,
+        "prevalence": 0.001
+      },
+      {
+        "precision": 0.00063249094104967,
+        "prevalence": 0.0001
+      }
+    ],
+    "false_help_k": 37,
+    "false_help_n": 384,
+    "false_help_rate": 0.09635416666666667,
+    "false_help_wilson95": [
+      0.07071415096638321,
+      0.1299904665888249
+    ],
+    "help_share": 0.1759656652360515,
+    "help_windows": 82,
+    "precision": 0.5747126436781609,
+    "recall": 0.6097560975609756,
+    "run": "20261008-003505_audio_A2b_sound_model_01e89411b8",
+    "status": "completed",
+    "test_windows": 466,
+    "vivae_false_help": {
+      "k": 33,
+      "n": 144,
+      "rate": 0.22916666666666666
+    }
+  },
+  "padding": {
+    "auc_quiet_share_help_vs_esc50_librispeech_non_help": 0.7850420068162004,
+    "auc_quiet_share_pooled": 0.6284129008179642,
+    "auc_quiet_share_within_corpus": {
+      "fsd50k": 0.26535612535612535,
+      "vivae": 0.5092621217863056
+    },
+    "model_probe": {
+      "crop_s": 0.85,
+      "description": "the same fold-5 non-HELP clips as the evaluation window (loudest 2 s) and, cut to their loudest 0.85 s, centred in the same padded 2-s window",
+      "esc50": {
+        "n": 191,
+        "natural_abnormal": 24,
+        "natural_daily": 134,
+        "natural_help": 4,
+        "natural_help_wilson95": [
+          0.008173375673314606,
+          0.052602146597083496
+        ],
+        "natural_impact": 7,
+        "natural_unknown": 22,
+        "padded_short_abnormal": 22,
+        "padded_short_daily": 92,
+        "padded_short_help": 19,
+        "padded_short_help_wilson95": [
+          0.06461141061320144,
+          0.15013533751450842
+        ],
+        "padded_short_impact": 9,
+        "padded_short_unknown": 49
+      },
+      "librispeech": {
+        "n": 30,
+        "natural_abnormal": 0,
+        "natural_daily": 30,
+        "natural_help": 0,
+        "natural_help_wilson95": [
+          0.0,
+          0.113517091390478
+        ],
+        "natural_impact": 0,
+        "natural_unknown": 0,
+        "padded_short_abnormal": 0,
+        "padded_short_daily": 26,
+        "padded_short_help": 0,
+        "padded_short_help_wilson95": [
+          0.0,
+          0.113517091390478
+        ],
+        "padded_short_impact": 0,
+        "padded_short_unknown": 4
+      }
+    },
+    "quiet_share_median": {
+      "esc50": {
+        "all": 0.035,
+        "help": null,
+        "n": 960,
+        "non_help": 0.035
+      },
+      "fsd50k": {
+        "all": 0.505,
+        "help": 0.415,
+        "n": 265,
+        "non_help": 0.655
+      },
+      "librispeech": {
+        "all": 0.0925,
+        "help": null,
+        "n": 156,
+        "non_help": 0.0925
+      },
+      "vivae": {
+        "all": 0.6,
+        "help": 0.6,
+        "n": 1001,
+        "non_help": 0.5974999999999999
+      }
+    },
+    "status": "completed",
+    "windows": 2382
+  },
+  "piper_determinism": {
+    "default_sampling": {
+      "bit_identical": false,
+      "same_length": false,
+      "samples": [
+        18391,
+        18205
+      ]
+    },
+    "deterministic": {
+      "bit_identical": true,
+      "same_length": true,
+      "samples": [
+        18205,
+        18205
+      ]
+    },
+    "speaker": 5,
+    "status": "completed",
+    "text": "I am fine, do not worry."
+  },
+  "unseen_phrases": {
+    "bank_entries": 312,
+    "cross_split_near_duplicate_pairs_by_jaccard": {
+      "0.5": 9,
+      "0.6": 0,
+      "0.8": 0
+    },
+    "help_missed": [
+      "I think I've broken my hip",
+      "Please come quickly",
+      "I slid off the chair",
+      "Can somebody come please",
+      "I'm in a lot of trouble here",
+      "My back is killing me",
+      "I feel faint",
+      "Get my son",
+      "I hit my head on the table",
+      "I blacked out for a bit",
+      "Send somebody over",
+      "It's my chest, it's tight",
+      "I tumbled down the stairs",
+      "Mum! Come quick!"
+    ],
+    "help_phrases": 20,
+    "help_read_as_help": 6,
+    "help_read_as_help_wilson95": [
+      0.14547527396899385,
+      0.5189767762289793
+    ],
+    "reassurance_phrases": 15,
+    "reassurance_read_as_help": 1,
+    "reassurance_read_as_help_phrases": [
+      "I just sat down on the floor, all good"
+    ],
+    "reassurance_read_as_reassurance": 6,
+    "status": "completed"
+  }
+}

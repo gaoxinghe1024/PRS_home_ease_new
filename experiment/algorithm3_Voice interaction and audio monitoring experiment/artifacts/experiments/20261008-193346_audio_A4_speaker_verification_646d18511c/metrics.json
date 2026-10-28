@@ -1,0 +1,101 @@
+{
+  "status": "completed",
+  "suite": "audio",
+  "name": "A4_speaker_verification",
+  "data_source": "LibriSpeech dev-clean-2 (real read speech, 26 speakers), speaker-disjoint dev/eval halves",
+  "headline": "voxceleb_resnet34_LM/clean: EER 0.007; voxceleb_resnet34_LM/noise_5dB: EER 0.022; voxceleb_resnet34_LM/replay_sim: EER 0.022; cnceleb_resnet34_LM/clean: EER 0.026; cnceleb_resnet34_LM/noise_5dB: EER 0.086; cnceleb_resnet34_LM/replay_sim: EER 0.082",
+  "missing": [],
+  "metrics": {
+    "entries": [
+      {
+        "config": "voxceleb_resnet34_LM",
+        "condition": "clean",
+        "eer_eval": 0.00746268656716419,
+        "tar_at_dev_far0.1pct_threshold": 0.996268656716418,
+        "far_eval_at_that_threshold": 0.017723880597014924,
+        "genuine_trials_eval": 268,
+        "impostor_trials_eval": 3216,
+        "far_0.1pct_reliable": false
+      },
+      {
+        "config": "voxceleb_resnet34_LM",
+        "condition": "noise_5dB",
+        "eer_eval": 0.02238805970149251,
+        "tar_at_dev_far0.1pct_threshold": 0.9738805970149254,
+        "far_eval_at_that_threshold": 0.018656716417910446,
+        "genuine_trials_eval": 268,
+        "impostor_trials_eval": 3216,
+        "far_0.1pct_reliable": false
+      },
+      {
+        "config": "voxceleb_resnet34_LM",
+        "condition": "replay_sim",
+        "eer_eval": 0.02238805970149251,
+        "tar_at_dev_far0.1pct_threshold": 0.9813432835820896,
+        "far_eval_at_that_threshold": 0.02736318407960199,
+        "genuine_trials_eval": 268,
+        "impostor_trials_eval": 3216,
+        "far_0.1pct_reliable": false
+      },
+      {
+        "config": "cnceleb_resnet34_LM",
+        "condition": "clean",
+        "eer_eval": 0.025808457711442793,
+        "tar_at_dev_far0.1pct_threshold": 0.9440298507462687,
+        "far_eval_at_that_threshold": 0.002798507462686567,
+        "genuine_trials_eval": 268,
+        "impostor_trials_eval": 3216,
+        "far_0.1pct_reliable": false
+      },
+      {
+        "config": "cnceleb_resnet34_LM",
+        "condition": "noise_5dB",
+        "eer_eval": 0.08582089552238804,
+        "tar_at_dev_far0.1pct_threshold": 0.7425373134328358,
+        "far_eval_at_that_threshold": 0.007462686567164179,
+        "genuine_trials_eval": 268,
+        "impostor_trials_eval": 3216,
+        "far_0.1pct_reliable": false
+      },
+      {
+        "config": "cnceleb_resnet34_LM",
+        "condition": "replay_sim",
+        "eer_eval": 0.08208955223880599,
+        "tar_at_dev_far0.1pct_threshold": 0.7014925373134329,
+        "far_eval_at_that_threshold": 0.011194029850746268,
+        "genuine_trials_eval": 268,
+        "impostor_trials_eval": 3216,
+        "far_0.1pct_reliable": false
+      }
+    ],
+    "dev_speakers": 13,
+    "eval_speakers": 13
+  },
+  "provenance": {
+    "run_id": "20261008-193346_audio_A4_speaker_verification_646d18511c",
+    "suite": "audio",
+    "name": "A4_speaker_verification",
+    "config_hash": "646d18511c",
+    "code_version": "e5355595d10b",
+    "split_hash": null,
+    "seed": 42,
+    "data_source": "LibriSpeech dev-clean-2 (real read speech, 26 speakers), speaker-disjoint dev/eval halves",
+    "started_at": "2026-10-08T11:33:46Z",
+    "versions": {
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.22631-SP0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "torch": "2.14.1",
+      "mediapipe": "1.0.1",
+      "opencv-python": "5.0.0.93",
+      "onnxruntime": "1.30.0",
+      "faster-whisper": "1.2.1",
+      "silero-vad": "6.2.3"
+    },
+    "device": "AMD64",
+    "finished_at": "2026-10-08T11:41:52Z",
+    "seconds": 485.8
+  }
+}

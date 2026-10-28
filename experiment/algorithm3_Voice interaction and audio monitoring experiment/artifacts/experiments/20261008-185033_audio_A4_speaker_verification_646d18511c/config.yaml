@@ -1,0 +1,3 @@
+seed: 42
+enroll_utts: 3
+max_trials_per_speaker: 25

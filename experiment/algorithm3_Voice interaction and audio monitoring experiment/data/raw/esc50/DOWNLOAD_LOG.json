@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "dataset": "esc50",
+    "license": "CC BY-NC 3.0",
+    "source": "https://github.com/karolpiczak/ESC-50/archive/refs/heads/master.zip"
+  },
+  "accessed_at": "2026-10-07T14:12:20Z",
+  "files": [
+    {
+      "url": "https://github.com/karolpiczak/ESC-50/archive/refs/heads/master.zip",
+      "path": "data/raw/esc50/ESC-50-master.zip",
+      "status": "downloaded",
+      "bytes": 645695005
+    }
+  ]
+}
